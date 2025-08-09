@@ -31,53 +31,85 @@
     form.reset();
   });
 })();
-<section id="kpis" class="kpis">
-  <h2>Key Numbers</h2>
-  <form id="kpiForm" class="kpi-form" autocomplete="off">
-    <div class="grid">
-      <label>Volume (kg)
-        <input type="text" inputmode="decimal" name="volumeKg" required placeholder="e.g. 1200">
-      </label>
-      <label>Sell price / kg
-        <input type="text" inputmode="decimal" name="sellPrice" required placeholder="e.g. 14,50">
-      </label>
-      <label>Raw cost / kg
-        <input type="text" inputmode="decimal" name="rawCost" required placeholder="e.g. 9,20">
-      </label>
-      <label>Processing + pack / kg
-        <input type="text" inputmode="decimal" name="procCost" required placeholder="e.g. 1,30">
-      </label>
-      <label>Freight / kg
-        <input type="text" inputmode="decimal" name="freight" value="0" required placeholder="0">
-      </label>
-      <label>Yield loss (%)
-        <input type="text" inputmode="decimal" name="wastePct" value="0" required placeholder="0 = no loss">
-      </label>
-    </div>
+// --- KPI Calculator + optional POST ---
+// Paste this AFTER your existing script's closing "})();"
+(function () {
+  const form = document.getElementById('kpiForm');
+  if (!form) return;
 
-    <details class="webhook-details">
-      <summary>Optional: post results to a webhook</summary>
-      <label>Webhook URL (POST)
-        <input type="url" name="webhookUrl" placeholder="https://your-endpoint.example/receive">
-      </label>
-    </details>
+  const out = {
+    netKg: document.getElementById('r_netKg'),
+    revenue: document.getElementById('r_revenue'),
+    totalCost: document.getElementById('r_totalCost'),
+    profit: document.getElementById('r_profit'),
+    marginPct: document.getElementById('r_marginPct'),
+    profitPerKg: document.getElementById('r_profitPerKg'),
+    panel: document.getElementById('kpiResults'),
+    status: document.getElementById('postStatus')
+  };
 
-    <div class="cta-row">
-      <button class="btn primary" type="submit">Calculate</button>
-      <button class="btn" type="reset">Reset</button>
-    </div>
-  </form>
+  // ---- Formatting & parsing ----
+  // Locale/currency for display (change if you want a different currency)
+  const locale = 'is-IS';
+  const currency = 'ISK';
 
-  <div id="kpiResults" class="kpi-results" hidden>
-    <h3>Results</h3>
-    <ul class="cards">
-      <li class="card"><h4>Net saleable kg</h4><p id="r_netKg">–</p></li>
-      <li class="card"><h4>Revenue</h4><p id="r_revenue">–</p></li>
-      <li class="card"><h4>Total cost</h4><p id="r_totalCost">–</p></li>
-      <li class="card"><h4>Profit</h4><p id="r_profit">–</p></li>
-      <li class="card"><h4>Gross margin %</h4><p id="r_marginPct">–</p></li>
-      <li class="card"><h4>Profit / kg</h4><p id="r_profitPerKg">–</p></li>
-    </ul>
-    <p id="postStatus" class="hint"></p>
-  </div>
-</section>
+  const fmtNumber   = n => new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(n);
+  const fmtCurrency = n => new Intl.NumberFormat(locale, { style: 'currency', currency, maximumFractionDigits: 2 }).format(n);
+
+  // Accept both "14,5" and "14.5"
+  const num = v => Number(String(v).replace(',', '.')) || 0;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    out.status.textContent = '';
+
+    const data = Object.fromEntries(new FormData(form).entries());
+
+    const volumeKg   = num(data.volumeKg);
+    const sellPrice  = num(data.sellPrice);   // per kg
+    const rawCost    = num(data.rawCost);     // per kg
+    const procCost   = num(data.procCost);    // per kg
+    const freight    = num(data.freight);     // per kg
+    const wastePct   = num(data.wastePct);    // percent
+    const webhookUrl = (data.webhookUrl || '').trim();
+
+    // ---- Calculations ----
+    const netKg = volumeKg * (1 - wastePct / 100);
+    const revenue = netKg * sellPrice;
+    const totalCostPerKg = rawCost + procCost + freight;
+    const totalCost = netKg * totalCostPerKg;
+    const profit = revenue - totalCost;
+    const marginPct = revenue > 0 ? (profit / revenue) * 100 : 0;
+    const profitPerKg = netKg > 0 ? profit / netKg : 0;
+
+    // ---- Show results ----
+    out.netKg.textContent       = fmtNumber(netKg) + ' kg';
+    out.revenue.textContent     = fmtCurrency(revenue);
+    out.totalCost.textContent   = fmtCurrency(totalCost);
+    out.profit.textContent      = fmtCurrency(profit);
+    out.marginPct.textContent   = fmtNumber(marginPct) + ' %';
+    out.profitPerKg.textContent = fmtCurrency(profitPerKg) + ' / kg';
+    out.panel.hidden = false;
+
+    // ---- Optional POST to webhook ----
+    if (webhookUrl) {
+      try {
+        const payload = {
+          timestamp: new Date().toISOString(),
+          inputs: { volumeKg, sellPrice, rawCost, procCost, freight, wastePct },
+          results: { netKg, revenue, totalCost, profit, marginPct, profitPerKg },
+          locale, currency
+        };
+        const res = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        out.status.textContent = 'Posted results successfully.';
+      } catch (err) {
+        out.status.textContent = 'Could not post results: ' + err.message;
+      }
+    }
+  });
+})();
