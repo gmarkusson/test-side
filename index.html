@@ -111,23 +111,31 @@
 
       <form id="kpiForm" class="kpi-form" autocomplete="off" novalidate>
         <div class="grid">
-          <label for="volumeKg">Volume (kg)</label>
-          <input type="text" inputmode="decimal" id="volumeKg" name="volumeKg" required placeholder="e.g. 1200">
+  <label>Volume (kg)
+    <input type="text" inputmode="decimal" name="volumeKg" id="volumeKg" required placeholder="e.g. 1200">
+  </label>
 
-          <label for="sellPrice">Sell price / kg</label>
-          <input type="text" inputmode="decimal" id="sellPrice" name="sellPrice" required placeholder="e.g. 14,50">
+  <label>Sell price / kg
+    <input type="text" inputmode="decimal" name="sellPrice" id="sellPrice" required placeholder="e.g. 14,50">
+  </label>
 
-          <label for="rawCost">Raw cost / kg</label>
-          <input type="text" inputmode="decimal" id="rawCost" name="rawCost" required placeholder="e.g. 9,20">
+  <label>Raw cost / kg
+    <input type="text" inputmode="decimal" name="rawCost" id="rawCost" required placeholder="e.g. 9,20">
+  </label>
 
-          <label for="procCost">Processing + pack / kg</label>
-          <input type="text" inputmode="decimal" id="procCost" name="procCost" required placeholder="e.g. 1,30">
+  <label>Processing + pack / kg
+    <input type="text" inputmode="decimal" name="procCost" id="procCost" required placeholder="e.g. 1,30">
+  </label>
 
-          <label for="freight">Freight / kg</label>
-          <input type="text" inputmode="decimal" id="freight" name="freight" value="0" required placeholder="0">
+  <label>Freight / kg
+    <input type="text" inputmode="decimal" name="freight" id="freight" value="0" required placeholder="0">
+  </label>
 
-          <label for="wastePct">Yield loss (%)</label>
-          <input type="text" inputmode="decimal" id="wastePct" name="wastePct" value="0" required placeholder="0 = no loss">
+  <label>Yield loss (%)
+    <input type="text" inputmode="decimal" name="wastePct" id="wastePct" value="0" required placeholder="0 = no loss">
+  </label>
+</div>
+
         </div>
 
         <details class="webhook-details">
