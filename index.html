@@ -27,7 +27,7 @@
       <a href="#about">About</a>
       <a href="#kpis">Key Numbers</a>
       <a href="#factory">Factory Day</a>
-      <a href="#network">Factory Network</a>
+      <a href="#network">Factory Network (3 factories)</a>
       <a href="#contact">Contact</a>
     </nav>
   </header>
@@ -158,7 +158,7 @@
       </div>
     </section>
 
-    <!-- Factory Day (single site, simple) -->
+    <!-- Factory Day (single site quick calc) -->
     <section id="factory" class="kpis">
       <h2>Factory Day</h2>
       <p class="hint">Quick single-site day calculator. Fixed costs (ISK/month) convert to EUR/day using working days for the month.</p>
@@ -294,10 +294,14 @@
       </div>
     </section>
 
-    <!-- Factory Network (two sites, three productions) -->
+    <!-- Factory Network: 3 factories -->
     <section id="network" class="kpis">
-      <h2>Factory Network</h2>
-      <p class="hint">Two sites: Factory A (Salmon + Whitefish, shared Factory A fixed costs) and Factory B (Smokehouse, pays its own rent). Administration is shared across all productions. Fixed costs are ISK/month and converted to EUR/day using working days in the selected month.</p>
+      <h2>Factory Network (3 factories)</h2>
+      <p class="hint">
+        Salmon Factory and Whitefish Factory share <strong>Building A</strong> (housing + equipment) allocated by produced kg.
+        Smokehouse is in <strong>Building B</strong> and pays its own rent. Administration is shared across all three.
+        Enter fixed costs in <strong>ISK / month</strong>; they convert to <strong>EUR / day</strong> using auto-calculated working days for the selected month.
+      </p>
 
       <form id="netForm" class="kpi-form" autocomplete="off" novalidate>
         <div class="grid">
@@ -313,15 +317,15 @@
           </label>
 
           <!-- Fixed costs (ISK/month) -->
-          <label>Factory A — Housing (ISK / month)
-            <input type="text" inputmode="decimal" name="faHousingIsk" value="600000">
+          <label>Building A — Housing (ISK / month)
+            <input type="text" inputmode="decimal" name="bA_housing" value="600000">
           </label>
-          <label>Factory A — Equipment rent (ISK / month)
-            <input type="text" inputmode="decimal" name="faEquipIsk" value="350000">
+          <label>Building A — Equipment (ISK / month)
+            <input type="text" inputmode="decimal" name="bA_equip" value="350000">
           </label>
 
-          <label>Factory B — Smokehouse rent (ISK / month)
-            <input type="text" inputmode="decimal" name="fbRentIsk" value="400000">
+          <label>Building B — Smokehouse rent (ISK / month)
+            <input type="text" inputmode="decimal" name="bB_rent" value="400000">
           </label>
 
           <label>Administration (ISK / month) — shared
@@ -329,7 +333,8 @@
           </label>
         </div>
 
-        <h3>Factory A — Salmon</h3>
+        <!-- Salmon Factory -->
+        <h3>Salmon Factory</h3>
         <div class="grid">
           <label>Staff — people
             <input type="text" inputmode="numeric" name="sal_staffCount" value="12">
@@ -386,7 +391,8 @@
           </label>
         </div>
 
-        <h3>Factory A — Whitefish</h3>
+        <!-- Whitefish Factory -->
+        <h3>Whitefish Factory</h3>
         <div class="grid">
           <label>Staff — people
             <input type="text" inputmode="numeric" name="wh_staffCount" value="8">
@@ -443,7 +449,8 @@
           </label>
         </div>
 
-        <h3>Factory B — Smokehouse</h3>
+        <!-- Smokehouse (Factory B) -->
+        <h3>Smokehouse (Building B)</h3>
         <div class="grid">
           <label>Staff — people
             <input type="text" inputmode="numeric" name="sm_staffCount" value="6">
@@ -516,18 +523,18 @@
           <li class="card"><h4>Cost / kg</h4><p id="n_costPerKg">–</p></li>
         </ul>
 
-        <h4>Per production</h4>
+        <h4>Per factory</h4>
         <ul class="cards">
-          <li class="card"><h4>Salmon</h4><p id="n_salmon">–</p></li>
-          <li class="card"><h4>Whitefish</h4><p id="n_whitefish">–</p></li>
+          <li class="card"><h4>Salmon Factory</h4><p id="n_salmon">–</p></li>
+          <li class="card"><h4>Whitefish Factory</h4><p id="n_whitefish">–</p></li>
           <li class="card"><h4>Smokehouse</h4><p id="n_smoke">–</p></li>
         </ul>
 
         <h4>Fixed costs (EUR/day)</h4>
         <ul class="cards">
-          <li class="card"><h4>Factory A — Housing</h4><p id="n_fa_housing">–</p></li>
-          <li class="card"><h4>Factory A — Equipment</h4><p id="n_fa_equip">–</p></li>
-          <li class="card"><h4>Factory B — Rent</h4><p id="n_fb_rent">–</p></li>
+          <li class="card"><h4>Building A — Housing</h4><p id="n_bA_housing">–</p></li>
+          <li class="card"><h4>Building A — Equipment</h4><p id="n_bA_equip">–</p></li>
+          <li class="card"><h4>Building B — Rent</h4><p id="n_bB_rent">–</p></li>
           <li class="card"><h4>Administration</h4><p id="n_admin">–</p></li>
         </ul>
       </div>
@@ -561,7 +568,7 @@
         <a href="#about">About</a>
         <a href="#kpis">Key Numbers</a>
         <a href="#factory">Factory Day</a>
-        <a href="#network">Factory Network</a>
+        <a href="#network">Factory Network (3 factories)</a>
         <a href="#contact">Contact</a>
       </nav>
     </div>
