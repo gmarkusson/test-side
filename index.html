@@ -12,7 +12,7 @@
   <link rel="preload" href="styles.css" as="style">
   <link rel="stylesheet" href="styles.css">
 
-  <!-- Automatically add a cache-busting query string to script.js -->
+  <!-- Auto cache-buster for script.js -->
   <script>
     document.write('<script defer src="script.js?v=' + Date.now() + '"><\/script>');
   </script>
@@ -30,6 +30,8 @@
       <a href="#features">Features</a>
       <a href="#about">About</a>
       <a href="#kpis">Key Numbers</a>
+      <a href="#factory">Factory Day</a>
+      <a href="#factory-advanced">Factory Day (Multi-species)</a>
       <a href="#contact">Contact</a>
     </nav>
   </header>
@@ -90,7 +92,7 @@
       </div>
     </section>
 
-    <!-- Key Numbers -->
+    <!-- Key Numbers (existing calculator) -->
     <section id="kpis" class="kpis">
       <h2>Key Numbers</h2>
 
@@ -110,86 +112,20 @@
       <form id="kpiForm" class="kpi-form" autocomplete="off" novalidate>
         <div class="grid">
           <label>Volume (kg)
-            <input type="text" inputmode="decimal" name="volumeKg" id="volumeKg" required placeholder="e.g. 1200">
+            <input type="text" inputmode="decimal" name="volumeKg" required placeholder="e.g. 1200">
           </label>
 
           <label>Sell price / kg
-            <input type="text" inputmode="decimal" name="sellPrice" id="sellPrice" required placeholder="e.g. 14,50">
+            <input type="text" inputmode="decimal" name="sellPrice" required placeholder="e.g. 14,50">
           </label>
 
           <label>Raw cost / kg
-            <input type="text" inputmode="decimal" name="rawCost" id="rawCost" required placeholder="e.g. 9,20">
+            <input type="text" inputmode="decimal" name="rawCost" required placeholder="e.g. 9,20">
           </label>
 
           <label>Processing + pack / kg
-            <input type="text" inputmode="decimal" name="procCost" id="procCost" required placeholder="e.g. 1,30">
+            <input type="text" inputmode="decimal" name="procCost" required placeholder="e.g. 1,30">
           </label>
 
           <label>Freight / kg
-            <input type="text" inputmode="decimal" name="freight" id="freight" value="0" required placeholder="0">
-          </label>
-
-          <label>Yield (%)
-            <input type="text" inputmode="decimal" name="yieldPct" id="yieldPct" value="100" required placeholder="100 = no loss">
-          </label>
-        </div>
-
-        <details class="webhook-details">
-          <summary>Optional: post results to a webhook</summary>
-          <label for="webhookUrl">Webhook URL (POST)</label>
-          <input type="url" id="webhookUrl" name="webhookUrl" placeholder="https://your-endpoint.example/receive">
-        </details>
-
-        <div class="cta-row">
-          <button class="btn primary" type="submit">Calculate</button>
-          <button class="btn" type="reset">Reset</button>
-        </div>
-      </form>
-
-      <div id="kpiResults" class="kpi-results" hidden>
-        <h3>Results</h3>
-        <ul class="cards">
-          <li class="card"><h4>Net saleable kg</h4><p id="r_netKg">–</p></li>
-          <li class="card"><h4>Revenue</h4><p id="r_revenue">–</p></li>
-          <li class="card"><h4>Total cost</h4><p id="r_totalCost">–</p></li>
-          <li class="card"><h4>Profit</h4><p id="r_profit">–</p></li>
-          <li class="card"><h4>Gross margin %</h4><p id="r_marginPct">–</p></li>
-          <li class="card"><h4>Profit / kg</h4><p id="r_profitPerKg">–</p></li>
-        </ul>
-        <p id="postStatus" class="hint"></p>
-      </div>
-    </section>
-
-    <!-- Contact -->
-    <section id="contact" class="contact">
-      <h2>Contact</h2>
-      <p>Have questions? Reach out to us anytime.</p>
-      <form class="contact-form" autocomplete="off" novalidate>
-        <label for="c_name">Your name</label>
-        <input id="c_name" type="text" name="name" required>
-
-        <label for="c_email">Your email</label>
-        <input id="c_email" type="email" name="email" required>
-
-        <label for="c_msg">Message</label>
-        <textarea id="c_msg" name="message" rows="4" required></textarea>
-
-        <button class="btn primary" type="submit">Send</button>
-      </form>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <p>&copy; 2025 Premium Starter Site. All rights reserved.</p>
-      <nav class="footer-nav" aria-label="Footer">
-        <a href="#home">Home</a>
-        <a href="#features">Features</a>
-        <a href="#about">About</a>
-        <a href="#kpis">Key Numbers</a>
-        <a href="#contact">Contact</a>
-      </nav>
-    </div>
-  </footer>
-</body>
-</html>
+            <input type="text" inputmode="decimal" name="freight" value="0" required placeholder="0">
