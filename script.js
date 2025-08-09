@@ -1,4 +1,4 @@
-// Helpers
+// -------- Helpers & formatting --------
 const $ = (sel, root = document) => root.querySelector(sel);
 
 const CURRENCY_MAP = {
@@ -25,7 +25,7 @@ function parseNum(v) {
   return Number.isFinite(n) ? n : NaN;
 }
 
-function fmtCurrency(val, currency) {
+function fmtCurrency(val, currency='EUR') {
   const cfg = CURRENCY_MAP[currency] || CURRENCY_MAP.EUR;
   return new Intl.NumberFormat(cfg.locale, {
     style: 'currency',
@@ -35,17 +35,94 @@ function fmtCurrency(val, currency) {
   }).format(val);
 }
 
-function fmtNumber(val, digits = 2) {
+function fmtNumber(val, digits = 1) {
   return new Intl.NumberFormat(undefined, {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits
   }).format(val);
 }
 
-// Shared UI
+// -------- Iceland working days (weekends + public holidays) --------
+
+// Easter Sunday (Anonymous Gregorian algorithm)
+function easterSunday(year) {
+  const a = year % 19;
+  const b = Math.floor(year / 100);
+  const c = year % 100;
+  const d = Math.floor(b / 4);
+  const e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4);
+  const k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31); // 3=March, 4=April
+  const day = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(Date.UTC(year, month - 1, day));
+}
+function addDays(d, n) {
+  const x = new Date(d.getTime());
+  x.setUTCDate(x.getUTCDate() + n);
+  return x;
+}
+function firstThursdayAfterApril18(year) {
+  // First Day of Summer (Sumardagurinn fyrsti) = first Thursday after April 18
+  const start = new Date(Date.UTC(year, 3, 19)); // Apr 19
+  for (let i = 0; i < 10; i++) {
+    const d = addDays(start, i);
+    if (d.getUTCDay() === 4) return d; // 4 = Thursday
+  }
+  return addDays(start, 7);
+}
+function firstMondayInAugust(year) {
+  const d = new Date(Date.UTC(year, 7, 1)); // Aug 1
+  const day = d.getUTCDay();
+  const offset = (8 - day) % 7; // to Monday
+  return addDays(d, offset === 0 ? 0 : offset);
+}
+function icelandPublicHolidays(year) {
+  const easter = easterSunday(year);
+  return [
+    new Date(Date.UTC(year, 0, 1)),                       // New Year's Day
+    addDays(easter, -3),                                  // Maundy Thursday
+    addDays(easter, -2),                                  // Good Friday
+    addDays(easter, 1),                                   // Easter Monday
+    firstThursdayAfterApril18(year),                      // First Day of Summer
+    new Date(Date.UTC(year, 4, 1)),                       // Labour Day (May 1)
+    addDays(easter, 39),                                  // Ascension Day
+    addDays(easter, 50),                                  // Whit Monday (Pentecost Mon)
+    firstMondayInAugust(year),                            // Commerce Day
+    new Date(Date.UTC(year, 5, 17)),                      // National Day (June 17)
+    new Date(Date.UTC(year, 11, 25)),                     // Christmas Day
+    new Date(Date.UTC(year, 11, 26)),                     // Second Day of Christmas
+    // Note: We do not count half-days (Dec 24 & Dec 31 afternoon).
+  ];
+}
+function isSameDateUTC(a, b) {
+  return a.getUTCFullYear() === b.getUTCFullYear() &&
+         a.getUTCMonth() === b.getUTCMonth() &&
+         a.getUTCDate() === b.getUTCDate();
+}
+function workingDaysInMonth(year, monthIndex /*0-11*/) {
+  const holidays = icelandPublicHolidays(year);
+  const first = new Date(Date.UTC(year, monthIndex, 1));
+  const last = new Date(Date.UTC(year, monthIndex + 1, 0));
+  let count = 0;
+  for (let d = new Date(first); d <= last; d = addDays(d, 1)) {
+    const dow = d.getUTCDay(); // 0 Sun .. 6 Sat
+    if (dow === 0 || dow === 6) continue; // weekends
+    if (holidays.some(h => isSameDateUTC(h, d))) continue; // public holiday
+    count++;
+  }
+  return count;
+}
+
+// -------- Shared currency control --------
 const currencySel = $('#currencySelect');
 
-// ---------------- Calculator 1: Key Numbers ----------------
+// ================= Calculator 1: Key Numbers =================
 const form1 = $('#kpiForm');
 const res1 = $('#kpiResults');
 const postStatus = $('#postStatus');
@@ -70,7 +147,7 @@ const out1 = {
 };
 
 function calculateKPI() {
-  const currency = currencySel.value;
+  const currency = currencySel.value || 'EUR';
 
   const volumeKg = parseNum(f1.volumeKg.value);
   const sell     = parseNum(f1.sellPrice.value);
@@ -98,12 +175,10 @@ function calculateKPI() {
   out1.profitPerKg.textContent = fmtCurrency(profitPerKg, currency) + ' /kg';
 
   res1.hidden = false;
-
-  return { currency, netKg, revenue, totalCost, profit, marginPct, profitPerKg,
-           inputs: { volumeKg, sell, raw, proc, freight, yieldPct } };
+  return { currency, netKg, revenue, totalCost, profit, marginPct, profitPerKg };
 }
 
-// Optional webhook for calc 1
+// optional webhook
 async function postWebhook(payload) {
   const url = (f1.webhook?.value || '').trim();
   if (!url) return;
@@ -120,379 +195,276 @@ async function postWebhook(payload) {
   }
 }
 
-form1?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  try { const r = calculateKPI(); await postWebhook(r); } catch (err) { alert(err.message || String(err)); }
-});
-form1?.addEventListener('reset', () => {
-  setTimeout(() => {
-    res1.hidden = true;
-    postStatus.textContent = '';
-    Object.values(out1).forEach(el => el.textContent = '–');
-  }, 0);
-});
+form1?.addEventListener('submit', async (e) => { e.preventDefault(); try { const r = calculateKPI(); await postWebhook(r); } catch (err) { alert(err.message || String(err)); }});
+form1?.addEventListener('reset', () => { setTimeout(() => { res1.hidden = true; postStatus.textContent = ''; Object.values(out1).forEach(el => el.textContent='–'); }, 0); });
+
+// Currency change re-runs visible calcs
 currencySel?.addEventListener('change', () => {
-  if (!res1.hidden) { try { calculateKPI(); } catch {} }
-  if (!$('#dayResults').hidden) { try { calculateDay(); } catch {} }
-  if (!$('#advResults').hidden) { try { calculateAdvanced(); } catch {} }
+  if (!res1.hidden) try { calculateKPI(); } catch {}
+  if (!$('#dayResults').hidden) try { calculateDay(); } catch {}
+  if (!$('#netResults').hidden) try { calculateNetwork(); } catch {}
 });
 
-// ---------------- Calculator 2: Factory Day (single-batch) ----------------
+// ================= Calculator 2: Factory Day (simple) =================
 const form2 = $('#dayForm');
 const res2 = $('#dayResults');
 
-const f2 = {
-  staffCount:          $('input[name="staffCount"]', form2),
-  staffCostPerPerson:  $('input[name="staffCostPerPerson"]', form2),
-  supCount:            $('input[name="supCount"]', form2),
-  supCostPerPerson:    $('input[name="supCostPerPerson"]', form2),
-  rawName:             $('input[name="rawName"]', form2),
-  rawUsedKg:           $('input[name="rawUsedKg"]', form2),
-  rawCostPerKg:        $('input[name="rawCostPerKg"]', form2),
-  packCostPerKg:       $('input[name="packCostPerKg"]', form2),
-  productName:         $('input[name="productName"]', form2),
-  producedKg:          $('input[name="producedKg"]', form2),
-  sellPriceDay:        $('input[name="sellPriceDay"]', form2),
-  housingCost:         $('input[name="housingCost"]', form2),
-  adminCost:           $('input[name="adminCost"]', form2),
-  elecKwh:             $('input[name="elecKwh"]', form2),
-  elecCostPerKwh:      $('input[name="elecCostPerKwh"]', form2),
-  waterM3:             $('input[name="waterM3"]', form2),
-  waterCostPerM3:      $('input[name="waterCostPerM3"]', form2),
-  freightPerKg:        $('input[name="freightPerKg"]', form2),
-  maintenanceCost:     $('input[name="maintenanceCost"]', form2),
-  deprCost:            $('input[name="deprCost"]', form2),
-  otherCost:           $('input[name="otherCost"]', form2)
-};
+function eurPerDayFromIskMonthly(isk, rate, workDays) {
+  if (!(rate > 0 && workDays > 0)) return 0;
+  return (isk * rate) / workDays;
+}
+function laborCost(people, dayH, dayRate, otH, otRate) {
+  const d = people * dayH * dayRate;
+  const o = people * otH * otRate;
+  return { day: d, ot: o, total: d + o };
+}
 
-const out2 = {
-  yieldPct:   $('#d_yieldPct'),
-  revenue:    $('#d_revenue'),
-  totalCost:  $('#d_totalCost'),
-  profit:     $('#d_profit'),
-  marginPct:  $('#d_marginPct'),
-  costPerKg:  $('#d_costPerKg'),
-  laborFloor: $('#d_laborFloor'),
-  laborSup:   $('#d_laborSup'),
-  rawCost:    $('#d_rawCost'),
-  packCost:   $('#d_packCost'),
-  freight:    $('#d_freightCost'),
-  utilities:  $('#d_utilities'),
-  housing:    $('#d_housing'),
-  admin:      $('#d_admin'),
-  maint:      $('#d_maint'),
-  depr:       $('#d_depr'),
-  other:      $('#d_other')
-};
+function initMonthAuto(inputId, outputId) {
+  const m = $(inputId);
+  const o = $(outputId);
+  const now = new Date();
+  const ym = `${now.getUTCFullYear()}-${String(now.getUTCMonth()+1).padStart(2,'0')}`;
+  m.value = ym;
+  const update = () => {
+    const [yy, mm] = (m.value || ym).split('-').map(Number);
+    o.value = workingDaysInMonth(yy, mm - 1);
+  };
+  m.addEventListener('change', update);
+  update();
+}
+initMonthAuto('#dayMonth', '#dayWorkDays');
 
 function calculateDay() {
-  const currency = currencySel.value;
+  const currency = 'EUR';
 
-  const staffCount         = parseNum(f2.staffCount.value);
-  const staffCostPerPerson = parseNum(f2.staffCostPerPerson.value);
-  const supCount           = parseNum(f2.supCount.value);
-  const supCostPerPerson   = parseNum(f2.supCostPerPerson.value);
-  const rawUsedKg          = parseNum(f2.rawUsedKg.value);
-  const rawCostPerKg       = parseNum(f2.rawCostPerKg.value);
-  const packCostPerKg      = parseNum(f2.packCostPerKg.value);
-  const producedKg         = parseNum(f2.producedKg.value);
-  const sellPriceDay       = parseNum(f2.sellPriceDay.value);
-  const housingCost        = parseNum(f2.housingCost.value || 0);
-  const adminCost          = parseNum(f2.adminCost.value || 0);
-  const elecKwh            = parseNum(f2.elecKwh.value || 0);
-  const elecCostPerKwh     = parseNum(f2.elecCostPerKwh.value || 0);
-  const waterM3            = parseNum(f2.waterM3.value || 0);
-  const waterCostPerM3     = parseNum(f2.waterCostPerM3.value || 0);
-  const freightPerKg       = parseNum(f2.freightPerKg.value || 0);
-  const maintenanceCost    = parseNum(f2.maintenanceCost.value || 0);
-  const deprCost           = parseNum(f2.deprCost.value || 0);
-  const otherCost          = parseNum(f2.otherCost.value || 0);
+  // Month / FX / workdays
+  const [yy, mm] = ($('#dayMonth').value).split('-').map(Number);
+  const workDays = parseNum($('#dayWorkDays').value);
+  const rate     = parseNum(form2.elements.iskToEur.value);
 
-  const required = { staffCount, staffCostPerPerson, supCount, supCostPerPerson, rawUsedKg, rawCostPerKg, packCostPerKg, producedKg, sellPriceDay };
-  for (const [k, v] of Object.entries(required)) if (!Number.isFinite(v)) throw new Error(`Please enter a valid number for "${k}".`);
+  // Labor
+  const sc = parseNum(form2.elements.staffCount.value);
+  const sDH= parseNum(form2.elements.staffDayHours.value);
+  const sDR= parseNum(form2.elements.staffDayRate.value);
+  const sOH= parseNum(form2.elements.staffOtHours.value);
+  const sOR= parseNum(form2.elements.staffOtRate.value);
+  const staffLab = laborCost(sc, sDH, sDR, sOH, sOR);
 
-  const laborFloor = staffCount * staffCostPerPerson;
-  const laborSup   = supCount   * supCostPerPerson;
-  const rawCost  = rawUsedKg  * rawCostPerKg;
-  const packCost = producedKg * packCostPerKg;
+  const uc = parseNum(form2.elements.supCount.value);
+  const uDH= parseNum(form2.elements.supDayHours.value);
+  const uDR= parseNum(form2.elements.supDayRate.value);
+  const uOH= parseNum(form2.elements.supOtHours.value);
+  const uOR= parseNum(form2.elements.supOtRate.value);
+  const supLab = laborCost(uc, uDH, uDR, uOH, uOR);
 
-  const utilElec  = elecKwh  * elecCostPerKwh;
-  const utilWater = waterM3  * waterCostPerM3;
-  const utilities = utilElec + utilWater;
+  // Materials & output
+  const rawKg   = parseNum(form2.elements.rawUsedKg.value);
+  const rawCost = parseNum(form2.elements.rawCostPerKg.value);
+  const packKg  = parseNum(form2.elements.packCostPerKg.value);
+  const prodKg  = parseNum(form2.elements.producedKg.value);
+  const sell    = parseNum(form2.elements.sellPriceDay.value);
 
-  const freight = producedKg * freightPerKg;
+  const freightPerKg = parseNum(form2.elements.freightPerKg.value || 0);
+  const utilitiesDay = parseNum(form2.elements.utilitiesDay.value || 0);
+  const maint        = parseNum(form2.elements.maintenanceCost.value || 0);
+  const depr         = parseNum(form2.elements.deprCost.value || 0);
+  const other        = parseNum(form2.elements.otherCost.value || 0);
 
-  const revenue   = producedKg * sellPriceDay;
-  const yieldPct  = rawUsedKg > 0 ? (producedKg / rawUsedKg) * 100 : 0;
+  // Fixed ISK/month -> EUR/day
+  const housingDayEur = eurPerDayFromIskMonthly(parseNum(form2.elements.housingIsk.value), rate, workDays);
+  const equipDayEur   = eurPerDayFromIskMonthly(parseNum(form2.elements.equipIsk.value),   rate, workDays);
+  const adminDayEur   = eurPerDayFromIskMonthly(parseNum(form2.elements.adminIsk.value),   rate, workDays);
 
-  const totalCost = laborFloor + laborSup + rawCost + packCost + freight
-                  + utilities + housingCost + adminCost + maintenanceCost
-                  + deprCost + otherCost;
+  // Validate some required nums
+  const req = [workDays, rate, sc, sDH, sDR, rawKg, rawCost, packKg, prodKg, sell];
+  if (req.some(v => !Number.isFinite(v))) throw new Error('Please fill required numeric fields (month, FX, staff, raw, produced, price…).');
 
-  const profit    = revenue - totalCost;
-  const marginPct = revenue > 0 ? (profit / revenue) * 100 : 0;
-  const costPerKg = producedKg > 0 ? totalCost / producedKg : 0;
+  // Calculations
+  const laborStaff = staffLab.total;
+  const laborSup   = supLab.total;
 
-  out2.yieldPct.textContent  = fmtNumber(yieldPct, 1) + ' %';
-  out2.revenue.textContent   = fmtCurrency(revenue, currency);
-  out2.totalCost.textContent = fmtCurrency(totalCost, currency);
-  out2.profit.textContent    = fmtCurrency(profit, currency);
-  out2.marginPct.textContent = fmtNumber(marginPct, 1) + ' %';
-  out2.costPerKg.textContent = fmtCurrency(costPerKg, currency) + ' /kg';
+  const rawCostTot = rawKg * rawCost;
+  const packCost   = prodKg * packKg;
+  const freight    = prodKg * freightPerKg;
 
-  out2.laborFloor.textContent = fmtCurrency(laborFloor, currency);
-  out2.laborSup.textContent   = fmtCurrency(laborSup, currency);
-  out2.rawCost.textContent    = fmtCurrency(rawCost, currency);
-  out2.packCost.textContent   = fmtCurrency(packCost, currency);
-  out2.freight.textContent    = fmtCurrency(freight, currency);
-  out2.utilities.textContent  = fmtCurrency(utilities, currency);
-  out2.housing.textContent    = fmtCurrency(housingCost, currency);
-  out2.admin.textContent      = fmtCurrency(adminCost, currency);
-  out2.maint.textContent      = fmtCurrency(maintenanceCost, currency);
-  out2.depr.textContent       = fmtCurrency(deprCost, currency);
-  out2.other.textContent      = fmtCurrency(otherCost, currency);
+  const revenue    = prodKg * sell;
+  const yieldPct   = rawKg > 0 ? (prodKg / rawKg) * 100 : 0;
+
+  const totalCost  = laborStaff + laborSup + rawCostTot + packCost + freight + utilitiesDay
+                   + housingDayEur + equipDayEur + adminDayEur + maint + depr + other;
+
+  const profit     = revenue - totalCost;
+  const marginPct  = revenue > 0 ? (profit / revenue) * 100 : 0;
+  const costPerKg  = prodKg > 0 ? totalCost / prodKg : 0;
+
+  // Output
+  $('#d_yieldPct').textContent  = fmtNumber(yieldPct) + ' %';
+  $('#d_revenue').textContent   = fmtCurrency(revenue, currency);
+  $('#d_totalCost').textContent = fmtCurrency(totalCost, currency);
+  $('#d_profit').textContent    = fmtCurrency(profit, currency);
+  $('#d_marginPct').textContent = fmtNumber(marginPct) + ' %';
+  $('#d_costPerKg').textContent = fmtCurrency(costPerKg, currency) + ' /kg';
+
+  $('#d_laborStaff').textContent = fmtCurrency(laborStaff, currency);
+  $('#d_laborSup').textContent   = fmtCurrency(laborSup, currency);
+  $('#d_rawCost').textContent    = fmtCurrency(rawCostTot, currency);
+  $('#d_packCost').textContent   = fmtCurrency(packCost, currency);
+  $('#d_freightCost').textContent= fmtCurrency(freight, currency);
+  $('#d_utilities').textContent  = fmtCurrency(utilitiesDay, currency);
+
+  $('#d_housing').textContent    = fmtCurrency(housingDayEur, currency);
+  $('#d_equip').textContent      = fmtCurrency(equipDayEur, currency);
+  $('#d_admin').textContent      = fmtCurrency(adminDayEur, currency);
+
+  $('#d_maint').textContent      = fmtCurrency(maint, currency);
+  $('#d_depr').textContent       = fmtCurrency(depr, currency);
+  $('#d_other').textContent      = fmtCurrency(other, currency);
 
   res2.hidden = false;
 }
 
-form2?.addEventListener('submit', (e) => { e.preventDefault(); try { calculateDay(); } catch (err) { alert(err.message || String(err)); } });
-form2?.addEventListener('reset', () => {
-  setTimeout(() => {
-    res2.hidden = true;
-    [ '#d_yieldPct','#d_revenue','#d_totalCost','#d_profit','#d_marginPct','#d_costPerKg',
-      '#d_laborFloor','#d_laborSup','#d_rawCost','#d_packCost','#d_freightCost','#d_utilities',
-      '#d_housing','#d_admin','#d_maint','#d_depr','#d_other'
-    ].forEach(id => $(id).textContent = '–');
-  }, 0);
-});
+form2?.addEventListener('submit', (e) => { e.preventDefault(); try { calculateDay(); } catch (err) { alert(err.message || String(err)); }});
+form2?.addEventListener('reset', () => { setTimeout(() => { res2.hidden = true; ['#d_yieldPct','#d_revenue','#d_totalCost','#d_profit','#d_marginPct','#d_costPerKg','#d_laborStaff','#d_laborSup','#d_rawCost','#d_packCost','#d_freightCost','#d_utilities','#d_housing','#d_equip','#d_admin','#d_maint','#d_depr','#d_other'].forEach(id=>$(id).textContent='–'); },0); });
 
-// ---------------- Calculator 3: Multi-species & products ----------------
-const formA = $('#advForm');
-const resA = $('#advResults');
-const rawTbody = $('#rawTable tbody');
-const skuTbody = $('#skuTable tbody');
-const prodTbody = $('#prodTable tbody');
-const speciesSummary = $('#speciesSummary');
+// ================= Calculator 3: Factory Network =================
+const netForm = $('#netForm');
+const netRes  = $('#netResults');
 
-// Add default rows
-function addRawRow(data = {}) {
-  const tr = document.createElement('tr');
-  tr.innerHTML = `
-    <td><input type="text" name="species" placeholder="e.g. Salmon" value="${data.species||''}"></td>
-    <td><input type="text" name="rawName" placeholder="e.g. Atlantic salmon HOG" value="${data.rawName||''}"></td>
-    <td><input type="text" inputmode="decimal" name="usedKg" value="${data.usedKg||''}"></td>
-    <td><input type="text" inputmode="decimal" name="costPerKg" value="${data.costPerKg||''}"></td>
-    <td><button type="button" class="btn remove">✕</button></td>
-  `;
-  rawTbody.appendChild(tr);
+function initMonthAutoNet() {
+  const m = $('#netMonth');
+  const o = $('#netWorkDays');
+  const now = new Date();
+  const ym = `${now.getUTCFullYear()}-${String(now.getUTCMonth()+1).padStart(2,'0')}`;
+  m.value = ym;
+  const update = () => {
+    const [yy, mm] = (m.value || ym).split('-').map(Number);
+    o.value = workingDaysInMonth(yy, mm - 1);
+  };
+  m.addEventListener('change', update);
+  update();
 }
-function addSkuRow(data = {}) {
-  const tr = document.createElement('tr');
-  tr.innerHTML = `
-    <td><input type="text" name="skuName" placeholder="e.g. Vacuum pouch 150µ" value="${data.skuName||''}"></td>
-    <td><input type="text" inputmode="decimal" name="skuCostPerKg" value="${data.skuCostPerKg||''}"></td>
-    <td><button type="button" class="btn remove">✕</button></td>
-  `;
-  skuTbody.appendChild(tr);
-  refreshSkuOptions();
+initMonthAutoNet();
+
+function prodLabor(prefix) {
+  const p = n => parseNum(netForm.elements[`${prefix}_${n}`].value);
+  const staff = laborCost(p('staffCount'), p('staffDayHours'), p('staffDayRate'), p('staffOtHours'), p('staffOtRate'));
+  const sup   = laborCost(p('supCount'),   p('supDayHours'),   p('supDayRate'),   p('supOtHours'),   p('supOtRate'));
+  return { staff: staff.total, sup: sup.total, total: staff.total + sup.total };
 }
-function addProdRow(data = {}) {
-  const tr = document.createElement('tr');
-  tr.innerHTML = `
-    <td><input type="text" name="species" placeholder="e.g. Salmon" value="${data.species||''}"></td>
-    <td><input type="text" name="prodName" placeholder="e.g. Portions 4x125g" value="${data.prodName||''}"></td>
-    <td><input type="text" inputmode="decimal" name="producedKg" value="${data.producedKg||''}"></td>
-    <td><input type="text" inputmode="decimal" name="sellPrice" value="${data.sellPrice||''}"></td>
-    <td>
-      <select name="pkgSku">
-        <option value="">— select SKU —</option>
-      </select>
-    </td>
-    <td><button type="button" class="btn remove">✕</button></td>
-  `;
-  prodTbody.appendChild(tr);
-  refreshSkuOptions();
-  if (data.pkgSku) tr.querySelector('select[name="pkgSku"]').value = data.pkgSku;
+function prodNumbers(prefix) {
+  const p = n => parseNum(netForm.elements[`${prefix}_${n}`].value);
+  return {
+    rawKg:  p('rawKg'), rawCost: p('rawCost'),
+    prodKg: p('prodKg'), sell: p('sell'),
+    pack:   p('pack'), freight: p('freight'),
+    utils:  p('utils')
+  };
 }
 
-$('#addRaw')?.addEventListener('click', () => addRawRow({}));
-$('#addSku')?.addEventListener('click', () => addSkuRow({}));
-$('#addProd')?.addEventListener('click', () => addProdRow({}));
+function calculateNetwork() {
+  const currency='EUR';
+  const [yy, mm] = ($('#netMonth').value).split('-').map(Number);
+  const workDays = parseNum($('#netWorkDays').value);
+  const rate     = parseNum(netForm.elements.iskToEur.value);
 
-rawTbody.addEventListener('click', (e) => { if (e.target.closest('.remove')) e.target.closest('tr').remove(); });
-skuTbody.addEventListener('click', (e) => { if (e.target.closest('.remove')) { e.target.closest('tr').remove(); refreshSkuOptions(); }});
-prodTbody.addEventListener('click', (e) => { if (e.target.closest('.remove')) e.target.closest('tr').remove(); });
+  // Fixed ISK/month -> EUR/day
+  const faHousing = (parseNum(netForm.elements.faHousingIsk.value) || 0) * rate / workDays;
+  const faEquip   = (parseNum(netForm.elements.faEquipIsk.value)   || 0) * rate / workDays;
+  const fbRent    = (parseNum(netForm.elements.fbRentIsk.value)    || 0) * rate / workDays;
+  const adminDay  = (parseNum(netForm.elements.adminIsk.value)     || 0) * rate / workDays;
 
-// Populate some starter rows
-addRawRow({ species:'Salmon', rawName:'Atlantic salmon HOG', usedKg:'1200', costPerKg:'7,90' });
-addSkuRow({ skuName:'Vacuum pouch 150µ', skuCostPerKg:'0,40' });
-addSkuRow({ skuName:'Retail carton', skuCostPerKg:'0,20' });
-addProdRow({ species:'Salmon', prodName:'Portions 4x125g', producedKg:'1000', sellPrice:'14,50', pkgSku:'Vacuum pouch 150µ' });
+  // Salmon
+  const salLab = prodLabor('sal');
+  const salNum = prodNumbers('sal');
+  const salRawCost = salNum.rawKg * salNum.rawCost;
+  const salPack    = salNum.prodKg * salNum.pack;
+  const salFreight = salNum.prodKg * salNum.freight;
+  const salRevenue = salNum.prodKg * salNum.sell;
 
-function getSkuMap() {
-  const map = new Map();
-  [...skuTbody.querySelectorAll('tr')].forEach(tr => {
-    const name = tr.querySelector('input[name="skuName"]')?.value?.trim();
-    const cost = parseNum(tr.querySelector('input[name="skuCostPerKg"]')?.value);
-    if (name && Number.isFinite(cost)) map.set(name, cost);
-  });
-  return map;
-}
+  // Whitefish
+  const whLab = prodLabor('wh');
+  const whNum = prodNumbers('wh');
+  const whRawCost = whNum.rawKg * whNum.rawCost;
+  const whPack    = whNum.prodKg * whNum.pack;
+  const whFreight = whNum.prodKg * whNum.freight;
+  const whRevenue = whNum.prodKg * whNum.sell;
 
-function refreshSkuOptions() {
-  const names = [...getSkuMap().keys()];
-  [...prodTbody.querySelectorAll('select[name="pkgSku"]')].forEach(sel => {
-    const current = sel.value;
-    sel.innerHTML = `<option value="">— select SKU —</option>` + names.map(n => `<option value="${n}">${n}</option>`).join('');
-    if (names.includes(current)) sel.value = current;
-  });
-}
+  // Smokehouse
+  const smLab = prodLabor('sm');
+  const smNum = prodNumbers('sm');
+  const smRawCost = smNum.rawKg * smNum.rawCost;
+  const smPack    = smNum.prodKg * smNum.pack;
+  const smFreight = smNum.prodKg * smNum.freight;
+  const smRevenue = smNum.prodKg * smNum.sell;
 
-function calculateAdvanced() {
-  const currency = currencySel.value;
+  // Allocation bases (produced kg)
+  const kgFA = Math.max(0, salNum.prodKg) + Math.max(0, whNum.prodKg); // Factory A productions
+  const kgAll = Math.max(0, salNum.prodKg) + Math.max(0, whNum.prodKg) + Math.max(0, smNum.prodKg);
 
-  // Overheads shared
-  const f = (name) => parseNum(formA.querySelector(`[name="${name}"]`).value || 0);
-  const staffCount         = f('staffCount');
-  const staffCostPerPerson = f('staffCostPerPerson');
-  const supCount           = f('supCount');
-  const supCostPerPerson   = f('supCostPerPerson');
-  const housingCost        = f('housingCost');
-  const adminCost          = f('adminCost');
-  const maintenanceCost    = f('maintenanceCost');
-  const deprCost           = f('deprCost');
-  const elecKwh            = f('elecKwh');
-  const elecCostPerKwh     = f('elecCostPerKwh');
-  const waterM3            = f('waterM3');
-  const waterCostPerM3     = f('waterCostPerM3');
-  const freightPerKg       = f('freightPerKg');
-  const otherCost          = f('otherCost');
+  const allocFA_sal = kgFA > 0 ? salNum.prodKg / kgFA : 0;
+  const allocFA_wh  = kgFA > 0 ? whNum.prodKg  / kgFA : 0;
 
-  // Raw materials
-  const raws = [...rawTbody.querySelectorAll('tr')].map(tr => ({
-    species:  tr.querySelector('input[name="species"]')?.value?.trim() || '',
-    rawName:  tr.querySelector('input[name="rawName"]')?.value?.trim() || '',
-    usedKg:   parseNum(tr.querySelector('input[name="usedKg"]')?.value),
-    costPerKg:parseNum(tr.querySelector('input[name="costPerKg"]')?.value)
-  })).filter(r => r.species && Number.isFinite(r.usedKg) && Number.isFinite(r.costPerKg));
+  const allocAdmin_sal = kgAll > 0 ? salNum.prodKg / kgAll : 0;
+  const allocAdmin_wh  = kgAll > 0 ? whNum.prodKg  / kgAll : 0;
+  const allocAdmin_sm  = kgAll > 0 ? smNum.prodKg  / kgAll : 0;
 
-  // SKUs
-  const skuMap = getSkuMap();
+  const salFixed = faHousing * allocFA_sal + faEquip * allocFA_sal + adminDay * allocAdmin_sal;
+  const whFixed  = faHousing * allocFA_wh  + faEquip * allocFA_wh  + adminDay * allocAdmin_wh;
+  const smFixed  = fbRent + (adminDay * allocAdmin_sm);
 
-  // Products
-  const prods = [...prodTbody.querySelectorAll('tr')].map(tr => ({
-    species:    tr.querySelector('input[name="species"]')?.value?.trim() || '',
-    prodName:   tr.querySelector('input[name="prodName"]')?.value?.trim() || '',
-    producedKg: parseNum(tr.querySelector('input[name="producedKg"]')?.value),
-    sellPrice:  parseNum(tr.querySelector('input[name="sellPrice"]')?.value),
-    pkgSku:     tr.querySelector('select[name="pkgSku"]')?.value || ''
-  })).filter(p => p.species && Number.isFinite(p.producedKg) && Number.isFinite(p.sellPrice));
-
-  // Totals
-  const totalProduced = prods.reduce((s,p)=>s+p.producedKg,0);
-  const totalRawUsed  = raws.reduce((s,r)=>s+r.usedKg,0);
-
-  // Costs
-  const rawCost  = raws.reduce((s,r)=>s + r.usedKg * r.costPerKg, 0);
-  const packCost = prods.reduce((s,p)=> s + p.producedKg * (skuMap.get(p.pkgSku) || 0), 0);
-  const freight  = totalProduced * freightPerKg;
-  const utilElec = elecKwh * elecCostPerKwh;
-  const utilWater= waterM3 * waterCostPerM3;
-  const utilities= utilElec + utilWater;
-  const laborFloor = staffCount * staffCostPerPerson;
-  const laborSup   = supCount   * supCostPerPerson;
-
-  const revenue = prods.reduce((s,p)=> s + p.producedKg * p.sellPrice, 0);
-  const totalCost = rawCost + packCost + freight + utilities + housingCost + adminCost + maintenanceCost + deprCost + laborFloor + laborSup + otherCost;
-  const profit = revenue - totalCost;
-  const marginPct = revenue > 0 ? (profit / revenue) * 100 : 0;
-  const costPerKg = totalProduced > 0 ? totalCost / totalProduced : 0;
-  const yieldPct  = totalRawUsed > 0 ? (totalProduced / totalRawUsed) * 100 : 0;
-
-  // Per-species summary
-  const bySpecies = new Map();
-  // init from raws
-  raws.forEach(r => {
-    if (!bySpecies.has(r.species)) bySpecies.set(r.species, { rawUsed:0, rawCost:0, produced:0, revenue:0, packCost:0, freight:0 });
-    const o = bySpecies.get(r.species);
-    o.rawUsed += r.usedKg;
-    o.rawCost += r.usedKg * r.costPerKg;
-  });
-  // add prods
-  prods.forEach(p => {
-    if (!bySpecies.has(p.species)) bySpecies.set(p.species, { rawUsed:0, rawCost:0, produced:0, revenue:0, packCost:0, freight:0 });
-    const o = bySpecies.get(p.species);
-    o.produced += p.producedKg;
-    o.revenue  += p.producedKg * p.sellPrice;
-    o.packCost += p.producedKg * (skuMap.get(p.pkgSku) || 0);
-    o.freight  += p.producedKg * freightPerKg;
-  });
-
-  // Write overall outputs
-  $('#a_yieldPct').textContent  = fmtNumber(yieldPct, 1) + ' %';
-  $('#a_revenue').textContent   = fmtCurrency(revenue, currency);
-  $('#a_totalCost').textContent = fmtCurrency(totalCost, currency);
-  $('#a_profit').textContent    = fmtCurrency(profit, currency);
-  $('#a_marginPct').textContent = fmtNumber(marginPct, 1) + ' %';
-  $('#a_costPerKg').textContent = fmtCurrency(costPerKg, currency) + ' /kg';
-
-  $('#a_laborFloor').textContent = fmtCurrency(laborFloor, currency);
-  $('#a_laborSup').textContent   = fmtCurrency(laborSup, currency);
-  $('#a_rawCost').textContent    = fmtCurrency(rawCost, currency);
-  $('#a_packCost').textContent   = fmtCurrency(packCost, currency);
-  $('#a_freightCost').textContent= fmtCurrency(freight, currency);
-  $('#a_utilities').textContent  = fmtCurrency(utilities, currency);
-  $('#a_housing').textContent    = fmtCurrency(housingCost, currency);
-  $('#a_admin').textContent      = fmtCurrency(adminCost, currency);
-  $('#a_maint').textContent      = fmtCurrency(maintenanceCost, currency);
-  $('#a_depr').textContent       = fmtCurrency(deprCost, currency);
-  $('#a_other').textContent      = fmtCurrency(otherCost, currency);
-
-  // Species cards
-  speciesSummary.innerHTML = '';
-  for (const [sp, o] of bySpecies.entries()) {
-    const spYield = o.rawUsed > 0 ? (o.produced / o.rawUsed) * 100 : 0;
-    const spDirect = o.rawCost + o.packCost + o.freight; // direct (no shared OH / labor split)
-    const spGross  = o.revenue - spDirect;
-
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-      <h4>${sp || '—'}</h4>
-      <p><strong>Yield:</strong> ${fmtNumber(spYield,1)} %</p>
-      <p><strong>Revenue:</strong> ${fmtCurrency(o.revenue, currency)}</p>
-      <p><strong>Raw:</strong> ${fmtCurrency(o.rawCost, currency)}</p>
-      <p><strong>Packaging:</strong> ${fmtCurrency(o.packCost, currency)}</p>
-      <p><strong>Freight:</strong> ${fmtCurrency(o.freight, currency)}</p>
-      <p><strong>Gross (before OH):</strong> ${fmtCurrency(spGross, currency)}</p>
-    `;
-    speciesSummary.appendChild(card);
+  // Totals per production
+  function tot(lab, num, rawCost, pack, freight, fixed) {
+    const rev   = num.prodKg * num.sell;
+    const cost  = lab.total + rawCost + pack + freight + (num.utils || 0) + fixed;
+    const prof  = rev - cost;
+    const mar   = rev > 0 ? (prof / rev) * 100 : 0;
+    const cpk   = num.prodKg > 0 ? cost / num.prodKg : 0;
+    const yld   = num.rawKg > 0 ? (num.prodKg / num.rawKg) * 100 : 0;
+    return { rev, cost, prof, mar, cpk, yld };
   }
+  const sal = tot(salLab, salNum, salRawCost, salPack, salFreight, salFixed);
+  const wh  = tot(whLab,  whNum,  whRawCost,  whPack,  whFreight,  whFixed);
+  const sm  = tot(smLab,  smNum,  smRawCost,  smPack,  smFreight,  smFixed);
 
-  resA.hidden = false;
+  // Network totals
+  const totalRev  = sal.rev + wh.rev + sm.rev;
+  const totalCost = sal.cost + wh.cost + sm.cost;
+  const totalProf = totalRev - totalCost;
+  const totalMar  = totalRev > 0 ? (totalProf / totalRev) * 100 : 0;
+  const totalKg   = salNum.prodKg + whNum.prodKg + smNum.prodKg;
+  const totalCpk  = totalKg > 0 ? totalCost / totalKg : 0;
+
+  // Output
+  $('#n_revenue').textContent   = fmtCurrency(totalRev, currency);
+  $('#n_totalCost').textContent = fmtCurrency(totalCost, currency);
+  $('#n_profit').textContent    = fmtCurrency(totalProf, currency);
+  $('#n_marginPct').textContent = fmtNumber(totalMar) + ' %';
+  $('#n_costPerKg').textContent = fmtCurrency(totalCpk, currency) + ' /kg';
+
+  $('#n_salmon').textContent    =
+    `Yield ${fmtNumber(sal.yld)}%, Rev ${fmtCurrency(sal.rev)}, Cost ${fmtCurrency(sal.cost)}, Profit ${fmtCurrency(sal.prof)}, Margin ${fmtNumber(sal.mar)}%`;
+  $('#n_whitefish').textContent =
+    `Yield ${fmtNumber(wh.yld)}%, Rev ${fmtCurrency(wh.rev)}, Cost ${fmtCurrency(wh.cost)}, Profit ${fmtCurrency(wh.prof)}, Margin ${fmtNumber(wh.mar)}%`;
+  $('#n_smoke').textContent     =
+    `Yield ${fmtNumber(sm.yld)}%, Rev ${fmtCurrency(sm.rev)}, Cost ${fmtCurrency(sm.cost)}, Profit ${fmtCurrency(sm.prof)}, Margin ${fmtNumber(sm.mar)}%`;
+
+  $('#n_fa_housing').textContent = fmtCurrency(faHousing, currency);
+  $('#n_fa_equip').textContent   = fmtCurrency(faEquip, currency);
+  $('#n_fb_rent').textContent    = fmtCurrency(fbRent, currency);
+  $('#n_admin').textContent      = fmtCurrency(adminDay, currency);
+
+  netRes.hidden = false;
 }
 
-formA?.addEventListener('submit', (e) => {
-  e.preventDefault();
-  try { calculateAdvanced(); } catch (err) { alert(err.message || String(err)); }
-});
-formA?.addEventListener('reset', () => {
+netForm?.addEventListener('submit', (e) => { e.preventDefault(); try { calculateNetwork(); } catch (err) { alert(err.message || String(err)); }});
+netForm?.addEventListener('reset', () => {
   setTimeout(() => {
-    resA.hidden = true;
-    ['#a_yieldPct','#a_revenue','#a_totalCost','#a_profit','#a_marginPct','#a_costPerKg',
-     '#a_laborFloor','#a_laborSup','#a_rawCost','#a_packCost','#a_freightCost','#a_utilities',
-     '#a_housing','#a_admin','#a_maint','#a_depr','#a_other'
-    ].forEach(id => $(id).textContent = '–');
-    speciesSummary.innerHTML = '';
-    rawTbody.innerHTML = ''; skuTbody.innerHTML = ''; prodTbody.innerHTML = '';
-    addRawRow({ species:'Salmon', rawName:'Atlantic salmon HOG', usedKg:'1200', costPerKg:'7,90' });
-    addSkuRow({ skuName:'Vacuum pouch 150µ', skuCostPerKg:'0,40' });
-    addSkuRow({ skuName:'Retail carton',     skuCostPerKg:'0,20' });
-    addProdRow({ species:'Salmon', prodName:'Portions 4x125g', producedKg:'1000', sellPrice:'14,50', pkgSku:'Vacuum pouch 150µ' });
+    netRes.hidden = true;
+    ['#n_revenue','#n_totalCost','#n_profit','#n_marginPct','#n_costPerKg','#n_salmon','#n_whitefish','#n_smoke','#n_fa_housing','#n_fa_equip','#n_fb_rent','#n_admin'].forEach(id=>$(id).textContent='–');
   }, 0);
 });
 
-// Nav (hamburger)
+// -------- Nav (hamburger) --------
 const navToggle = $('#navToggle');
 const siteNav = $('#siteNav');
 navToggle?.addEventListener('click', () => {
