@@ -1,11 +1,4 @@
-// script.js v7 — Light-only + KPI calculator
-'use strict';
-console.log('Loaded script.js v7 (light-only)');
-
-// Force light theme immediately
-document.documentElement.classList.add('light');
-
-// ---------- helpers ----------
+// --- helpers ---------------------------------------------------------------
 const $ = (sel, root = document) => root.querySelector(sel);
 
 const CURRENCY_MAP = {
@@ -23,7 +16,6 @@ function parseNum(v) {
   const s = String(v).trim();
   if (!s) return NaN;
   let t = s.replace(/\s/g, '');
-  // EU-style decimal comma handling
   if (t.includes(',') && t.lastIndexOf(',') > t.lastIndexOf('.')) {
     t = t.replace(/\./g, '').replace(',', '.');
   } else {
@@ -50,7 +42,7 @@ function fmtNumber(val, digits = 2) {
   }).format(val);
 }
 
-// ---------- UI elements ----------
+// --- UI elements -----------------------------------------------------------
 const currencySel = $('#currencySelect');
 const form = $('#kpiForm');
 const resWrap = $('#kpiResults');
@@ -75,7 +67,7 @@ const out = {
   profitPerKg:  $('#r_profitPerKg')
 };
 
-// ---------- core calculation ----------
+// --- core calculation ------------------------------------------------------
 function calculate() {
   const currency = currencySel.value;
 
@@ -84,17 +76,19 @@ function calculate() {
   const raw      = parseNum(f.rawCost.value);
   const proc     = parseNum(f.procCost.value);
   const freight  = parseNum(f.freight.value || 0);
-  let   yieldPct = parseNum(f.yieldPct.value || 100);   // default 100
+  const yieldPct = parseNum(f.yieldPct.value || 100);
 
-  if (!Number.isFinite(yieldPct)) throw new Error('Yield (%) must be a number.');
-  yieldPct = Math.min(100, Math.max(0, yieldPct));       // clamp 0..100
-
-  const fields = { volumeKg, sell, raw, proc, freight };
-  for (const [k, v] of Object.entries(fields)) {
-    if (!Number.isFinite(v)) throw new Error(`Please enter a valid number for "${k}".`);
+  if (yieldPct < 0 || yieldPct > 100) {
+    throw new Error('Yield (%) must be between 0 and 100.');
   }
 
-  // Use Yield (%) directly
+  const fields = { volumeKg, sell, raw, proc, freight, yieldPct };
+  for (const [k, v] of Object.entries(fields)) {
+    if (!Number.isFinite(v)) {
+      throw new Error(`Please enter a valid number for "${k}".`);
+    }
+  }
+
   const netKg = Math.max(0, volumeKg * (yieldPct / 100));
   const revenue = netKg * sell;
   const totalCost = netKg * (raw + proc + freight);
@@ -102,7 +96,6 @@ function calculate() {
   const marginPct = revenue > 0 ? (profit / revenue) * 100 : 0;
   const profitPerKg = netKg > 0 ? profit / netKg : 0;
 
-  // write outputs
   out.netKg.textContent       = fmtNumber(netKg, 2) + ' kg';
   out.revenue.textContent     = fmtCurrency(revenue, currency);
   out.totalCost.textContent   = fmtCurrency(totalCost, currency);
@@ -110,14 +103,13 @@ function calculate() {
   out.marginPct.textContent   = fmtNumber(marginPct, 1) + ' %';
   out.profitPerKg.textContent = fmtCurrency(profitPerKg, currency) + ' /kg';
 
-  // reveal block
   resWrap.hidden = false;
 
   return { currency, netKg, revenue, totalCost, profit, marginPct, profitPerKg,
            inputs: { volumeKg, sell, raw, proc, freight, yieldPct } };
 }
 
-// ---------- webhook (optional) ----------
+// --- webhook (optional) ----------------------------------------------------
 async function postWebhook(payload) {
   const url = (f.webhook.value || '').trim();
   postStatus.textContent = '';
@@ -135,17 +127,7 @@ async function postWebhook(payload) {
   }
 }
 
-// ---------- events ----------
-document.getElementById('calcBtn')?.addEventListener('click', async () => {
-  try {
-    const result = calculate();
-    await postWebhook(result);
-  } catch (err) {
-    alert(err.message || String(err));
-  }
-});
-
-// Support Enter key in any field
+// --- events ----------------------------------------------------------------
 form?.addEventListener('submit', async (e) => {
   e.preventDefault();
   try {
@@ -156,14 +138,21 @@ form?.addEventListener('submit', async (e) => {
   }
 });
 
-// Recalculate formatting if currency changes after results shown
+form?.addEventListener('reset', () => {
+  setTimeout(() => {
+    resWrap.hidden = true;
+    postStatus.textContent = '';
+    Object.values(out).forEach(el => el.textContent = '–');
+  }, 0);
+});
+
 currencySel?.addEventListener('change', () => {
   if (!resWrap.hidden) {
-    try { calculate(); } catch {}
+    try { calculate(); } catch { /* ignore until form valid */ }
   }
 });
 
-// ---------- nav (hamburger) ----------
+// --- nav menu toggle -------------------------------------------------------
 const navToggle = $('#navToggle');
 const siteNav = $('#siteNav');
 navToggle?.addEventListener('click', () => {
