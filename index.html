@@ -12,7 +12,7 @@
   <link rel="preload" href="styles.css" as="style">
   <link rel="stylesheet" href="styles.css">
 
-  <!-- JS cache-buster -->
+  <!-- Automatically add a cache-busting query string to script.js -->
   <script>
     document.write('<script defer src="script.js?v=' + Date.now() + '"><\/script>');
   </script>
@@ -94,12 +94,11 @@
     <section id="kpis" class="kpis">
       <h2>Key Numbers</h2>
 
-      <!-- Single currency selector -->
       <div class="kpi-toolbar">
         <label for="currencySelect">Currency</label>
         <select id="currencySelect" name="currency">
-          <option value="ISK" selected>ISK kr.</option>
-          <option value="EUR">EUR €</option>
+          <option value="ISK">ISK kr.</option>
+          <option value="EUR" selected>EUR €</option>
           <option value="GBP">GBP £</option>
           <option value="USD">USD $</option>
           <option value="SEK">SEK kr</option>
@@ -180,7 +179,6 @@
     </section>
   </main>
 
-  <!-- Footer -->
   <footer class="site-footer">
     <div class="footer-inner">
       <p>&copy; 2025 Premium Starter Site. All rights reserved.</p>
