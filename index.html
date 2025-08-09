@@ -11,11 +11,7 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preload" href="styles.css" as="style">
   <link rel="stylesheet" href="styles.css">
-
-  <!-- Auto cache-buster for script.js -->
-  <script>
-    document.write('<script defer src="script.js?v=' + Date.now() + '"><\/script>');
-  </script>
+  <script>document.write('<script defer src="script.js?v=' + Date.now() + '"><\\/script>');</script>
 </head>
 <body>
   <header class="site-header">
@@ -31,7 +27,7 @@
       <a href="#about">About</a>
       <a href="#kpis">Key Numbers</a>
       <a href="#factory">Factory Day</a>
-      <a href="#factory-advanced">Factory Day (Multi-species)</a>
+      <a href="#network">Factory Network</a>
       <a href="#contact">Contact</a>
     </nav>
   </header>
@@ -162,87 +158,101 @@
       </div>
     </section>
 
-    <!-- Factory Day (single-batch) -->
+    <!-- Factory Day (single site, simple) -->
     <section id="factory" class="kpis">
       <h2>Factory Day</h2>
-      <p class="hint">Estimate the full-day result for the factory (all numbers per day unless noted).</p>
+      <p class="hint">Quick single-site day calculator. Fixed costs (ISK/month) convert to EUR/day using working days for the month.</p>
 
       <form id="dayForm" class="kpi-form" autocomplete="off" novalidate>
         <div class="grid">
+          <!-- Month & FX -->
+          <label>Month
+            <input type="month" name="month" id="dayMonth">
+          </label>
+          <label>Working days (auto)
+            <input type="text" name="workDays" id="dayWorkDays" readonly>
+          </label>
+          <label>ISK → EUR
+            <input type="text" inputmode="decimal" name="iskToEur" value="0.0067" required>
+          </label>
+
           <!-- Labor -->
-          <label>Staff (floor) — people
+          <label>Staff — people
             <input type="text" inputmode="numeric" name="staffCount" value="10" required>
           </label>
-          <label>Avg cost per person (floor)
-            <input type="text" inputmode="decimal" name="staffCostPerPerson" value="120" required placeholder="€/day">
+          <label>Staff daytime hours
+            <input type="text" inputmode="decimal" name="staffDayHours" value="8" required>
+          </label>
+          <label>Staff overtime hours
+            <input type="text" inputmode="decimal" name="staffOtHours" value="0" required>
+          </label>
+          <label>Staff €/h (daytime)
+            <input type="text" inputmode="decimal" name="staffDayRate" value="15" required>
+          </label>
+          <label>Staff €/h (overtime)
+            <input type="text" inputmode="decimal" name="staffOtRate" value="22.5" required>
           </label>
 
           <label>Supervisors — people
             <input type="text" inputmode="numeric" name="supCount" value="2" required>
           </label>
-          <label>Avg cost per supervisor
-            <input type="text" inputmode="decimal" name="supCostPerPerson" value="180" required placeholder="€/day">
+          <label>Supervisors daytime hours
+            <input type="text" inputmode="decimal" name="supDayHours" value="8" required>
+          </label>
+          <label>Supervisors overtime hours
+            <input type="text" inputmode="decimal" name="supOtHours" value="0" required>
+          </label>
+          <label>Supervisors €/h (daytime)
+            <input type="text" inputmode="decimal" name="supDayRate" value="20" required>
+          </label>
+          <label>Supervisors €/h (overtime)
+            <input type="text" inputmode="decimal" name="supOtRate" value="30" required>
           </label>
 
           <!-- Materials -->
-          <label>Raw material name
-            <input type="text" name="rawName" placeholder="e.g. Atlantic salmon">
-          </label>
           <label>Raw used (kg)
             <input type="text" inputmode="decimal" name="rawUsedKg" value="1200" required>
           </label>
-          <label>Raw cost / kg
+          <label>Raw cost / kg — €/kg
             <input type="text" inputmode="decimal" name="rawCostPerKg" value="7,90" required>
           </label>
-
-          <label>Packaging avg cost / kg
+          <label>Packaging / kg — €/kg
             <input type="text" inputmode="decimal" name="packCostPerKg" value="0,60" required>
           </label>
 
           <!-- Output -->
-          <label>Product name
-            <input type="text" name="productName" placeholder="e.g. Salmon portions">
-          </label>
-          <label>Product produced (kg)
+          <label>Produced (kg)
             <input type="text" inputmode="decimal" name="producedKg" value="1000" required>
           </label>
-          <label>Selling price / kg
+          <label>Selling price / kg — €/kg
             <input type="text" inputmode="decimal" name="sellPriceDay" value="14,50" required>
           </label>
 
-          <!-- Overheads -->
-          <label>Housing (rent, coldstore, etc.)
-            <input type="text" inputmode="decimal" name="housingCost" value="350" required>
+          <!-- Fixed costs ISK/month -->
+          <label>Housing (ISK / month)
+            <input type="text" inputmode="decimal" name="housingIsk" value="500000" required>
           </label>
-          <label>Administration
-            <input type="text" inputmode="decimal" name="adminCost" value="250" required>
+          <label>Equipment rent (ISK / month)
+            <input type="text" inputmode="decimal" name="equipIsk" value="300000" required>
           </label>
-
-          <!-- Utilities -->
-          <label>Electricity used (kWh)
-            <input type="text" inputmode="decimal" name="elecKwh" value="900">
-          </label>
-          <label>Electricity cost / kWh
-            <input type="text" inputmode="decimal" name="elecCostPerKwh" value="0,18">
-          </label>
-          <label>Water used (m³)
-            <input type="text" inputmode="decimal" name="waterM3" value="8">
-          </label>
-          <label>Water cost / m³
-            <input type="text" inputmode="decimal" name="waterCostPerM3" value="2,20">
+          <label>Administration (ISK / month)
+            <input type="text" inputmode="decimal" name="adminIsk" value="700000" required>
           </label>
 
-          <!-- Logistics / Other -->
-          <label>Freight / distribution per kg
+          <!-- Other EUR/day -->
+          <label>Freight / kg — €/kg
             <input type="text" inputmode="decimal" name="freightPerKg" value="0,15">
           </label>
-          <label>Maintenance (daily)
+          <label>Utilities — €/day
+            <input type="text" inputmode="decimal" name="utilitiesDay" value="0">
+          </label>
+          <label>Maintenance — €/day
             <input type="text" inputmode="decimal" name="maintenanceCost" value="120">
           </label>
-          <label>Depreciation (daily)
+          <label>Depreciation — €/day
             <input type="text" inputmode="decimal" name="deprCost" value="180">
           </label>
-          <label>Other overheads
+          <label>Other overheads — €/day
             <input type="text" inputmode="decimal" name="otherCost" value="0">
           </label>
         </div>
@@ -266,14 +276,17 @@
 
         <h4>Breakdown</h4>
         <ul class="cards">
-          <li class="card"><h4>Labor (floor)</h4><p id="d_laborFloor">–</p></li>
+          <li class="card"><h4>Labor (staff)</h4><p id="d_laborStaff">–</p></li>
           <li class="card"><h4>Labor (supervisors)</h4><p id="d_laborSup">–</p></li>
           <li class="card"><h4>Raw material</h4><p id="d_rawCost">–</p></li>
           <li class="card"><h4>Packaging</h4><p id="d_packCost">–</p></li>
           <li class="card"><h4>Freight</h4><p id="d_freightCost">–</p></li>
           <li class="card"><h4>Utilities</h4><p id="d_utilities">–</p></li>
-          <li class="card"><h4>Housing</h4><p id="d_housing">–</p></li>
-          <li class="card"><h4>Administration</h4><p id="d_admin">–</p></li>
+
+          <li class="card"><h4>Housing (EUR/day)</h4><p id="d_housing">–</p></li>
+          <li class="card"><h4>Equipment (EUR/day)</h4><p id="d_equip">–</p></li>
+          <li class="card"><h4>Administration (EUR/day)</h4><p id="d_admin">–</p></li>
+
           <li class="card"><h4>Maintenance</h4><p id="d_maint">–</p></li>
           <li class="card"><h4>Depreciation</h4><p id="d_depr">–</p></li>
           <li class="card"><h4>Other</h4><p id="d_other">–</p></li>
@@ -281,148 +294,242 @@
       </div>
     </section>
 
-    <!-- Factory Day (Multi-species & products) -->
-    <section id="factory-advanced" class="kpis">
-      <h2>Factory Day (Multi-species)</h2>
-      <p class="hint">Add multiple raw materials (by species), multiple packaging SKUs, and multiple products per species.</p>
+    <!-- Factory Network (two sites, three productions) -->
+    <section id="network" class="kpis">
+      <h2>Factory Network</h2>
+      <p class="hint">Two sites: Factory A (Salmon + Whitefish, shared Factory A fixed costs) and Factory B (Smokehouse, pays its own rent). Administration is shared across all productions. Fixed costs are ISK/month and converted to EUR/day using working days in the selected month.</p>
 
-      <!-- Overheads & labor shared -->
-      <form id="advForm" class="kpi-form" autocomplete="off" novalidate>
+      <form id="netForm" class="kpi-form" autocomplete="off" novalidate>
         <div class="grid">
-          <label>Staff (floor) — people
-            <input type="text" inputmode="numeric" name="staffCount" value="10" required>
+          <!-- Month & FX -->
+          <label>Month
+            <input type="month" name="month" id="netMonth">
           </label>
-          <label>Avg cost per person (floor)
-            <input type="text" inputmode="decimal" name="staffCostPerPerson" value="120" required>
+          <label>Working days (auto)
+            <input type="text" name="workDays" id="netWorkDays" readonly>
           </label>
+          <label>ISK → EUR
+            <input type="text" inputmode="decimal" name="iskToEur" value="0.0067" required>
+          </label>
+
+          <!-- Fixed costs (ISK/month) -->
+          <label>Factory A — Housing (ISK / month)
+            <input type="text" inputmode="decimal" name="faHousingIsk" value="600000">
+          </label>
+          <label>Factory A — Equipment rent (ISK / month)
+            <input type="text" inputmode="decimal" name="faEquipIsk" value="350000">
+          </label>
+
+          <label>Factory B — Smokehouse rent (ISK / month)
+            <input type="text" inputmode="decimal" name="fbRentIsk" value="400000">
+          </label>
+
+          <label>Administration (ISK / month) — shared
+            <input type="text" inputmode="decimal" name="adminIsk" value="900000">
+          </label>
+        </div>
+
+        <h3>Factory A — Salmon</h3>
+        <div class="grid">
+          <label>Staff — people
+            <input type="text" inputmode="numeric" name="sal_staffCount" value="12">
+          </label>
+          <label>Staff daytime hours
+            <input type="text" inputmode="decimal" name="sal_staffDayHours" value="8">
+          </label>
+          <label>Staff overtime hours
+            <input type="text" inputmode="decimal" name="sal_staffOtHours" value="0">
+          </label>
+          <label>Staff €/h (daytime)
+            <input type="text" inputmode="decimal" name="sal_staffDayRate" value="15">
+          </label>
+          <label>Staff €/h (overtime)
+            <input type="text" inputmode="decimal" name="sal_staffOtRate" value="22.5">
+          </label>
+
           <label>Supervisors — people
-            <input type="text" inputmode="numeric" name="supCount" value="2" required>
+            <input type="text" inputmode="numeric" name="sal_supCount" value="2">
           </label>
-          <label>Avg cost per supervisor
-            <input type="text" inputmode="decimal" name="supCostPerPerson" value="180" required>
+          <label>Supervisors daytime hours
+            <input type="text" inputmode="decimal" name="sal_supDayHours" value="8">
           </label>
-
-          <label>Housing
-            <input type="text" inputmode="decimal" name="housingCost" value="350" required>
+          <label>Supervisors overtime hours
+            <input type="text" inputmode="decimal" name="sal_supOtHours" value="0">
           </label>
-          <label>Administration
-            <input type="text" inputmode="decimal" name="adminCost" value="250" required>
+          <label>Supervisors €/h (daytime)
+            <input type="text" inputmode="decimal" name="sal_supDayRate" value="20">
           </label>
-          <label>Maintenance (daily)
-            <input type="text" inputmode="decimal" name="maintenanceCost" value="120" required>
-          </label>
-          <label>Depreciation (daily)
-            <input type="text" inputmode="decimal" name="deprCost" value="180" required>
+          <label>Supervisors €/h (overtime)
+            <input type="text" inputmode="decimal" name="sal_supOtRate" value="30">
           </label>
 
-          <label>Electricity used (kWh)
-            <input type="text" inputmode="decimal" name="elecKwh" value="900">
+          <label>Raw used (kg)
+            <input type="text" inputmode="decimal" name="sal_rawKg" value="1200">
           </label>
-          <label>Electricity cost / kWh
-            <input type="text" inputmode="decimal" name="elecCostPerKwh" value="0,18">
+          <label>Raw cost / kg — €/kg
+            <input type="text" inputmode="decimal" name="sal_rawCost" value="7,90">
           </label>
-          <label>Water used (m³)
-            <input type="text" inputmode="decimal" name="waterM3" value="8">
+          <label>Produced (kg)
+            <input type="text" inputmode="decimal" name="sal_prodKg" value="1000">
           </label>
-          <label>Water cost / m³
-            <input type="text" inputmode="decimal" name="waterCostPerM3" value="2,20">
+          <label>Sell price / kg — €/kg
+            <input type="text" inputmode="decimal" name="sal_sell" value="14,50">
           </label>
-
-          <label>Freight / distribution per kg (all products)
-            <input type="text" inputmode="decimal" name="freightPerKg" value="0,15">
+          <label>Packaging / kg — €/kg
+            <input type="text" inputmode="decimal" name="sal_pack" value="0,60">
           </label>
-          <label>Other overheads
-            <input type="text" inputmode="decimal" name="otherCost" value="0">
+          <label>Freight / kg — €/kg
+            <input type="text" inputmode="decimal" name="sal_freight" value="0,15">
+          </label>
+          <label>Utilities — €/day
+            <input type="text" inputmode="decimal" name="sal_utils" value="0">
           </label>
         </div>
 
-        <!-- Raw materials table -->
-        <h3>Raw Materials</h3>
-        <div class="card" style="overflow:auto">
-          <table id="rawTable" class="adv-table" style="width:100%; border-spacing:0 6px;">
-            <thead>
-              <tr>
-                <th>Species</th>
-                <th>Raw material name</th>
-                <th>Used (kg)</th>
-                <th>Cost / kg</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-          <div class="cta-row"><button id="addRaw" class="btn" type="button">+ Add raw material</button></div>
+        <h3>Factory A — Whitefish</h3>
+        <div class="grid">
+          <label>Staff — people
+            <input type="text" inputmode="numeric" name="wh_staffCount" value="8">
+          </label>
+          <label>Staff daytime hours
+            <input type="text" inputmode="decimal" name="wh_staffDayHours" value="8">
+          </label>
+          <label>Staff overtime hours
+            <input type="text" inputmode="decimal" name="wh_staffOtHours" value="0">
+          </label>
+          <label>Staff €/h (daytime)
+            <input type="text" inputmode="decimal" name="wh_staffDayRate" value="14">
+          </label>
+          <label>Staff €/h (overtime)
+            <input type="text" inputmode="decimal" name="wh_staffOtRate" value="21">
+          </label>
+
+          <label>Supervisors — people
+            <input type="text" inputmode="numeric" name="wh_supCount" value="1">
+          </label>
+          <label>Supervisors daytime hours
+            <input type="text" inputmode="decimal" name="wh_supDayHours" value="8">
+          </label>
+          <label>Supervisors overtime hours
+            <input type="text" inputmode="decimal" name="wh_supOtHours" value="0">
+          </label>
+          <label>Supervisors €/h (daytime)
+            <input type="text" inputmode="decimal" name="wh_supDayRate" value="19">
+          </label>
+          <label>Supervisors €/h (overtime)
+            <input type="text" inputmode="decimal" name="wh_supOtRate" value="28.5">
+          </label>
+
+          <label>Raw used (kg)
+            <input type="text" inputmode="decimal" name="wh_rawKg" value="800">
+          </label>
+          <label>Raw cost / kg — €/kg
+            <input type="text" inputmode="decimal" name="wh_rawCost" value="5,20">
+          </label>
+          <label>Produced (kg)
+            <input type="text" inputmode="decimal" name="wh_prodKg" value="650">
+          </label>
+          <label>Sell price / kg — €/kg
+            <input type="text" inputmode="decimal" name="wh_sell" value="9,80">
+          </label>
+          <label>Packaging / kg — €/kg
+            <input type="text" inputmode="decimal" name="wh_pack" value="0,45">
+          </label>
+          <label>Freight / kg — €/kg
+            <input type="text" inputmode="decimal" name="wh_freight" value="0,12">
+          </label>
+          <label>Utilities — €/day
+            <input type="text" inputmode="decimal" name="wh_utils" value="0">
+          </label>
         </div>
 
-        <!-- Packaging SKUs -->
-        <h3>Packaging SKUs</h3>
-        <div class="card" style="overflow:auto">
-          <table id="skuTable" class="adv-table" style="width:100%; border-spacing:0 6px;">
-            <thead>
-              <tr>
-                <th>SKU name</th>
-                <th>Cost / kg</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-          <div class="cta-row"><button id="addSku" class="btn" type="button">+ Add SKU</button></div>
-        </div>
+        <h3>Factory B — Smokehouse</h3>
+        <div class="grid">
+          <label>Staff — people
+            <input type="text" inputmode="numeric" name="sm_staffCount" value="6">
+          </label>
+          <label>Staff daytime hours
+            <input type="text" inputmode="decimal" name="sm_staffDayHours" value="8">
+          </label>
+          <label>Staff overtime hours
+            <input type="text" inputmode="decimal" name="sm_staffOtHours" value="0">
+          </label>
+          <label>Staff €/h (daytime)
+            <input type="text" inputmode="decimal" name="sm_staffDayRate" value="15">
+          </label>
+          <label>Staff €/h (overtime)
+            <input type="text" inputmode="decimal" name="sm_staffOtRate" value="22.5">
+          </label>
 
-        <!-- Products table -->
-        <h3>Products</h3>
-        <div class="card" style="overflow:auto">
-          <table id="prodTable" class="adv-table" style="width:100%; border-spacing:0 6px;">
-            <thead>
-              <tr>
-                <th>Species</th>
-                <th>Product name</th>
-                <th>Produced (kg)</th>
-                <th>Selling price / kg</th>
-                <th>Packaging SKU</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-          <div class="cta-row"><button id="addProd" class="btn" type="button">+ Add product</button></div>
+          <label>Supervisors — people
+            <input type="text" inputmode="numeric" name="sm_supCount" value="1">
+          </label>
+          <label>Supervisors daytime hours
+            <input type="text" inputmode="decimal" name="sm_supDayHours" value="8">
+          </label>
+          <label>Supervisors overtime hours
+            <input type="text" inputmode="decimal" name="sm_supOtHours" value="0">
+          </label>
+          <label>Supervisors €/h (daytime)
+            <input type="text" inputmode="decimal" name="sm_supDayRate" value="21">
+          </label>
+          <label>Supervisors €/h (overtime)
+            <input type="text" inputmode="decimal" name="sm_supOtRate" value="31.5">
+          </label>
+
+          <label>Raw used (kg)
+            <input type="text" inputmode="decimal" name="sm_rawKg" value="500">
+          </label>
+          <label>Raw cost / kg — €/kg
+            <input type="text" inputmode="decimal" name="sm_rawCost" value="9,80">
+          </label>
+          <label>Produced (kg)
+            <input type="text" inputmode="decimal" name="sm_prodKg" value="450">
+          </label>
+          <label>Sell price / kg — €/kg
+            <input type="text" inputmode="decimal" name="sm_sell" value="18,00">
+          </label>
+          <label>Packaging / kg — €/kg
+            <input type="text" inputmode="decimal" name="sm_pack" value="0,75">
+          </label>
+          <label>Freight / kg — €/kg
+            <input type="text" inputmode="decimal" name="sm_freight" value="0,18">
+          </label>
+          <label>Utilities — €/day
+            <input type="text" inputmode="decimal" name="sm_utils" value="0">
+          </label>
         </div>
 
         <div class="cta-row" style="margin-top:1rem">
-          <button class="btn primary" type="submit">Calculate multi-species day</button>
+          <button class="btn primary" type="submit">Calculate network</button>
           <button class="btn" type="reset">Reset</button>
         </div>
       </form>
 
-      <div id="advResults" class="kpi-results" hidden>
-        <h3>Daily Results (All Species)</h3>
+      <div id="netResults" class="kpi-results" hidden>
+        <h3>Network Results</h3>
         <ul class="cards">
-          <li class="card"><h4>Overall yield (%)</h4><p id="a_yieldPct">–</p></li>
-          <li class="card"><h4>Total revenue</h4><p id="a_revenue">–</p></li>
-          <li class="card"><h4>Total cost</h4><p id="a_totalCost">–</p></li>
-          <li class="card"><h4>Profit</h4><p id="a_profit">–</p></li>
-          <li class="card"><h4>Margin %</h4><p id="a_marginPct">–</p></li>
-          <li class="card"><h4>Cost / kg</h4><p id="a_costPerKg">–</p></li>
+          <li class="card"><h4>Total revenue</h4><p id="n_revenue">–</p></li>
+          <li class="card"><h4>Total cost</h4><p id="n_totalCost">–</p></li>
+          <li class="card"><h4>Profit</h4><p id="n_profit">–</p></li>
+          <li class="card"><h4>Margin %</h4><p id="n_marginPct">–</p></li>
+          <li class="card"><h4>Cost / kg</h4><p id="n_costPerKg">–</p></li>
         </ul>
 
-        <h4>Breakdown</h4>
+        <h4>Per production</h4>
         <ul class="cards">
-          <li class="card"><h4>Labor (floor)</h4><p id="a_laborFloor">–</p></li>
-          <li class="card"><h4>Labor (supervisors)</h4><p id="a_laborSup">–</p></li>
-          <li class="card"><h4>Raw materials</h4><p id="a_rawCost">–</p></li>
-          <li class="card"><h4>Packaging</h4><p id="a_packCost">–</p></li>
-          <li class="card"><h4>Freight</h4><p id="a_freightCost">–</p></li>
-          <li class="card"><h4>Utilities</h4><p id="a_utilities">–</p></li>
-          <li class="card"><h4>Housing</h4><p id="a_housing">–</p></li>
-          <li class="card"><h4>Administration</h4><p id="a_admin">–</p></li>
-          <li class="card"><h4>Maintenance</h4><p id="a_maint">–</p></li>
-          <li class="card"><h4>Depreciation</h4><p id="a_depr">–</p></li>
-          <li class="card"><h4>Other</h4><p id="a_other">–</p></li>
+          <li class="card"><h4>Salmon</h4><p id="n_salmon">–</p></li>
+          <li class="card"><h4>Whitefish</h4><p id="n_whitefish">–</p></li>
+          <li class="card"><h4>Smokehouse</h4><p id="n_smoke">–</p></li>
         </ul>
 
-        <h3>Per-species summary</h3>
-        <div id="speciesSummary" class="cards" style="display:grid; grid-template-columns:repeat(2,minmax(220px,1fr)); gap:1rem;"></div>
+        <h4>Fixed costs (EUR/day)</h4>
+        <ul class="cards">
+          <li class="card"><h4>Factory A — Housing</h4><p id="n_fa_housing">–</p></li>
+          <li class="card"><h4>Factory A — Equipment</h4><p id="n_fa_equip">–</p></li>
+          <li class="card"><h4>Factory B — Rent</h4><p id="n_fb_rent">–</p></li>
+          <li class="card"><h4>Administration</h4><p id="n_admin">–</p></li>
+        </ul>
       </div>
     </section>
 
@@ -454,7 +561,7 @@
         <a href="#about">About</a>
         <a href="#kpis">Key Numbers</a>
         <a href="#factory">Factory Day</a>
-        <a href="#factory-advanced">Factory Day (Multi-species)</a>
+        <a href="#network">Factory Network</a>
         <a href="#contact">Contact</a>
       </nav>
     </div>
