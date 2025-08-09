@@ -36,22 +36,22 @@
   <form id="kpiForm" class="kpi-form" autocomplete="off">
     <div class="grid">
       <label>Volume (kg)
-        <input type="text" name="volumeKg" required placeholder="e.g. 1200">
+        <input type="text" inputmode="decimal" name="volumeKg" required placeholder="e.g. 1200">
       </label>
       <label>Sell price / kg
-        <input type="text" name="sellPrice" required placeholder="e.g. 14,50">
+        <input type="text" inputmode="decimal" name="sellPrice" required placeholder="e.g. 14,50">
       </label>
       <label>Raw cost / kg
-        <input type="text" name="rawCost" required placeholder="e.g. 9,20">
+        <input type="text" inputmode="decimal" name="rawCost" required placeholder="e.g. 9,20">
       </label>
       <label>Processing + pack / kg
-        <input type="text" name="procCost" required placeholder="e.g. 1,30">
+        <input type="text" inputmode="decimal" name="procCost" required placeholder="e.g. 1,30">
       </label>
       <label>Freight / kg
-        <input type="text" name="freight" value="0" required placeholder="0">
+        <input type="text" inputmode="decimal" name="freight" value="0" required placeholder="0">
       </label>
       <label>Yield loss (%)
-        <input type="text" name="wastePct" value="0" required placeholder="0 = no loss">
+        <input type="text" inputmode="decimal" name="wastePct" value="0" required placeholder="0 = no loss">
       </label>
     </div>
 
