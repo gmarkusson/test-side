@@ -169,9 +169,13 @@
 169   const light = document.documentElement.classList.toggle('light');
 170   try { localStorage.setItem('theme', light ? 'light' : 'dark'); } catch {}
 171 });
-172 (function initTheme(){
-173   try {
-174     const saved = localStorage.getItem('theme');
-175     if (saved === 'light') document.documentElement.classList.add('light');
-176   } catch {}
-177 })();
+(function initTheme(){
+  try {
+    const saved = localStorage.getItem('theme');
+    if (!saved || saved === 'light') {
+      document.documentElement.classList.add('light'); // default to light
+    }
+  } catch {
+    document.documentElement.classList.add('light');
+  }
+})();
