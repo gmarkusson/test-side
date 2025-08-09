@@ -47,6 +47,9 @@
     status: document.getElementById('postStatus')
   };
 
+  // Helper to accept both comma and dot decimals
+  const num = v => Number(String(v).replace(',', '.')) || 0;
+
   const fmt = (n, opts = {}) =>
     new Intl.NumberFormat(undefined, { maximumFractionDigits: 2, ...opts }).format(n);
 
@@ -55,12 +58,12 @@
     out.status.textContent = '';
 
     const data = Object.fromEntries(new FormData(form).entries());
-    const volumeKg   = Number(data.volumeKg || 0);
-    const sellPrice  = Number(data.sellPrice || 0);   // per kg
-    const rawCost    = Number(data.rawCost || 0);     // per kg
-    const procCost   = Number(data.procCost || 0);    // per kg
-    const freight    = Number(data.freight || 0);     // per kg
-    const wastePct   = Number(data.wastePct || 0);    // percent
+    const volumeKg   = num(data.volumeKg);
+    const sellPrice  = num(data.sellPrice);   // per kg
+    const rawCost    = num(data.rawCost);     // per kg
+    const procCost   = num(data.procCost);    // per kg
+    const freight    = num(data.freight);     // per kg
+    const wastePct   = num(data.wastePct);    // percent
     const webhookUrl = (data.webhookUrl || '').trim();
 
     // Calculations
