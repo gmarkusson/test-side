@@ -60,22 +60,15 @@ function easterSunday(year) {
   const day = ((h + l - 7 * m + 114) % 31) + 1;
   return new Date(Date.UTC(year, month - 1, day));
 }
-function addDays(d, n) {
-  const x = new Date(d.getTime());
-  x.setUTCDate(x.getUTCDate() + n); return x;
-}
+function addDays(d, n) { const x = new Date(d.getTime()); x.setUTCDate(x.getUTCDate() + n); return x; }
 function firstThursdayAfterApril18(year) {
   const start = new Date(Date.UTC(year, 3, 19));
-  for (let i = 0; i < 10; i++) {
-    const d = addDays(start, i);
-    if (d.getUTCDay() === 4) return d;
-  }
+  for (let i = 0; i < 10; i++) { const d = addDays(start, i); if (d.getUTCDay() === 4) return d; }
   return addDays(start, 7);
 }
 function firstMondayInAugust(year) {
   const d = new Date(Date.UTC(year, 7, 1));
-  const day = d.getUTCDay();
-  const offset = (8 - day) % 7;
+  const day = d.getUTCDay(); const offset = (8 - day) % 7;
   return addDays(d, offset === 0 ? 0 : offset);
 }
 function icelandPublicHolidays(year) {
@@ -107,7 +100,7 @@ function workingDaysInMonth(year, monthIndex) {
   let count = 0;
   for (let d = new Date(first); d <= last; d = addDays(d, 1)) {
     const dow = d.getUTCDay();
-    if (dow === 0 || dow === 6) continue; // weekends
+    if (dow === 0 || dow === 6) continue;
     if (holidays.some(h => isSameDateUTC(h, d))) continue;
     count++;
   }
@@ -117,7 +110,7 @@ function workingDaysInMonth(year, monthIndex) {
 // ===== Shared currency control =====
 const currencySel = $('#currencySelect');
 
-// ================= Calculator 1: Key Numbers =================
+// ========== Calculator 1: Key Numbers ==========
 const form1 = $('#kpiForm');
 const res1 = $('#kpiResults');
 const postStatus = $('#postStatus');
@@ -190,7 +183,7 @@ currencySel?.addEventListener('change', () => {
   if (!$('#netResults').hidden) try { calculateNetwork(); } catch {}
 });
 
-// ================= Calculator 2: Factory Day (single site) =================
+// ========== Calculator 2: Factory Day ==========
 const form2 = $('#dayForm');
 const res2  = $('#dayResults');
 
@@ -305,7 +298,7 @@ form2?.addEventListener('reset', () => {
   }, 0);
 });
 
-// ================= Calculator 3: Factory Network (3 factories) =================
+// ========== Calculator 3: Factory Network (3 factories) ==========
 const netForm = $('#netForm');
 const netRes  = $('#netResults');
 
@@ -330,12 +323,8 @@ function laborCostGroup(prefix) {
 }
 function numbersGroup(prefix) {
   const p = n => parseNum(netForm.elements[`${prefix}_${n}`].value);
-  return {
-    rawKg:  p('rawKg'), rawCost: p('rawCost'),
-    prodKg: p('prodKg'), sell: p('sell'),
-    pack:   p('pack'),   freight: p('freight'),
-    utils:  p('utils')
-  };
+  return { rawKg: p('rawKg'), rawCost: p('rawCost'), prodKg: p('prodKg'), sell: p('sell'),
+           pack: p('pack'), freight: p('freight'), utils: p('utils') };
 }
 
 function calculateNetwork() {
@@ -435,7 +424,9 @@ netForm?.addEventListener('submit', (e) => { e.preventDefault(); try { calculate
 netForm?.addEventListener('reset', () => {
   setTimeout(() => {
     netRes.hidden = true;
-    ['#n_revenue','#n_totalCost','#n_profit','#n_marginPct','#n_costPerKg','#n_salmon','#n_whitefish','#n_smoke','#n_bA_housing','#n_bA_equip','#n_bB_rent','#n_admin'].forEach(id=>$(id).textContent='–');
+    ['#n_revenue','#n_totalCost','#n_profit','#n_marginPct','#n_costPerKg',
+     '#n_salmon','#n_whitefish','#n_smoke',
+     '#n_bA_housing','#n_bA_equip','#n_bB_rent','#n_admin'].forEach(id=>$(id).textContent='–');
   }, 0);
 });
 
