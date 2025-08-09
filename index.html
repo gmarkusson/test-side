@@ -11,7 +11,6 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preload" href="styles.css" as="style">
   <link rel="stylesheet" href="styles.css">
-  <script defer src="script.js?v=6"></script>
 </head>
 <body>
   <header class="site-header">
@@ -103,7 +102,7 @@
         </select>
       </div>
 
-      <form id="kpiForm" class="kpi-form" autocomplete="off" novalidate>
+      <form id="kpiForm" class="kpi-form" autocomplete="off" novalidate action="javascript:void(0)">
         <div class="grid">
           <label>Volume (kg)
             <input type="text" inputmode="decimal" name="volumeKg" id="volumeKg" required placeholder="e.g. 1200">
@@ -137,7 +136,7 @@
         </details>
 
         <div class="cta-row">
-          <button class="btn primary" type="submit">Calculate</button>
+          <button id="calcBtn" class="btn primary" type="button">Calculate</button>
           <button class="btn" type="reset">Reset</button>
         </div>
       </form>
@@ -188,5 +187,8 @@
       </nav>
     </div>
   </footer>
+
+  <!-- Your JS with cache-buster -->
+  <script defer src="script.js?v=6"></script>
 </body>
 </html>
