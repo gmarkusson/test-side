@@ -11,7 +11,6 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preload" href="styles.css" as="style">
   <link rel="stylesheet" href="styles.css">
-  <script>document.write('<script defer src="script.js?v=' + Date.now() + '"><\\/script>');</script>
 </head>
 <body>
   <header class="site-header">
@@ -449,7 +448,7 @@
           </label>
         </div>
 
-        <!-- Smokehouse (Factory B) -->
+        <!-- Smokehouse (Building B) -->
         <h3>Smokehouse (Building B)</h3>
         <div class="grid">
           <label>Staff — people
@@ -573,5 +572,8 @@
       </nav>
     </div>
   </footer>
+
+  <!-- Load JS safely at the end -->
+  <script defer src="script.js?v=1"></script>
 </body>
 </html>
