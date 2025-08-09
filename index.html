@@ -32,6 +32,7 @@
   </header>
 
   <main id="home">
+    <!-- Hero -->
     <section class="hero">
       <div class="hero-content">
         <h1>Build a simple website fast</h1>
@@ -56,6 +57,7 @@
       </div>
     </section>
 
+    <!-- Features -->
     <section id="features" class="features">
       <h2>Features</h2>
       <ul class="cards">
@@ -78,6 +80,7 @@
       </ul>
     </section>
 
+    <!-- About -->
     <section id="about" class="about">
       <div class="about-inner">
         <h2>About</h2>
@@ -92,7 +95,7 @@
     <section id="kpis" class="kpis">
       <h2>Key Numbers</h2>
 
-      <!-- Single currency selector lives here -->
+      <!-- Single currency selector -->
       <div class="kpi-toolbar">
         <label for="currencySelect">Currency</label>
         <select id="currencySelect" name="currency">
@@ -153,8 +156,37 @@
       </div>
     </section>
 
-    <!-- Simple contact anchor to match nav -->
-    <section id="contact" class="contact" aria-label="Contact"></section>
+    <!-- Contact -->
+    <section id="contact" class="contact">
+      <h2>Contact</h2>
+      <p>Have questions? Reach out to us anytime.</p>
+      <form class="contact-form" autocomplete="off" novalidate>
+        <label for="c_name">Your name</label>
+        <input id="c_name" type="text" name="name" required>
+
+        <label for="c_email">Your email</label>
+        <input id="c_email" type="email" name="email" required>
+
+        <label for="c_msg">Message</label>
+        <textarea id="c_msg" name="message" rows="4" required></textarea>
+
+        <button class="btn primary" type="submit">Send</button>
+      </form>
+    </section>
   </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p>&copy; 2025 Premium Starter Site. All rights reserved.</p>
+      <nav class="footer-nav" aria-label="Footer">
+        <a href="#home">Home</a>
+        <a href="#features">Features</a>
+        <a href="#about">About</a>
+        <a href="#kpis">Key Numbers</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </footer>
 </body>
 </html>
