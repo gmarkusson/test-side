@@ -31,8 +31,7 @@
     form.reset();
   });
 })();
-// --- KPI Calculator + optional POST ---
-// Paste this AFTER your existing script's closing "})();"
+// --- KPI Calculator + optional POST + currency switcher ---
 (function () {
   const form = document.getElementById('kpiForm');
   if (!form) return;
@@ -48,10 +47,11 @@
     status: document.getElementById('postStatus')
   };
 
+  const currencySelect = document.getElementById('currencySelect');
+
   // ---- Formatting & parsing ----
-  // Locale/currency for display (change if you want a different currency)
-  const locale = 'is-IS';
-  const currency = 'ISK';
+  const locale = 'is-IS';               // keep Icelandic number style; change if you prefer
+  let currency = currencySelect?.value || 'ISK';
 
   const fmtNumber   = n => new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(n);
   const fmtCurrency = n => new Intl.NumberFormat(locale, { style: 'currency', currency, maximumFractionDigits: 2 }).format(n);
@@ -59,18 +59,37 @@
   // Accept both "14,5" and "14.5"
   const num = v => Number(String(v).replace(',', '.')) || 0;
 
+  // Keep last results so we can re-render when currency changes
+  let last = null;
+
+  const render = () => {
+    if (!last) return;
+    const { netKg, revenue, totalCost, profit, marginPct, profitPerKg } = last;
+    out.netKg.textContent       = fmtNumber(netKg) + ' kg';
+    out.revenue.textContent     = fmtCurrency(revenue);
+    out.totalCost.textContent   = fmtCurrency(totalCost);
+    out.profit.textContent      = fmtCurrency(profit);
+    out.marginPct.textContent   = fmtNumber(marginPct) + ' %';
+    out.profitPerKg.textContent = fmtCurrency(profitPerKg) + ' / kg';
+    out.panel.hidden = false;
+  };
+
+  currencySelect?.addEventListener('change', () => {
+    currency = currencySelect.value;
+    render();
+  });
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     out.status.textContent = '';
 
     const data = Object.fromEntries(new FormData(form).entries());
-
     const volumeKg   = num(data.volumeKg);
-    const sellPrice  = num(data.sellPrice);   // per kg
-    const rawCost    = num(data.rawCost);     // per kg
-    const procCost   = num(data.procCost);    // per kg
-    const freight    = num(data.freight);     // per kg
-    const wastePct   = num(data.wastePct);    // percent
+    const sellPrice  = num(data.sellPrice);
+    const rawCost    = num(data.rawCost);
+    const procCost   = num(data.procCost);
+    const freight    = num(data.freight);
+    const wastePct   = num(data.wastePct);
     const webhookUrl = (data.webhookUrl || '').trim();
 
     // ---- Calculations ----
@@ -82,14 +101,8 @@
     const marginPct = revenue > 0 ? (profit / revenue) * 100 : 0;
     const profitPerKg = netKg > 0 ? profit / netKg : 0;
 
-    // ---- Show results ----
-    out.netKg.textContent       = fmtNumber(netKg) + ' kg';
-    out.revenue.textContent     = fmtCurrency(revenue);
-    out.totalCost.textContent   = fmtCurrency(totalCost);
-    out.profit.textContent      = fmtCurrency(profit);
-    out.marginPct.textContent   = fmtNumber(marginPct) + ' %';
-    out.profitPerKg.textContent = fmtCurrency(profitPerKg) + ' / kg';
-    out.panel.hidden = false;
+    last = { netKg, revenue, totalCost, profit, marginPct, profitPerKg };
+    render();
 
     // ---- Optional POST to webhook ----
     if (webhookUrl) {
