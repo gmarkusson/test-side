@@ -57,7 +57,7 @@ const f = {
   rawCost:   $('input[name="rawCost"]'),
   procCost:  $('input[name="procCost"]'),
   freight:   $('input[name="freight"]'),
-  wastePct:  $('input[name="wastePct"]'),
+  yieldPct:  $('input[name="yieldPct"]'),
   webhook:   $('input[name="webhookUrl"]')
 };
 
@@ -79,16 +79,16 @@ function calculate() {
   const raw      = parseNum(f.rawCost.value);
   const proc     = parseNum(f.procCost.value);
   const freight  = parseNum(f.freight.value || 0);
-  const waste    = parseNum(f.wastePct.value || 0);
+  const yieldPct    = parseNum(f.yieldPct.value || 0);
 
-  const fields = { volumeKg, sell, raw, proc, freight, waste };
+  const fields = { volumeKg, sell, raw, proc, freight, yieldPct };
   for (const [k, v] of Object.entries(fields)) {
     if (!Number.isFinite(v)) {
       throw new Error(`Please enter a valid number for "${k}".`);
     }
   }
 
-  const netKg = Math.max(0, volumeKg * (1 - waste / 100));
+  const netKg = Math.max(0, volumeKg * (1 - yieldPct / 100));
   const revenue = netKg * sell;
   const totalCost = netKg * (raw + proc + freight);
   const profit = revenue - totalCost;
@@ -107,7 +107,7 @@ function calculate() {
   resWrap.hidden = false;
 
   return { currency, netKg, revenue, totalCost, profit, marginPct, profitPerKg,
-           inputs: { volumeKg, sell, raw, proc, freight, waste } };
+           inputs: { volumeKg, sell, raw, proc, freight, yieldPct } };
 }
 
 // --- webhook (optional) ----------------------------------------------------
