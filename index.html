@@ -102,25 +102,41 @@
 
 <section id="kpis" class="kpis">
   <h2>Key Numbers</h2>
+
+  <!-- 👇 Currency switcher -->
+  <div class="kpi-toolbar">
+    <label>Currency
+      <select id="currencySelect">
+        <option value="ISK" selected>ISK kr.</option>
+        <option value="EUR">EUR €</option>
+        <option value="GBP">GBP £</option>
+        <option value="USD">USD $</option>
+        <option value="SEK">SEK kr</option>
+        <option value="NOK">NOK kr</option>
+        <option value="DKK">DKK kr</option>
+      </select>
+    </label>
+  </div>
+
   <form id="kpiForm" class="kpi-form" autocomplete="off">
     <div class="grid">
       <label>Volume (kg)
-        <input type="number" step="0.01" name="volumeKg" required placeholder="e.g. 1200">
+        <input type="text" inputmode="decimal" name="volumeKg" required placeholder="e.g. 1200">
       </label>
       <label>Sell price / kg
-        <input type="number" step="0.01" name="sellPrice" required placeholder="e.g. 14.50">
+        <input type="text" inputmode="decimal" name="sellPrice" required placeholder="e.g. 14,50">
       </label>
       <label>Raw cost / kg
-        <input type="number" step="0.01" name="rawCost" required placeholder="e.g. 9.20">
+        <input type="text" inputmode="decimal" name="rawCost" required placeholder="e.g. 9,20">
       </label>
       <label>Processing + pack / kg
-        <input type="number" step="0.01" name="procCost" required placeholder="e.g. 1.30">
+        <input type="text" inputmode="decimal" name="procCost" required placeholder="e.g. 1,30">
       </label>
       <label>Freight / kg
-        <input type="number" step="0.01" name="freight" value="0" required placeholder="0">
+        <input type="text" inputmode="decimal" name="freight" value="0" required placeholder="0">
       </label>
       <label>Yield loss (%)
-        <input type="number" step="0.1" name="wastePct" value="0" required placeholder="0 = no loss">
+        <input type="text" inputmode="decimal" name="wastePct" value="0" required placeholder="0 = no loss">
       </label>
     </div>
 
@@ -150,31 +166,3 @@
     <p id="postStatus" class="hint"></p>
   </div>
 </section>
-
-    
-    <section id="contact" class="contact">
-      <h2>Contact</h2>
-      <form id="contactForm" class="contact-form">
-        <label>
-          Name
-          <input type="text" name="name" placeholder="Your name" required>
-        </label>
-        <label>
-          Email
-          <input type="email" name="email" placeholder="you@example.com" required>
-        </label>
-        <label>
-          Message
-          <textarea name="message" rows="5" placeholder="How can we help?" required></textarea>
-        </label>
-        <button class="btn primary" type="submit">Send</button>
-        <p class="hint">This demo form uses JavaScript only and doesn't send email until you connect a backend.</p>
-      </form>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <p>© <span id="year"></span> Premium Starter. Built with ❤</p>
-  </footer>
-</body>
-</html>
