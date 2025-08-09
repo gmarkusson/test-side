@@ -159,3 +159,10 @@ navToggle?.addEventListener('click', () => {
   const open = siteNav.classList.toggle('open');
   navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
 });
+
+// --- set default currency to EUR -------------------------------------------
+document.addEventListener('DOMContentLoaded', () => {
+  if (currencySel) {
+    currencySel.value = 'EUR';
+  }
+});
