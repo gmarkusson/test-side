@@ -75,6 +75,16 @@ body {
 .features, .about, .contact { padding: 3rem 1rem; max-width: 1100px; margin: 0 auto; }
 .features h2, .about h2, .contact h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); margin: 0 0 1rem; }
 
+.kpis { padding: 3rem 1rem; max-width: 1100px; margin: 0 auto; }
+.kpi-form .grid { 
+  display: grid; grid-template-columns: repeat(3, minmax(220px, 1fr)); gap: 1rem; 
+}
+.kpi-form input { width: 100%; }
+.webhook-details { margin-top: 0.5rem; }
+.kpi-results h3 { margin: 1.2rem 0 0.6rem; }
+@media (max-width: 900px) { .kpi-form .grid { grid-template-columns: 1fr; } }
+
+
 .cards { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
 .card {
   background: linear-gradient(180deg, color-mix(in oklab, var(--card) 85%, transparent), color-mix(in oklab, var(--card) 65%, transparent));
