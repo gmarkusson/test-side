@@ -11,7 +11,7 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preload" href="styles.css" as="style">
   <link rel="stylesheet" href="styles.css">
-  <script defer src="script.js"></script>
+  <script defer src="script.js?v=6"></script>
 </head>
 <body>
   <header class="site-header">
@@ -27,7 +27,6 @@
       <a href="#about">About</a>
       <a href="#kpis">Key Numbers</a>
       <a href="#contact">Contact</a>
-      <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">🌓</button>
     </nav>
   </header>
 
@@ -36,7 +35,7 @@
     <section class="hero">
       <div class="hero-content">
         <h1>Build a simple website fast</h1>
-        <p>This starter gives you a responsive layout, dark mode, smooth scrolling, and clean styles.</p>
+        <p>This starter gives you a responsive layout, smooth scrolling, and clean styles.</p>
         <div class="cta-row">
           <a class="btn primary" href="#features">See features</a>
           <a class="btn" href="#contact">Contact us</a>
@@ -70,10 +69,6 @@
           <p>Semantic HTML, aria labels, and focus styles built in.</p>
         </li>
         <li class="card">
-          <h3>Dark mode</h3>
-          <p>One click theme toggle that remembers your preference.</p>
-        </li>
-        <li class="card">
           <h3>Clean styles</h3>
           <p>Modern typography and spacing you can tweak easily.</p>
         </li>
@@ -95,7 +90,6 @@
     <section id="kpis" class="kpis">
       <h2>Key Numbers</h2>
 
-      <!-- Single currency selector -->
       <div class="kpi-toolbar">
         <label for="currencySelect">Currency</label>
         <select id="currencySelect" name="currency">
@@ -111,31 +105,29 @@
 
       <form id="kpiForm" class="kpi-form" autocomplete="off" novalidate>
         <div class="grid">
-  <label>Volume (kg)
-    <input type="text" inputmode="decimal" name="volumeKg" id="volumeKg" required placeholder="e.g. 1200">
-  </label>
+          <label>Volume (kg)
+            <input type="text" inputmode="decimal" name="volumeKg" id="volumeKg" required placeholder="e.g. 1200">
+          </label>
 
-  <label>Sell price / kg
-    <input type="text" inputmode="decimal" name="sellPrice" id="sellPrice" required placeholder="e.g. 14,50">
-  </label>
+          <label>Sell price / kg
+            <input type="text" inputmode="decimal" name="sellPrice" id="sellPrice" required placeholder="e.g. 14,50">
+          </label>
 
-  <label>Raw cost / kg
-    <input type="text" inputmode="decimal" name="rawCost" id="rawCost" required placeholder="e.g. 9,20">
-  </label>
+          <label>Raw cost / kg
+            <input type="text" inputmode="decimal" name="rawCost" id="rawCost" required placeholder="e.g. 9,20">
+          </label>
 
-  <label>Processing + pack / kg
-    <input type="text" inputmode="decimal" name="procCost" id="procCost" required placeholder="e.g. 1,30">
-  </label>
+          <label>Processing + pack / kg
+            <input type="text" inputmode="decimal" name="procCost" id="procCost" required placeholder="e.g. 1,30">
+          </label>
 
-  <label>Freight / kg
-    <input type="text" inputmode="decimal" name="freight" id="freight" value="0" required placeholder="0">
-  </label>
+          <label>Freight / kg
+            <input type="text" inputmode="decimal" name="freight" id="freight" value="0" required placeholder="0">
+          </label>
 
-<label>Yield (%)
-  <input type="text" inputmode="decimal" name="yieldPct" id="yieldPct" value="100" required placeholder="100 = no loss">
-</label>
-</div>
-
+          <label>Yield (%)
+            <input type="text" inputmode="decimal" name="yieldPct" id="yieldPct" value="100" required placeholder="100 = no loss">
+          </label>
         </div>
 
         <details class="webhook-details">
@@ -196,6 +188,5 @@
       </nav>
     </div>
   </footer>
-  <script defer src="script.js?v=5"></script>
 </body>
 </html>
