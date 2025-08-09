@@ -11,6 +11,11 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preload" href="styles.css" as="style">
   <link rel="stylesheet" href="styles.css">
+
+  <!-- JS cache-buster -->
+  <script>
+    document.write('<script defer src="script.js?v=' + Date.now() + '"><\/script>');
+  </script>
 </head>
 <body>
   <header class="site-header">
@@ -89,6 +94,7 @@
     <section id="kpis" class="kpis">
       <h2>Key Numbers</h2>
 
+      <!-- Single currency selector -->
       <div class="kpi-toolbar">
         <label for="currencySelect">Currency</label>
         <select id="currencySelect" name="currency">
@@ -102,7 +108,7 @@
         </select>
       </div>
 
-      <form id="kpiForm" class="kpi-form" autocomplete="off" novalidate action="javascript:void(0)">
+      <form id="kpiForm" class="kpi-form" autocomplete="off" novalidate>
         <div class="grid">
           <label>Volume (kg)
             <input type="text" inputmode="decimal" name="volumeKg" id="volumeKg" required placeholder="e.g. 1200">
@@ -136,7 +142,7 @@
         </details>
 
         <div class="cta-row">
-          <button id="calcBtn" class="btn primary" type="button">Calculate</button>
+          <button class="btn primary" type="submit">Calculate</button>
           <button class="btn" type="reset">Reset</button>
         </div>
       </form>
@@ -187,8 +193,5 @@
       </nav>
     </div>
   </footer>
-
-  <!-- Your JS with cache-buster -->
-  <script defer src="script.js?v=7"></script>
 </body>
 </html>
