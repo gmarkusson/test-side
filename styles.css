@@ -83,6 +83,7 @@ body {
 .webhook-details { margin-top: 0.5rem; }
 .kpi-results h3 { margin: 1.2rem 0 0.6rem; }
 @media (max-width: 900px) { .kpi-form .grid { grid-template-columns: 1fr; } }
+
 .kpi-toolbar { margin: 0 0 1rem; }
 .kpi-toolbar select { padding: .5rem .6rem; border-radius: 10px; }
 
