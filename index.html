@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Premium Starter Site</title>
+  <meta name="description" content="A clean, responsive starter website you can customize.">
+  <meta property="og:title" content="Premium Starter Site">
+  <meta property="og:description" content="A clean, responsive starter website you can customize.">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="styles.css" as="style">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="#home">Premium<span>Starter</span></a>
+
+    <button id="navToggle" class="hamburger" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav id="siteNav" class="site-nav" aria-label="Primary">
+      <a href="#home">Home</a>
+      <a href="#features">Features</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">🌓</button>
+    </nav>
+  </header>
+
+  <main id="home">
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Build a simple website fast</h1>
+        <p>This starter gives you a responsive layout, dark mode, smooth scrolling, and clean styles.</p>
+        <div class="cta-row">
+          <a class="btn primary" href="#features">See features</a>
+          <a class="btn" href="#contact">Contact us</a>
+        </div>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <svg viewBox="0 0 600 400" role="img" aria-label="decorative">
+          <defs>
+            <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0%" stop-color="#22d3ee"/>
+              <stop offset="100%" stop-color="#6366f1"/>
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width="600" height="400" rx="24" fill="url(#g)"/>
+          <circle cx="120" cy="80" r="40" fill="#fff" opacity="0.2"/>
+          <circle cx="520" cy="320" r="60" fill="#fff" opacity="0.15"/>
+        </svg>
+      </div>
+    </section>
+
+    <section id="features" class="features">
+      <h2>Features</h2>
+      <ul class="cards">
+        <li class="card">
+          <h3>Responsive</h3>
+          <p>Looks great on phones, tablets, and desktops.</p>
+        </li>
+        <li class="card">
+          <h3>Accessible</h3>
+          <p>Semantic HTML, aria labels, and focus styles built in.</p>
+        </li>
+        <li class="card">
+          <h3>Dark mode</h3>
+          <p>One click theme toggle that remembers your preference.</p>
+        </li>
+        <li class="card">
+          <h3>Clean styles</h3>
+          <p>Modern typography and spacing you can tweak easily.</p>
+        </li>
+      </ul>
+    </section>
+
+    <section id="about" class="about">
+      <div class="about-inner">
+        <h2>About</h2>
+        <p>
+          This starter is pure HTML, CSS, and vanilla JS—no frameworks. Edit the content in
+          <code>index.html</code>, tweak styles in <code>styles.css</code>, and add interactivity in <code>script.js</code>.
+        </p>
+      </div>
+    </section>
+
+    <section id="contact" class="contact">
+      <h2>Contact</h2>
+      <form id="contactForm" class="contact-form">
+        <label>
+          Name
+          <input type="text" name="name" placeholder="Your name" required>
+        </label>
+        <label>
+          Email
+          <input type="email" name="email" placeholder="you@example.com" required>
+        </label>
+        <label>
+          Message
+          <textarea name="message" rows="5" placeholder="How can we help?" required></textarea>
+        </label>
+        <button class="btn primary" type="submit">Send</button>
+        <p class="hint">This demo form uses JavaScript only and doesn't send email until you connect a backend.</p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© <span id="year"></span> Premium Starter. Built with ❤</p>
+  </footer>
+</body>
+</html>
