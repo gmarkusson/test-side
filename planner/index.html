@@ -126,82 +126,78 @@
   </ul>
 </section>
   </main>
+<script>
+const locale='is-IS';
+const q=(s,r=document)=>r.querySelector(s);
+const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const setText=(sel,val)=>{const el=typeof sel==='string'?q(sel):sel;if(el)el.textContent=val;};
 
-  <script>
-    const locale='is-IS';
-    const q=(s,r=document)=>r.querySelector(s);
-    const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
-    const setText=(sel,val)=>{const el=typeof sel==='string'?q(sel):sel;if(el)el.textContent=val;};
+// Robust number parser (your version)
 function toNumber(v) {
   if (v == null) return NaN;
-  let s = String(v).trim()
-    .replace(/\u00A0/g, '')   // NBSP
-    .replace(/\s/g, '');      // spaces
-
+  let s = String(v).trim().replace(/\u00A0/g,'').replace(/\s/g,'');
   if (!s) return NaN;
-
-  const hasComma = s.includes(',');
-  const hasDot   = s.includes('.');
-
+  const hasComma = s.includes(','), hasDot = s.includes('.');
   if (hasComma && hasDot) {
-    // Use the right-most punctuation as the decimal; remove the other as thousands
-    if (s.lastIndexOf(',') > s.lastIndexOf('.')) {
-      s = s.replace(/\./g, '').replace(',', '.');  // 1.234,56 -> 1234.56
-    } else {
-      s = s.replace(/,/g, '');                     // 1,234.56 -> 1234.56
-    }
+    if (s.lastIndexOf(',') > s.lastIndexOf('.')) s = s.replace(/\./g,'').replace(',', '.');
+    else s = s.replace(/,/g,'');
   } else if (hasComma) {
-    // Only commas: treat as thousands if grouped, otherwise decimal
-    const parts = s.split(',');
-    const looksLikeThousands = parts.length > 1 &&
-      parts.every((p, i) => (i === 0 ? p.length <= 3 : p.length === 3));
-    s = looksLikeThousands ? s.replace(/,/g, '') : s.replace(',', '.');
+    const parts = s.split(','), looksThousands = parts.length>1 && parts.every((p,i)=>(i===0?p.length<=3:p.length===3));
+    s = looksThousands ? s.replace(/,/g,'') : s.replace(',', '.');
   } else if (hasDot) {
-    // Only dots: if grouped like thousands, strip; else decimal
-    const parts = s.split('.');
-    const looksLikeThousands = parts.length > 1 &&
-      parts.every((p, i) => (i === 0 ? p.length <= 3 : p.length === 3));
-    if (looksLikeThousands) s = s.replace(/\./g, '');
+    const parts = s.split('.'), looksThousands = parts.length>1 && parts.every((p,i)=>(i===0?p.length<=3:p.length===3));
+    if (looksThousands) s = s.replace(/\./g,'');
   }
-
   const n = Number(s);
   return Number.isFinite(n) ? n : NaN;
 }
 
+const fmt=(n,d=2)=>Number.isFinite(n)?new Intl.NumberFormat(locale,{minimumFractionDigits:d,maximumFractionDigits:d}).format(n):'–';
 
-    const fmt=(n,d=2)=>Number.isFinite(n)?new Intl.NumberFormat(locale,{minimumFractionDigits:d,maximumFractionDigits:d}).format(n):'–';
+const bindings={
+  producedKg:'#producedKg', sellPriceDay:'#sellPriceDay', rawUsedKg:'#rawUsedKg', yieldPct:'#yieldPct',
+  rawCostPerKg:'#rawCostPerKg', packCostPerKg:'#packCostPerKg', freightPerKg:'#freightPerKg'
+};
 
-    const bindings={producedKg:'#producedKg',sellPriceDay:'#sellPriceDay',rawUsedKg:'#rawUsedKg',yieldPct: '#yieldPct',rawCostPerKg:'#rawCostPerKg',packCostPerKg:'#packCostPerKg',freightPerKg:'#freightPerKg'};
+function applyQueryParams(){
+  const p=new URLSearchParams(location.search);
+  for(const [k,sel] of Object.entries(bindings)){
+    const el=q(sel); if(!el) continue;
+    const v=p.get(k); if(v!=null && v!=='') el.value=decodeURIComponent(v);
+  }
+}
 
-    function applyQueryParams(){ const p=new URLSearchParams(location.search);
-      for(const [k,sel] of Object.entries(bindings)){ const el=q(sel); if(!el) continue; const v=p.get(k); if(v!=null&&v!=='') el.value=decodeURIComponent(v); } }
-    function syncUrlFromInputs(){ const p=new URLSearchParams();
-      for(const [k,sel] of Object.entries(bindings)){ const el=q(sel); if(el&&el.value!=='') p.set(k,el.value); }
-      history.replaceState(null,'',`${location.pathname}?${p.toString()}`); }
-let lastEdited = null;  // put this once near the top of the script
+function syncUrlFromInputs(){
+  const p=new URLSearchParams();
+  for(const [k,sel] of Object.entries(bindings)){
+    const el=q(sel); if(el && el.value!=='') p.set(k,el.value);
+  }
+  history.replaceState(null,'',`${location.pathname}?${p.toString()}`);
+}
+
+let lastEdited = null;
 
 function attachSync(){
-  document.querySelectorAll('input, select, textarea').forEach(el => {
-    el.addEventListener('input', () => {
-      // NEW: remember which field was edited
-      if (el.id === 'yieldPct')      lastEdited = 'yield';
-      else if (el.id === 'rawUsedKg') lastEdited = 'raw';
+  qa('input, select, textarea').forEach(el=>{
+    el.addEventListener('input', ()=>{
+      // remember which field was edited
+      if (el.id==='yieldPct') lastEdited='yield';
+      else if (el.id==='rawUsedKg') lastEdited='raw';
 
-      if (typeof syncUrlFromInputs === 'function') syncUrlFromInputs();
+      syncUrlFromInputs();
       calcKeyNumbers();
     });
   });
-
-  // Keep these (your thousand-separator on blur)
-  q('#producedKg')?.addEventListener('blur', () => formatIntInput(q('#producedKg')));
-  q('#rawUsedKg')?.addEventListener('blur', () => formatIntInput(q('#rawUsedKg')));
+  // thousand-separator on blur for integer inputs
+  q('#producedKg')?.addEventListener('blur', ()=>formatIntInput(q('#producedKg')));
+  q('#rawUsedKg')?.addEventListener('blur', ()=>formatIntInput(q('#rawUsedKg')));
 }
 
-// Format integers with Icelandic thousands separators (no decimals)
+// integer formatter
 const nfIntIS = new Intl.NumberFormat('is-IS', { maximumFractionDigits: 0 });
+function formatIntInput(el){ if(!el) return; const n=toNumber(el.value); if(Number.isFinite(n)) el.value = nfIntIS.format(Math.round(n)); }
 
-<script>
-function calcKeyNumbers() {
+function calcKeyNumbers(){
   const producedKg = toNumber(q('#producedKg')?.value);
   const sellPrice  = toNumber(q('#sellPriceDay')?.value);
   let   rawUsed    = toNumber(q('#rawUsedKg')?.value);
@@ -210,26 +206,20 @@ function calcKeyNumbers() {
   const freight    = toNumber(q('#freightPerKg')?.value) || 0;
   let   yieldIn    = toNumber(q('#yieldPct')?.value);
 
-  // Keep Raw used and Yield % linked based on the last edited field
   const rawUsedEl = q('#rawUsedKg');
   const yieldEl   = q('#yieldPct');
   let changed = false;
 
   if (Number.isFinite(producedKg)) {
     // If Yield changed (or Raw is empty), compute Raw used
-    if (Number.isFinite(yieldIn) && yieldIn > 0 &&
-        (lastEdited === 'yield' || !Number.isFinite(rawUsed))) {
-      const computedRaw = producedKg / (yieldIn / 100);
+    if (Number.isFinite(yieldIn) && yieldIn > 0 && (lastEdited==='yield' || !Number.isFinite(rawUsed))) {
+      const computedRaw = producedKg / (yieldIn/100);
       rawUsed = computedRaw;
-      if (rawUsedEl) {
-        rawUsedEl.value = String(Math.round(computedRaw));
-        formatIntInput(rawUsedEl); // thousands separator
-      }
+      if (rawUsedEl){ rawUsedEl.value = String(Math.round(computedRaw)); formatIntInput(rawUsedEl); }
       changed = true;
     }
     // Else if Raw changed (or Yield is empty), compute Yield %
-    else if (Number.isFinite(rawUsed) && rawUsed > 0 &&
-             (lastEdited === 'raw' || !Number.isFinite(yieldIn))) {
+    else if (Number.isFinite(rawUsed) && rawUsed > 0 && (lastEdited==='raw' || !Number.isFinite(yieldIn))) {
       const computedYield = (producedKg / rawUsed) * 100;
       yieldIn = computedYield;
       if (yieldEl) yieldEl.value = computedYield.toFixed(1);
@@ -239,21 +229,18 @@ function calcKeyNumbers() {
 
   if (changed) syncUrlFromInputs();
 
-  // Final yield to display
   const yieldPct = Number.isFinite(yieldIn)
     ? yieldIn
     : (Number.isFinite(producedKg) && Number.isFinite(rawUsed) && rawUsed > 0)
         ? (producedKg / rawUsed) * 100
         : NaN;
 
-  // KPI math
   const revenue   = producedKg * sellPrice;
   const totalCost = producedKg * (rawCost + packCost + freight);
   const profit    = revenue - totalCost;
   const marginPct = revenue ? (profit / revenue) * 100 : NaN;
   const profitKg  = producedKg ? profit / producedKg : NaN;
 
-  // Output
   setText('#key-net-kg', fmt(producedKg, 0));
   setText('#key-revenue', fmt(revenue));
   setText('#key-total-cost', fmt(totalCost));
@@ -262,38 +249,14 @@ function calcKeyNumbers() {
   setText('#key-profit-kg', fmt(profitKg));
   setText('#key-yield', Number.isFinite(yieldPct) ? fmt(yieldPct, 1) + ' %' : '–');
 }
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  applyQueryParams?.();
+  attachSync();
+  calcKeyNumbers();
+});
 </script>
 
-
-  if (changed) syncUrlFromInputs();
-
-
-  const yieldPct = Number.isFinite(yieldIn)
-    ? yieldIn
-    : (Number.isFinite(producedKg) && Number.isFinite(rawUsed) && rawUsed > 0)
-        ? (producedKg / rawUsed) * 100
-        : NaN;
-
-  const revenue   = producedKg * sellPrice;
-  const totalCost = producedKg * (rawCost + packCost + freight);
-  const profit    = revenue - totalCost;
-  const marginPct = revenue ? (profit / revenue) * 100 : NaN;
-  const profitKg  = producedKg ? profit / producedKg : NaN;
-
-  setText('#key-net-kg', fmt(producedKg, 0));
-  setText('#key-revenue', fmt(revenue));
-  setText('#key-total-cost', fmt(totalCost));
-  setText('#key-profit', fmt(profit));
-  setText('#key-gm', Number.isFinite(marginPct) ? fmt(marginPct, 1) + ' %' : '–');
-  setText('#key-profit-kg', fmt(profitKg));
-  setText('#key-yield', Number.isFinite(yieldPct) ? fmt(yieldPct, 1) + ' %' : '–');
-}
-document.addEventListener('DOMContentLoaded', () => {
-  if (typeof applyQueryParams === 'function') applyQueryParams();
-  attachSync();      // wire up input listeners + URL sync
-  calcKeyNumbers();  // initial compute
-});
- 
-  </script>
+  
 </body>
 </html>
