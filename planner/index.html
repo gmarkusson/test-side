@@ -157,10 +157,12 @@ function toNumber(v) {
 
 const fmt=(n,d=2)=>Number.isFinite(n)?new Intl.NumberFormat(locale,{minimumFractionDigits:d,maximumFractionDigits:d}).format(n):'–';
 
-const bindings={
+const bindings = {
   producedKg:'#producedKg', sellPriceDay:'#sellPriceDay', rawUsedKg:'#rawUsedKg', yieldPct:'#yieldPct',
-  rawCostPerKg:'#rawCostPerKg', packCostPerKg:'#packCostPerKg', freightPerKg:'#freightPerKg'
+  rawCostPerKg:'#rawCostPerKg', packCostPerKg:'#packCostPerKg', freightPerKg:'#freightPerKg',
+  month:'#month', workingDays:'#workingDays' // ← optional
 };
+
 
 function applyQueryParams(){
   const p=new URLSearchParams(location.search);
