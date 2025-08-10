@@ -69,55 +69,82 @@
       </div>
     </section>
 
-    <!-- BUILDINGS -->
-   <section class="card" id="buildings">
+<!-- BUILDINGS -->
+<section class="card">
   <h2>Buildings</h2>
 
   <div class="buildings">
     <!-- Building A -->
-    <div class="building" id="bA">
-      <h3>Building A</h3>
+    <div id="bA" class="building" data-index="0">
+      <h3>Whitefish &amp; Salmon factories</h3>
+
       <div class="grid">
-        <label>Housing (ISK/month)
-          <input id="bA_housingISK" inputmode="decimal" />
-        </label>
-        <label>Maintenance (€/month)
-          <input id="bA_maintMonth" inputmode="decimal" />
-        </label>
-        <label>Spare parts (€/month)
-          <input id="bA_sparesMonth" inputmode="decimal" />
-        </label>
-        <label>Rental items (€/month)
-          <input id="bA_rentMonth" inputmode="decimal" />
-        </label>
+        <label>Electricity (kWh/day)<input class="elec" inputmode="decimal" /></label>
+        <label>Water (m³/day)<input class="water" inputmode="decimal" /></label>
       </div>
+
+      <h4 class="muted" style="margin:12px 0 6px">Monthly costs (ISK / month)</h4>
+      <div class="rows monthly"></div>
+      <div class="actions">
+        <button class="btn add-monthly" type="button">+ Add new cost</button>
+      </div>
+
+      <h4 class="muted" style="margin:14px 0 6px">Daily costs (€/day)</h4>
+      <div class="rows daily"></div>
+      <div class="actions">
+        <button class="btn add-daily" type="button">+ Add new cost</button>
+      </div>
+
+      <!-- Per-building mini totals (no depreciation) -->
+      <ul class="results mini">
+        <li><span>Housing (ISK/mo)</span><strong id="b0-housing">–</strong></li>
+        <li><span>Equipment (ISK/mo)</span><strong id="b0-equip">–</strong></li>
+        <li><span>Admin (ISK/mo)</span><strong id="b0-admin">–</strong></li>
+        <li><span>Maintenance (ISK/mo)</span><strong id="b0-maint">–</strong></li>
+        <li><span>Rentals (ISK/mo)</span><strong id="b0-rentals">–</strong></li>
+        <li><span>Spare parts (ISK/mo)</span><strong id="b0-spares">–</strong></li>
+        <li><span>Other (€/day)</span><strong id="b0-other">–</strong></li>
+        <li><span>Elec (kWh/day)</span><strong id="b0-elec">–</strong></li>
+        <li><span>Water (m³/day)</span><strong id="b0-water">–</strong></li>
+      </ul>
     </div>
 
     <!-- Building B -->
-    <div class="building" id="bB">
-      <h3>Building B</h3>
+    <div id="bB" class="building" data-index="1">
+      <h3>Smokehouse</h3>
+
       <div class="grid">
-        <label>Housing (ISK/month)
-          <input id="bB_housingISK" inputmode="decimal" />
-        </label>
-        <label>Maintenance (€/month)
-          <input id="bB_maintMonth" inputmode="decimal" />
-        </label>
-        <label>Spare parts (€/month)
-          <input id="bB_sparesMonth" inputmode="decimal" />
-        </label>
-        <label>Rental items (€/month)
-          <input id="bB_rentMonth" inputmode="decimal" />
-        </label>
+        <label>Electricity (kWh/day)<input class="elec" inputmode="decimal" /></label>
+        <label>Water (m³/day)<input class="water" inputmode="decimal" /></label>
       </div>
+
+      <h4 class="muted" style="margin:12px 0 6px">Monthly costs (ISK / month)</h4>
+      <div class="rows monthly"></div>
+      <div class="actions">
+        <button class="btn add-monthly" type="button">+ Add new cost</button>
+      </div>
+
+      <h4 class="muted" style="margin:14px 0 6px">Daily costs (€/day)</h4>
+      <div class="rows daily"></div>
+      <div class="actions">
+        <button class="btn add-daily" type="button">+ Add new cost</button>
+      </div>
+
+      <ul class="results mini">
+        <li><span>Housing (ISK/mo)</span><strong id="b1-housing">–</strong></li>
+        <li><span>Equipment (ISK/mo)</span><strong id="b1-equip">–</strong></li>
+        <li><span>Admin (ISK/mo)</span><strong id="b1-admin">–</strong></li>
+        <li><span>Maintenance (ISK/mo)</span><strong id="b1-maint">–</strong></li>
+        <li><span>Rentals (ISK/mo)</span><strong id="b1-rentals">–</strong></li>
+        <li><span>Spare parts (ISK/mo)</span><strong id="b1-spares">–</strong></li>
+        <li><span>Other (€/day)</span><strong id="b1-other">–</strong></li>
+        <li><span>Elec (kWh/day)</span><strong id="b1-elec">–</strong></li>
+        <li><span>Water (m³/day)</span><strong id="b1-water">–</strong></li>
+      </ul>
     </div>
   </div>
-
-  <div class="muted" style="margin-top:10px">
-    Maintenance is stored as €/month and auto-converted to €/day for the main planner.
-    Rentals are also €/month and are added into “Other (€/day)” on the main page.
-  </div>
 </section>
+   
 
     <!-- TOTALS SENT TO PLANNER -->
     <section class="card">
