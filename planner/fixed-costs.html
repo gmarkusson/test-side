@@ -486,26 +486,33 @@ const $$ = (s, r=document)=>Array.from(r.querySelectorAll(s));
 
 const STORE_KEY = 'fp:fixed:v2';
 
+<script>
+const $  = (s, r=document)=>r.querySelector(s);
+const $$ = (s, r=document)=>Array.from(r.querySelectorAll(s));
+const STORE_KEY = 'fp:fixed:v2';
+
+/* ---- Add a row (works for monthly & daily) ---- */
 function addCostRow(rowsEl, preset={}){
   const isMonthly = rowsEl.classList.contains('monthly');
   const row = document.createElement('div');
   row.className = 'row';
   row.innerHTML = `
     <input class="name" type="text" placeholder="Name (e.g. Rent, Waste pickup)" value="${preset.name||''}">
+    <input class="desc" type="text" placeholder="Description (optional)" value="${preset.desc||''}">
     <input class="amt"  inputmode="decimal" placeholder="${isMonthly ? 'ISK / month' : '€ / day'}" value="${preset.amt||''}">
     <button class="del" type="button" aria-label="Remove">×</button>
   `;
   rowsEl.appendChild(row);
-
-  // events
   row.addEventListener('input', saveAll);
   row.querySelector('.del').addEventListener('click', ()=>{ row.remove(); saveAll(); });
 }
 
+/* ---- Persist/restore ---- */
 function serializeBuilding(bEl){
   const pick = (sel)=>$$(`${sel} .row`, bEl).map(r=>({
     name: r.querySelector('.name')?.value?.trim() || '',
-    amt:  r.querySelector('.amt') ?.value?.trim() || ''
+    desc: r.querySelector('.desc') ?.value?.trim() || '',
+    amt:  r.querySelector('.amt')  ?.value?.trim() || ''
   }));
   return {
     title: $('h3', bEl)?.textContent || '',
@@ -522,6 +529,54 @@ function restoreBuilding(bEl, data={}){
   (data.monthly || []).forEach(item => addCostRow($('.rows.monthly', bEl), item));
   (data.daily   || []).forEach(item => addCostRow($('.rows.daily',   bEl), item));
 }
+
+/* Optional: migrate any old rows that used a <select> */
+function migrateOldRows(){
+  $$('.rows .row').forEach(r=>{
+    if (r.querySelector('select')) {
+      const nameVal = r.querySelector('select')?.selectedOptions?.[0]?.textContent || '';
+      const descVal = r.querySelector('.desc')?.value || '';
+      const amtVal  = r.querySelector('.amt')?.value || '';
+      const parent  = r.parentElement;
+      r.remove();
+      addCostRow(parent, {name:nameVal, desc:descVal, amt:amtVal});
+    }
+  });
+}
+
+function saveAll(){
+  const data = $$('.building').map(serializeBuilding);
+  localStorage.setItem(STORE_KEY, JSON.stringify(data));
+}
+
+function restoreAll(){
+  try{
+    const data = JSON.parse(localStorage.getItem(STORE_KEY)||'[]');
+    $$('.building').forEach((bEl, i)=> restoreBuilding(bEl, data[i]||{}));
+  }catch(e){}
+}
+
+function wireButtons(){
+  $$('.building .add-monthly').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      addCostRow($('.rows.monthly', btn.closest('.building')));
+      saveAll();
+    });
+  });
+  $$('.building .add-daily').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      addCostRow($('.rows.daily', btn.closest('.building')));
+      saveAll();
+    });
+  });
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  wireButtons();
+  restoreAll();
+  migrateOldRows();   // safe to keep; no-op once everything is migrated
+});
+</script>
 
 function saveAll(){
   const data = $$('.building').map(serializeBuilding);
