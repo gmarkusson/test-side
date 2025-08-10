@@ -216,56 +216,36 @@ function formatIntInput(el) {
   const freight    = toNumber(q('#freightPerKg')?.value) || 0;
   let   yieldIn    = toNumber(q('#yieldPct')?.value);  // new
 
-  const rawUsedEl = q('#rawUsedKg');
-  const yieldEl   = q('#yieldPct');
-  let changed = false;
-
+ 
   // --- Keep Raw used and Yield % linked, based on what was edited last ---
   const rawUsedEl = q('#rawUsedKg');
   const yieldEl   = q('#yieldPct');
   let changed = false;
 
   // 3a) If user edited Yield → recompute Raw used
-  if (lastEdited === 'yield' &&
-      Number.isFinite(producedKg) && Number.isFinite(yieldIn) && yieldIn > 0) {
+ // --- Recompute depending on what was edited ---
+if (Number.isFinite(producedKg)) {
+  // If Yield % changed (or Raw is empty), compute Raw used
+  if (Number.isFinite(yieldIn) && yieldIn > 0 &&
+      (lastEdited === 'yield' || !Number.isFinite(rawUsed))) {
     const computedRaw = producedKg / (yieldIn / 100);
-    // format with thousands if you added nfIntIS; otherwise just round
-    rawUsedEl.value =
-      (typeof nfIntIS !== 'undefined')
-        ? nfIntIS.format(Math.round(computedRaw))
-        : String(Math.round(computedRaw));
     rawUsed = computedRaw;
+    if (rawUsedEl) {
+      rawUsedEl.value = String(Math.round(computedRaw));
+      // format with thousands separators for the input
+      formatIntInput(rawUsedEl);
+    }
     changed = true;
   }
-
-  // 3b) If user edited Raw used → recompute Yield
-  else if (lastEdited === 'raw' &&
-           Number.isFinite(producedKg) && Number.isFinite(rawUsed) && rawUsed > 0) {
+  // Otherwise, if Raw used was edited (or Yield is empty), compute Yield %
+  else if (Number.isFinite(rawUsed) && rawUsed > 0 &&
+           (lastEdited === 'raw' || !Number.isFinite(yieldIn))) {
     const computedYield = (producedKg / rawUsed) * 100;
-    yieldEl.value = computedYield.toFixed(1);
     yieldIn = computedYield;
+    if (yieldEl) yieldEl.value = computedYield.toFixed(1);
     changed = true;
   }
-
-  // 3c) Fallback: if one is empty, compute it from the other
-  else {
-    if (!Number.isFinite(rawUsed) &&
-        Number.isFinite(producedKg) && Number.isFinite(yieldIn) && yieldIn > 0) {
-      const computedRaw = producedKg / (yieldIn / 100);
-      rawUsedEl.value =
-        (typeof nfIntIS !== 'undefined')
-          ? nfIntIS.format(Math.round(computedRaw))
-          : String(Math.round(computedRaw));
-      rawUsed = computedRaw;
-      changed = true;
-    }
-    if (!Number.isFinite(yieldIn) &&
-        Number.isFinite(producedKg) && Number.isFinite(rawUsed) && rawUsed > 0) {
-      const computedYield = (producedKg / rawUsed) * 100;
-      yieldEl.value = computedYield.toFixed(1);
-      yieldIn = computedYield;
-      changed = true;
-    }
+}
   }
 
   if (changed) syncUrlFromInputs();
