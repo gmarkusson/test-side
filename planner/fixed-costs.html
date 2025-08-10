@@ -524,11 +524,12 @@ function addCostRow(rowsEl, preset={}){
   const row = document.createElement('div');
   row.className = 'row';
   row.innerHTML = `
-    <input class="name" type="text" placeholder="Name (e.g. Rent, Waste pickup)" value="${preset.name||''}">
-    <input class="desc" type="text" placeholder="Description (optional)" value="${preset.desc||''}">
-    <input class="amt"  inputmode="decimal" placeholder="${isMonthly ? 'ISK / month' : '€ / day'}" value="${preset.amt||''}">
-    <button class="del" type="button" aria-label="Remove">×</button>
-  `;
+  <input class="name" placeholder="Name (e.g. Rent, Waste pickup)" />
+  <select class="cat"></select>
+  <input class="desc" placeholder="Description (optional)" />
+  <input class="amt" inputmode="decimal" />
+  <button class="del" type="button">×</button>
+`;
   rowsEl.appendChild(row);
   row.addEventListener('input', saveAll);
   row.querySelector('.del').addEventListener('click', ()=>{ row.remove(); saveAll(); });
