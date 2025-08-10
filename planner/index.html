@@ -188,6 +188,14 @@ function attachSync(){
       // remember which field was edited
       if (el.id==='yieldPct') lastEdited='yield';
       else if (el.id==='rawUsedKg') lastEdited='raw';
+// Some browsers don't fire 'input' for <select>, so listen for 'change' too
+qa('select').forEach(el => {
+  el.addEventListener('change', () => {
+    syncUrlFromInputs();
+    calcKeyNumbers();
+    calcDay();
+  });
+});
 
       syncUrlFromInputs();
       calcKeyNumbers();
