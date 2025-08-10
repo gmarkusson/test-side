@@ -135,34 +135,34 @@ const q=(s,r=document)=>r.querySelector(s);
 const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
 const setText=(sel,val)=>{const el=typeof sel==='string'?q(sel):sel;if(el)el.textContent=val;};
 
-// Robust number parser (your version)
-function toNumber(v) {
-  if (v == null) return NaN;
-  let s = String(v).trim().replace(/\u00A0/g,'').replace(/\s/g,'');
-  if (!s) return NaN;
-  const hasComma = s.includes(','), hasDot = s.includes('.');
-  if (hasComma && hasDot) {
-    if (s.lastIndexOf(',') > s.lastIndexOf('.')) s = s.replace(/\./g,'').replace(',', '.');
-    else s = s.replace(/,/g,'');
-  } else if (hasComma) {
-    const parts = s.split(','), looksThousands = parts.length>1 && parts.every((p,i)=>(i===0?p.length<=3:p.length===3));
-    s = looksThousands ? s.replace(/,/g,'') : s.replace(',', '.');
-  } else if (hasDot) {
-    const parts = s.split('.'), looksThousands = parts.length>1 && parts.every((p,i)=>(i===0?p.length<=3:p.length===3));
-    if (looksThousands) s = s.replace(/\./g,'');
+// Robust number parser
+function toNumber(v){
+  if(v==null) return NaN;
+  let s=String(v).trim().replace(/\u00A0/g,'').replace(/\s/g,'');
+  if(!s) return NaN;
+  const hasComma=s.includes(','), hasDot=s.includes('.');
+  if(hasComma&&hasDot){
+    if(s.lastIndexOf(',')>s.lastIndexOf('.')) s=s.replace(/\./g,'').replace(',', '.');
+    else s=s.replace(/,/g,'');
+  }else if(hasComma){
+    const parts=s.split(','), looksThousands=parts.length>1 && parts.every((p,i)=>(i===0?p.length<=3:p.length===3));
+    s=looksThousands? s.replace(/,/g,'') : s.replace(',', '.');
+  }else if(hasDot){
+    const parts=s.split('.'), looksThousands=parts.length>1 && parts.every((p,i)=>(i===0?p.length<=3:p.length===3));
+    if(looksThousands) s=s.replace(/\./g,'');
   }
-  const n = Number(s);
-  return Number.isFinite(n) ? n : NaN;
+  const n=Number(s);
+  return Number.isFinite(n)? n : NaN;
 }
 
-const fmt=(n,d=2)=>Number.isFinite(n)?new Intl.NumberFormat(locale,{minimumFractionDigits:d,maximumFractionDigits:d}).format(n):'–';
+const fmt=(n,d=2)=>Number.isFinite(n)? new Intl.NumberFormat(locale,{minimumFractionDigits:d,maximumFractionDigits:d}).format(n) : '–';
 
-const bindings = {
+// URL bindings (include month & workingDays so they sync)
+const bindings={
   producedKg:'#producedKg', sellPriceDay:'#sellPriceDay', rawUsedKg:'#rawUsedKg', yieldPct:'#yieldPct',
   rawCostPerKg:'#rawCostPerKg', packCostPerKg:'#packCostPerKg', freightPerKg:'#freightPerKg',
-  month:'#month', workingDays:'#workingDays' // ← optional
+  month:'#month', workingDays:'#workingDays'
 };
-
 
 function applyQueryParams(){
   const p=new URLSearchParams(location.search);
@@ -180,166 +180,75 @@ function syncUrlFromInputs(){
   history.replaceState(null,'',`${location.pathname}?${p.toString()}`);
 }
 
-let lastEdited = null;
+let lastEdited=null;
 
 function attachSync(){
-  // input listeners
-  qa('input, select, textarea').forEach(el => {
-    el.addEventListener('input', () => {
-      if (el.id === 'yieldPct')      lastEdited = 'yield';
-      else if (el.id === 'rawUsedKg') lastEdited = 'raw';
-
+  // 'input' listeners
+  qa('input, select, textarea').forEach(el=>{
+    el.addEventListener('input',()=>{
+      if(el.id==='yieldPct') lastEdited='yield';
+      else if(el.id==='rawUsedKg') lastEdited='raw';
+      syncUrlFromInputs();
+      calcKeyNumbers();
+      calcDay();
+    });
+  });
+  // 'change' listeners (some browsers don’t fire input for <select>)
+  qa('select').forEach(el=>{
+    el.addEventListener('change',()=>{
+      // Special: when month changes, clear working days so we auto-fill
+      if(el.id==='month'){ const wd=q('#workingDays'); if(wd) wd.value=''; }
       syncUrlFromInputs();
       calcKeyNumbers();
       calcDay();
     });
   });
 
-  // some browsers don't fire 'input' for <select>, so also listen for 'change'
-  qa('select').forEach(el => {
-    el.addEventListener('change', () => {
-      syncUrlFromInputs();
-      calcKeyNumbers();
-      calcDay();
-    });
-  });
-
-  // thousand-separator on blur for integers
-  q('#producedKg')?.addEventListener('blur', () => formatIntInput(q('#producedKg')));
-  q('#rawUsedKg')?.addEventListener('blur', () => formatIntInput(q('#rawUsedKg')));
-  q('#producedKg_day')?.addEventListener('blur', () => formatIntInput(q('#producedKg_day')));
-  q('#rawUsedKg_day')?.addEventListener('blur', () => formatIntInput(q('#rawUsedKg_day')));
-}
-// Month select → clear working days so it auto-fills, then recalc
-const monthSel = q('#month');
-if (monthSel) {
-  monthSel.addEventListener('change', () => {
-    const wd = q('#workingDays');
-    if (wd) wd.value = '';      // force auto-calc from selected month
-    calcDay();                  // update results
-    syncUrlFromInputs();        // keep the URL in sync
-  });
+  // integer blur formatting
+  q('#producedKg')?.addEventListener('blur',()=>formatIntInput(q('#producedKg')));
+  q('#rawUsedKg')?.addEventListener('blur',()=>formatIntInput(q('#rawUsedKg')));
+  q('#producedKg_day')?.addEventListener('blur',()=>formatIntInput(q('#producedKg_day')));
+  q('#rawUsedKg_day')?.addEventListener('blur',()=>formatIntInput(q('#rawUsedKg_day')));
 }
 
-}
+const nfIntIS=new Intl.NumberFormat('is-IS',{maximumFractionDigits:0});
+function formatIntInput(el){ if(!el) return; const n=toNumber(el.value); if(Number.isFinite(n)) el.value=nfIntIS.format(Math.round(n)); }
 
-// integer formatter
-const nfIntIS = new Intl.NumberFormat('is-IS', { maximumFractionDigits: 0 });
-function formatIntInput(el){ if(!el) return; const n=toNumber(el.value); if(Number.isFinite(n)) el.value = nfIntIS.format(Math.round(n)); }
-
+// Key Numbers
 function calcKeyNumbers(){
-  const producedKg = toNumber(q('#producedKg').value);
-  const sellPrice  = toNumber(q('#sellPriceDay').value);
-  let   rawUsed    = toNumber(q('#rawUsedKg').value);
-  const rawCost    = toNumber(q('#rawCostPerKg').value);
-  const packCost   = toNumber(q('#packCostPerKg').value) || 0;
-  const freight    = toNumber(q('#freightPerKg').value) || 0;
-  let   yieldIn    = toNumber(q('#yieldPct').value);
+  const producedKg=toNumber(q('#producedKg').value);
+  const sellPrice =toNumber(q('#sellPriceDay').value);
+  let   rawUsed   =toNumber(q('#rawUsedKg').value);
+  const rawCost   =toNumber(q('#rawCostPerKg').value);
+  const packCost  =toNumber(q('#packCostPerKg').value)||0;
+  const freight   =toNumber(q('#freightPerKg').value)||0;
+  let   yieldIn   =toNumber(q('#yieldPct').value);
 
-  const rawUsedEl = q('#rawUsedKg');
-  const yieldEl   = q('#yieldPct');
-  let changed = false;
+  const rawUsedEl=q('#rawUsedKg'); const yieldEl=q('#yieldPct'); let changed=false;
 
-  if (Number.isFinite(producedKg)) {
-    // If Yield changed (or Raw is empty), compute Raw used
-    if (Number.isFinite(yieldIn) && yieldIn > 0 && (lastEdited==='yield' || !Number.isFinite(rawUsed))) {
-      const computedRaw = producedKg / (yieldIn/100);
-      rawUsed = computedRaw;
-      if (rawUsedEl){ rawUsedEl.value = String(Math.round(computedRaw)); formatIntInput(rawUsedEl); }
-      changed = true;
-    }
-    // Else if Raw changed (or Yield is empty), compute Yield %
-    else if (Number.isFinite(rawUsed) && rawUsed > 0 && (lastEdited==='raw' || !Number.isFinite(yieldIn))) {
-      const computedYield = (producedKg / rawUsed) * 100;
-      yieldIn = computedYield;
-      if (yieldEl) yieldEl.value = computedYield.toFixed(1);
-      changed = true;
+  if(Number.isFinite(producedKg)){
+    if(Number.isFinite(yieldIn)&&yieldIn>0 && (lastEdited==='yield'||!Number.isFinite(rawUsed))){
+      const computedRaw=producedKg/(yieldIn/100);
+      rawUsed=computedRaw;
+      if(rawUsedEl){ rawUsedEl.value=String(Math.round(computedRaw)); formatIntInput(rawUsedEl); }
+      changed=true;
+    }else if(Number.isFinite(rawUsed)&&rawUsed>0 && (lastEdited==='raw'||!Number.isFinite(yieldIn))){
+      const computedYield=(producedKg/rawUsed)*100;
+      yieldIn=computedYield;
+      if(yieldEl) yieldEl.value=computedYield.toFixed(1);
+      changed=true;
     }
   }
+  if(changed) syncUrlFromInputs();
 
-  if (changed) syncUrlFromInputs();
+  const yieldPct=Number.isFinite(yieldIn)? yieldIn
+    : (Number.isFinite(producedKg)&&Number.isFinite(rawUsed)&&rawUsed>0)? (producedKg/rawUsed)*100 : NaN;
 
-  const yieldPct = Number.isFinite(yieldIn)
-    ? yieldIn
-    : (Number.isFinite(producedKg) && Number.isFinite(rawUsed) && rawUsed > 0)
-        ? (producedKg / rawUsed) * 100
-        : NaN;
+  const revenue  =producedKg*sellPrice;
+  const totalCost=producedKg*(rawCost+packCost+freight);
+  const profit   =revenue-totalCost;
+  const marginPct=revenue? (prof
 
-  const revenue   = producedKg * sellPrice;
-  const totalCost = producedKg * (rawCost + packCost + freight);
-  const profit    = revenue - totalCost;
-  const marginPct = revenue ? (profit / revenue) * 100 : NaN;
-  const profitKg  = producedKg ? profit / producedKg : NaN;
-
-  setText('#key-net-kg', fmt(producedKg, 0));
-  setText('#key-revenue', fmt(revenue));
-  setText('#key-total-cost', fmt(totalCost));
-  setText('#key-profit', fmt(profit));
-  setText('#key-gm', Number.isFinite(marginPct) ? fmt(marginPct, 1) + ' %' : '–');
-  setText('#key-profit-kg', fmt(profitKg));
-  setText('#key-yield', Number.isFinite(yieldPct) ? fmt(yieldPct, 1) + ' %' : '–');
-}
-// --- Factory Day helpers ---
-function workingDaysInMonth(val) {
-  let y, m;
-
-  if (/^\d{2}$/.test(val)) {           // "08" (just month)
-    y = new Date().getFullYear();
-    m = Number(val);
-  } else if (/^\d{4}-\d{2}$/.test(val)) { // "2025-08" (still supported)
-    [y, m] = val.split('-').map(Number);
-  } else {
-    return NaN;
-  }
-
-  // count Mon–Fri in the month
-  const end = new Date(y, m, 0).getDate();   // last day of month
-  let days = 0;
-  for (let d = 1; d <= end; d++) {
-    const dow = new Date(y, m - 1, d).getDay(); // 0=Sun..6=Sat
-    if (dow !== 0 && dow !== 6) days++;
-  }
-  return days;
-}
-
-function calcDay() { /* keep your existing calcDay exactly as is */ }
-
-function populateMonthSelect() {
-  const sel = q('#month');
-  if (!sel) return;
-  sel.innerHTML = '';
-
-  // 12 months, value = "01".."12", label = "January".."December"
-  for (let i = 0; i < 12; i++) {
-    const label = new Date(2000, i, 1).toLocaleString('en', { month: 'long' });
-    const m = String(i + 1).padStart(2, '0');
-    const opt = document.createElement('option');
-    opt.value = m;
-    opt.textContent = label;
-    sel.appendChild(opt);
-  }
-
-  // default to current month if nothing set (URL may override later)
-  if (!sel.value) sel.value = String(new Date().getMonth() + 1).padStart(2, '0');
-}
-
-// Single, clean listener for the month dropdown
-q('#month')?.addEventListener('change', () => {
-  const wd = q('#workingDays');
-  if (wd) wd.value = '';   // force auto-calc based on selected month
-  syncUrlFromInputs();
-  calcDay();
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  populateMonthSelect();    // build month list
-  applyQueryParams?.();     // may set #month from ?month=
-  attachSync();
-  calcKeyNumbers();
-  calcDay();
-});
-
-</script>
 
   
 </body>
