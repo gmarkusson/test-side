@@ -251,7 +251,7 @@ function calcKeyNumbers(){
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
-  applyQueryParams?.();
+  if (typeof applyQueryParams === 'function') applyQueryParams();
   attachSync();
   calcKeyNumbers();
 });
