@@ -198,13 +198,13 @@ const nfIntIS = new Intl.NumberFormat('is-IS', { maximumFractionDigits: 0 });
 function formatIntInput(el){ if(!el) return; const n=toNumber(el.value); if(Number.isFinite(n)) el.value = nfIntIS.format(Math.round(n)); }
 
 function calcKeyNumbers(){
-  const producedKg = toNumber(q('#producedKg')?.value);
-  const sellPrice  = toNumber(q('#sellPriceDay')?.value);
-  let   rawUsed    = toNumber(q('#rawUsedKg')?.value);
-  const rawCost    = toNumber(q('#rawCostPerKg')?.value);
-  const packCost   = toNumber(q('#packCostPerKg')?.value) || 0;
-  const freight    = toNumber(q('#freightPerKg')?.value) || 0;
-  let   yieldIn    = toNumber(q('#yieldPct')?.value);
+  const producedKg = toNumber(q('#producedKg').value);
+  const sellPrice  = toNumber(q('#sellPriceDay').value);
+  let   rawUsed    = toNumber(q('#rawUsedKg').value);
+  const rawCost    = toNumber(q('#rawCostPerKg').value);
+  const packCost   = toNumber(q('#packCostPerKg').value) || 0;
+  const freight    = toNumber(q('#freightPerKg').value) || 0;
+  let   yieldIn    = toNumber(q('#yieldPct').value);
 
   const rawUsedEl = q('#rawUsedKg');
   const yieldEl   = q('#yieldPct');
