@@ -97,7 +97,10 @@
     <label>Maintenance (€/day)<input id="maintenanceCost" inputmode="decimal" /></label>
     <label>Depreciation (€/day)<input id="deprCost" inputmode="decimal" /></label>
     <label>Other (€/day)<input id="otherCost" inputmode="decimal" /></label>
-    <label>Month (YYYY-MM)<input id="month" placeholder="2025-08" /></label>
+<label>Month
+  <select id="month"></select>
+</label>
+
   </div>
 
   <ul class="results">
@@ -389,13 +392,42 @@ function calcDay() {
   setText('#bd-depr',        fmt(Number.isFinite(deprEURday)  ? deprEURday  : NaN));
   setText('#bd-other',       fmt(Number.isFinite(otherEURday) ? otherEURday : NaN));
 }
+function populateMonthSelect() {
+  const sel = q('#month');
+  if (!sel) return;
+  sel.innerHTML = '';
+
+  const now = new Date();
+  // Build options for the next 18 months (including current)
+  for (let i = 0; i < 18; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const val = `${y}-${m}`;
+    const text = d.toLocaleString('en', { month: 'long', year: 'numeric' });
+
+    const opt = document.createElement('option');
+    opt.value = val;          // stays "YYYY-MM" for our calc
+    opt.textContent = text;   // nice label: "August 2025"
+    sel.appendChild(opt);
+  }
+}
+q('#month')?.addEventListener('change', () => {
+  // Clear working days so calcDay auto-fills for the selected month
+  const wd = q('#workingDays');
+  if (wd) wd.value = '';
+  syncUrlFromInputs();
+  calcDay();
+});
 
 document.addEventListener('DOMContentLoaded', ()=>{
-  if (typeof applyQueryParams === 'function') applyQueryParams();
+  populateMonthSelect();        // <— add this FIRST
+  applyQueryParams?.();         // will set the select if ?month=YYYY-MM is in URL
   attachSync();
   calcKeyNumbers();
-    calcDay();
+  calcDay();
 });
+
 </script>
 
   
