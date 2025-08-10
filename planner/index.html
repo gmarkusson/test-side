@@ -5,32 +5,23 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Factory Planner — Key Numbers</title>
   <style>
-    :root {
-      --gap:14px; --pad:16px;
-      --bg:#f6f8fc;      /* page background */
-      --card:#ffffff;    /* card background */
-      --ink:#0b1320;     /* main text */
-      --muted:#4a5874;   /* secondary text */
-      --accent:#0b5fff;  /* headings/accent */
-      --border:#e4e9f2;  /* card borders */
-      --field-border:#d6dbe6;
+    :root{
+      --gap:14px;--pad:16px;
+      --bg:#f6f8fc;--card:#ffffff;--ink:#0b1320;--muted:#4a5874;--accent:#0b5fff;--border:#e4e9f2;--field:#d6dbe6;
     }
-    html,body { margin:0; padding:0; background:var(--bg); color:var(--ink);
-      font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-    header { padding:24px var(--pad); border-bottom:1px solid var(--border); }
-    h1 { margin:0 0 6px 0; font-size:22px; }
-    h2 { margin:0 0 10px 0; font-size:18px; color:var(--accent); }
-    main { padding: 20px var(--pad) 60px; display:grid; gap: 14px; }
-    section.card { background: var(--card); border:1px solid var(--border); border-radius:10px; padding:16px; }
-    .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 14px; }
-    label { display:flex; flex-direction:column; gap:6px; color:var(--muted); font-weight:600; }
-    input { background:#fff; color:var(--ink); border:1px solid var(--field-border); border-radius:8px; padding:10px 12px; outline:none; }
-    input:focus { border-color:#2c6fff; box-shadow: 0 0 0 2px rgba(44,111,255,.14); }
-    .results { display:grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap:10px; margin:12px 0 0; padding:0; list-style:none; }
-    .results li { background:#fff; border:1px solid var(--border); border-radius:8px; padding:10px;
-      display:flex; justify-content:space-between; align-items:center; }
-    .results li span { color:var(--muted); }
-    .results li strong { font-size:15px; }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+      font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    header{padding:24px var(--pad);border-bottom:1px solid var(--border)}
+    h1{margin:0 0 6px;font-size:22px} h2{margin:0 0 10px;font-size:18px;color:var(--accent)}
+    main{padding:20px var(--pad) 60px;display:grid;gap:14px}
+    section.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+    label{display:flex;flex-direction:column;gap:6px;color:var(--muted);font-weight:600}
+    input{background:#fff;color:var(--ink);border:1px solid var(--field);border-radius:8px;padding:10px 12px;outline:none}
+    input:focus{border-color:#2c6fff;box-shadow:0 0 0 2px rgba(44,111,255,.14)}
+    .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0 0;padding:0;list-style:none}
+    .results li{background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px;display:flex;justify-content:space-between;align-items:center}
+    .results li span{color:var(--muted)} .results li strong{font-size:15px}
   </style>
 </head>
 <body>
@@ -40,7 +31,6 @@
   </header>
 
   <main>
-    <!-- KEY NUMBERS ONLY (for Step 1) -->
     <section class="card" id="key">
       <h2>Key Numbers</h2>
       <div class="grid">
@@ -64,87 +54,49 @@
   </main>
 
   <script>
-    // --- Helpers ---
-    const locale = 'is-IS';
-    const q = (s, r=document) => r.querySelector(s);
-    const qa = (s, r=document) => Array.from(r.querySelectorAll(s));
-    const setText = (sel, val) => { const el = typeof sel==='string'? q(sel) : sel; if (el) el.textContent = val; };
+    const locale='is-IS';
+    const q=(s,r=document)=>r.querySelector(s);
+    const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
+    const setText=(sel,val)=>{const el=typeof sel==='string'?q(sel):sel;if(el)el.textContent=val;};
+    function toNumber(v){ if(v==null)return NaN; const s=String(v).trim().replace(/\s/g,''); if(!s)return NaN;
+      if(s.includes(',')&&!s.includes('.')) return Number(s.replace(/\./g,'').replace(',', '.'));
+      return Number(s.replace(/,/g,'')); }
+    const fmt=(n,d=2)=>Number.isFinite(n)?new Intl.NumberFormat(locale,{minimumFractionDigits:d,maximumFractionDigits:d}).format(n):'–';
 
-    // Accept "1.234,56" or "1,234.56" or "1234,56" or "1234.56"
-    function toNumber(v){
-      if (v == null) return NaN;
-      const s = String(v).trim().replace(/\s/g,'');
-      if (!s) return NaN;
-      if (s.includes(',') && !s.includes('.')) return Number(s.replace(/\./g,'').replace(',', '.'));
-      return Number(s.replace(/,/g,''));
-    }
-    const fmt = (n, digits=2) =>
-      Number.isFinite(n) ? new Intl.NumberFormat(locale,{minimumFractionDigits:digits,maximumFractionDigits:digits}).format(n) : '–';
+    const bindings={producedKg:'#producedKg',sellPriceDay:'#sellPriceDay',rawUsedKg:'#rawUsedKg',rawCostPerKg:'#rawCostPerKg',packCostPerKg:'#packCostPerKg',freightPerKg:'#freightPerKg'};
 
-    // --- URL <-> Inputs sync (Step 1 scope: Key Numbers only) ---
-    const bindings = {
-      producedKg: '#producedKg',
-      sellPriceDay: '#sellPriceDay',
-      rawUsedKg: '#rawUsedKg',
-      rawCostPerKg: '#rawCostPerKg',
-      packCostPerKg: '#packCostPerKg',
-      freightPerKg: '#freightPerKg'
-    };
+    function applyQueryParams(){ const p=new URLSearchParams(location.search);
+      for(const [k,sel] of Object.entries(bindings)){ const el=q(sel); if(!el) continue; const v=p.get(k); if(v!=null&&v!=='') el.value=decodeURIComponent(v); } }
+    function syncUrlFromInputs(){ const p=new URLSearchParams();
+      for(const [k,sel] of Object.entries(bindings)){ const el=q(sel); if(el&&el.value!=='') p.set(k,el.value); }
+      history.replaceState(null,'',`${location.pathname}?${p.toString()}`); }
+    function attachSync(){ qa('input').forEach(el=> el.addEventListener('input',()=>{ syncUrlFromInputs(); calcKeyNumbers(); })); }
 
-    function applyQueryParams(){
-      const params = new URLSearchParams(location.search);
-      for (const [key, sel] of Object.entries(bindings)) {
-        const el = q(sel); if (!el) continue;
-        const v = params.get(key);
-        if (v != null && v !== '') el.value = decodeURIComponent(v);
-      }
-    }
-    function syncUrlFromInputs(){
-      const params = new URLSearchParams();
-      for (const [key, sel] of Object.entries(bindings)) {
-        const el = q(sel);
-        if (el && el.value !== '') params.set(key, el.value);
-      }
-      history.replaceState(null, '', `${location.pathname}?${params.toString()}`);
-    }
-    function attachSync(){
-      qa('input').forEach(el => {
-        el.addEventListener('input', () => { syncUrlFromInputs(); calcKeyNumbers(); });
-      });
-    }
-
-    // --- Key Numbers calc ---
     function calcKeyNumbers(){
-      const producedKg = toNumber(q('#producedKg')?.value);
-      const sellPrice  = toNumber(q('#sellPriceDay')?.value);
-      const rawUsed    = toNumber(q('#rawUsedKg')?.value);
-      const rawCost    = toNumber(q('#rawCostPerKg')?.value);
-      const packCost   = toNumber(q('#packCostPerKg')?.value) || 0;
-      const freight    = toNumber(q('#freightPerKg')?.value) || 0;
+      const producedKg=toNumber(q('#producedKg')?.value);
+      const sellPrice =toNumber(q('#sellPriceDay')?.value);
+      const rawUsed   =toNumber(q('#rawUsedKg')?.value);
+      const rawCost   =toNumber(q('#rawCostPerKg')?.value);
+      const packCost  =toNumber(q('#packCostPerKg')?.value)||0;
+      const freight   =toNumber(q('#freightPerKg')?.value)||0;
 
-      const yieldPct = (Number.isFinite(producedKg) && Number.isFinite(rawUsed) && rawUsed > 0)
-        ? (producedKg / rawUsed) * 100 : NaN;
+      const yieldPct=(Number.isFinite(producedKg)&&Number.isFinite(rawUsed)&&rawUsed>0)?(producedKg/rawUsed)*100:NaN;
+      const revenue=producedKg*sellPrice;
+      const totalCost=producedKg*(rawCost+packCost+freight);
+      const profit=revenue-totalCost;
+      const marginPct=revenue?(profit/revenue)*100:NaN;
+      const profitKg=producedKg?profit/producedKg:NaN;
 
-      const revenue   = producedKg * sellPrice;
-      const totalCost = producedKg * (rawCost + packCost + freight);
-      const profit    = revenue - totalCost;
-      const marginPct = revenue ? (profit / revenue) * 100 : NaN;
-      const profitKg  = producedKg ? profit / producedKg : NaN;
-
-      setText('#key-net-kg', fmt(producedKg, 0));
-      setText('#key-revenue', fmt(revenue));
-      setText('#key-total-cost', fmt(totalCost));
-      setText('#key-profit', fmt(profit));
-      setText('#key-gm', Number.isFinite(marginPct) ? fmt(marginPct, 1) + ' %' : '–');
-      setText('#key-profit-kg', fmt(profitKg));
-      setText('#key-yield', Number.isFinite(yieldPct) ? fmt(yieldPct, 1) + ' %' : '–');
+      setText('#key-net-kg',fmt(producedKg,0));
+      setText('#key-revenue',fmt(revenue));
+      setText('#key-total-cost',fmt(totalCost));
+      setText('#key-profit',fmt(profit));
+      setText('#key-gm',Number.isFinite(marginPct)?fmt(marginPct,1)+' %':'–');
+      setText('#key-profit-kg',fmt(profitKg));
+      setText('#key-yield',Number.isFinite(yieldPct)?fmt(yieldPct,1)+' %':'–');
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      applyQueryParams();
-      attachSync();
-      calcKeyNumbers();
-    });
+    document.addEventListener('DOMContentLoaded',()=>{ applyQueryParams(); attachSync(); calcKeyNumbers(); });
   </script>
 </body>
 </html>
