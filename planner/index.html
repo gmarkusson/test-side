@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Factory Planner</title>
+  <style>
+    :root { --gap: 14px; --pad: 16px; --bg:#0b1320; --card:#111a2b; --ink:#e9eef7; --muted:#a8b3c7; --accent:#6fd3ff; }
+    html,body { margin:0; padding:0; background:var(--bg); color:var(--ink); font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    header { padding:24px var(--pad); border-bottom:1px solid #1f2a40; }
+    h1 { margin:0 0 6px 0; font-size:22px; }
+    h2 { margin:0 0 10px 0; font-size:18px; color:var(--accent); }
+    h3 { margin:0 0 12px 0; font-size:16px; color:#bfeaff; }
+    main { padding: 20px var(--pad) 80px; display:grid; gap: var(--gap); }
+    section.card { background: var(--card); border:1px solid #1f2a40; border-radius:10px; padding:16px; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: var(--gap); }
+    label { display:flex; flex-direction:column; gap:6px; color:var(--muted); font-weight:600; }
+    input, select { background:#0d1627; color:var(--ink); border:1px solid #26324a; border-radius:8px; padding:10px 12px; outline:none; }
+    input:focus { border-color:#3a80ff; box-shadow: 0 0 0 2px rgba(58,128,255,0.15); }
+    .results { display:grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap:10px; margin:12px 0 0; padding:0; list-style:none; }
+    .results li { background:#0d1627; border:1px solid #22304a; border-radius:8px; padding:10px; display:flex; justify-content:space-between; align-items:center; }
+    .results li span { color:var(--muted); }
+    .results li strong { font-size:15px; }
+    .cards-3 { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap: var(--gap); }
+    .factory-card { background:#0d1627; border:1px solid #22304a; border-radius:10px; padding:12px; }
+    .factory-card label { font-weight:500; }
+    .muted { color:var(--muted); }
+    .row { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; }
+    @media (max-width:640px){ .row{grid-template-columns:1fr;} }
+    .bar { height:1px; background:#1f2a40; margin:10px 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Factory Planner</h1>
+    <div class="muted">Type values or pass them via URL (commas as decimals are OK). The page auto-calculates and keeps the URL in sync.</div>
+  </header>
+
+  <main>
+    <!-- KEY NUMBERS -->
+    <section class="card" id="key">
+      <h2>Key Numbers</h2>
+      <div class="grid">
+        <label>Produced kg (net)<input id="producedKg" inputmode="decimal" /></label>
+        <label>Selling price / kg<input id="sellPriceDay" inputmode="decimal" /></label>
+        <label>Raw used kg<input id="rawUsedKg" inputmode="decimal" /></label>
+        <label>Raw cost / kg<input id="rawCostPerKg" inputmode="decimal" /></label>
+        <label>Pack cost / kg<input id="packCostPerKg" inputmode="decimal" /></label>
+        <label>Freight / kg<input id="freightPerKg" inputmode="decimal" /></label>
+      </div>
+      <ul class="results">
+        <li><span>Net saleable kg</span><strong id="key-net-kg">–</strong></li>
+        <li><span>Revenue</span><strong id="key-revenue">–</strong></li>
+        <li><span>Total cost</span><strong id="key-total-cost">–</strong></li>
+        <li><span>Profit</span><strong id="key-profit">–</strong></li>
+        <li><span>Gross margin %</span><strong id="key-gm">–</strong></li>
+        <li><span>Profit / kg</span><strong id="key-profit-kg">–</strong></li>
+        <li style="display:none"><span>Yield</span><strong id="key-yield">–</strong></li>
+      </ul>
+    </section>
+
+    <!-- FACTORY DAY -->
+    <section class="card" id="day">
+      <h2>Factory Day</h2>
+
+      <h3>Labor</h3>
+      <div class="grid">
+        <label>Operators (count)<input id="staffCount" inputmode="numeric" /></label>
+        <label>€/operator/hr<input id="staffCostPerPerson" inputmode="decimal" /></label>
+        <label>Supervisors (count)<input id="supCount" inputmode="numeric" /></label>
+        <label>€/supervisor/hr<input id="supCostPerPerson" inputmode="decimal" /></label>
+        <label>Operator hours<input id="staffHoursDay" inputmode="decimal" value="8" /></label>
+        <label>Supervisor hours<input id="supHoursDay" inputmode="decimal" value="8" /></label>
+      </div>
+
+      <div class="bar"></div>
+      <h3>Materials & Production</h3>
+      <div class="grid">
+        <label>Raw used kg<input id="rawUsedKg_day" inputmode="decimal" /></label>
+        <label>Raw cost / kg<input id="rawCostPerKg_day" inputmode="decimal" /></label>
+        <label>Pack cost / kg<input id="packCostPerKg_day" inputmode="decimal" /></label>
+        <label>Produced kg (net)<input id="producedKg_day" inputmode="decimal" /></label>
+        <label>Selling price / kg<input id="sellPriceDay_day" inputmode="decimal" /></label>
+        <label>Freight / kg<input id="freightPerKg_day" inputmode="decimal" /></label>
+      </div>
+
+      <div class="bar"></div>
+      <h3>Utilities</h3>
+      <div class="grid">
+        <label>Electricity kWh<input id="elecKwh" inputmode="decimal" /></label>
+        <label>€/kWh<input id="elecCostPerKwh" inputmode="decimal" /></label>
+        <label>Water m³<input id="waterM3" inputmode="decimal" /></label>
+        <label>€/m³<input id="waterCostPerM3" inputmode="decimal" /></label>
+      </div>
+
+      <div class="bar"></div>
+      <h3>Fixed (ISK → EUR/day)</h3>
+      <div class="grid">
+        <label>ISK per EUR<input id="iskPerEur" inputmode="decimal" /></label>
+        <label>Working days (auto if empty)<input id="workingDays" inputmode="numeric" /></label>
+        <label>Housing (ISK/month)<input id="housingCost" inputmode="decimal" /></label>
+        <label>Equipment (ISK/month)<input id="equipCost" inputmode="decimal" /></label>
+        <label>Admin (ISK/month)<input id="adminCost" inputmode="decimal" /></label>
+        <label>Maintenance (€/day)<input id="maintenanceCost" inputmode="decimal" /></label>
+        <label>Depreciation (€/day)<input id="deprCost" inputmode="decimal" /></label>
+        <label>Other (€/day)<input id="otherCost" inputmode="decimal" /></label>
+        <label>Month (YYYY-MM)<input id="month" placeholder="2025-08" /></label>
+      </div>
+
+      <ul class="results">
+        <li><span>Yield</span><strong id="day-yield">–</strong></li>
+        <li><span>Revenue</span><strong id="day-revenue">–</strong></li>
+        <li><span>Total cost</span><strong id="day-total-cost">–</strong></li>
+        <li><span>Profit</span><strong id="day-profit">–</strong></li>
+        <li><span>Gross margin %</span><strong id="day-margin">–</strong></li>
+        <li><span>Cost / kg</span><strong id="day-cost-kg">–</strong></li>
+      </ul>
+
+      <h3 style="margin-top:10px">Breakdown</h3>
+      <ul class="results">
+        <li><span>Labor (operators)</span><strong id="bd-labor-staff">–</strong></li>
+        <li><span>Labor (supervisors)</span><strong id="bd-labor-sup">–</strong></li>
+        <li><span>Material</span><strong id="bd-material">–</strong></li>
+        <li><span>Pack</span><strong id="bd-pack">–</strong></li>
+        <li><span>Freight</span><strong id="bd-freight">–</strong></li>
+        <li><span>Utilities</span><strong id="bd-utilities">–</strong></li>
+        <li><span>Housing €/day</span><strong id="bd-housing">–</strong></li>
+        <li><span>Equipment €/day</span><strong id="bd-equip">–</strong></li>
+        <li><span>Admin €/day</span><strong id="bd-admin">–</strong></li>
+        <li><span>Maintenance €/day</span><strong id="bd-maint">–</strong></li>
+        <li><span>Depreciation €/day</span><strong id="bd-depr">–</strong></li>
+        <li><span>Other €/day</span><strong id="bd-other">–</strong></li>
+      </ul>
+    </section>
+
+    <!-- FACTORY NETWORK -->
+    <section class="card" id="network">
+      <h2>Factory Network (3 factories)</h2>
+
+      <!-- Template: define ONCE -->
+      <template id="factory-template">
+        <section class="factory-card">
+          <h3>Factory <span class="factory-number"></span></h3>
+
+          <div class="row">
+            <label>Produced kg <input data-key="producedKg" type="text" inputmode="decimal" /></label>
+            <label>Sell price/kg <input data-key="sellPriceDay" type="text" inputmode="decimal" /></label>
+          </div>
+
+          <div class="row">
+            <label>Raw used kg <input data-key="rawUsedKg" type="text" inputmode="decimal" /></label>
+            <label>Raw cost/kg <input data-key="rawCostPerKg" type="text" inputmode="decimal" /></label>
+          </div>
+
+          <div class="row">
+            <label>Pack cost/kg <input data-key="packCostPerKg" type="text" inputmode="decimal" /></label>
+            <label>Freight/kg <input data-key="freightPerKg" type="text" inputmode="decimal" /></label>
+          </div>
+
+          <div class="row">
+            <label>Operators <input data-key="staffCount" type="text" inputmode="numeric" /></label>
+            <label>€/operator/hr <input data-key="staffCostPerPerson" type="text" inputmode="decimal" /></label>
+          </div>
+
+          <div class="row">
+            <label>Supervisors <input data-key="supCount" type="text" inputmode="numeric" /></label>
+            <label>€/supervisor/hr <input data-key="supCostPerPerson" type="text" inputmode="decimal" /></label>
+          </div>
+
+          <div class="row">
+            <label>Operator hrs <input data-key="staffHoursDay" type="text" inputmode="decimal" value="8" /></label>
+            <label>Supervisor hrs <input data-key="supHoursDay" type="text" inputmode="decimal" value="8" /></label>
+          </div>
+
+          <div class="row">
+            <label>Electricity kWh <input data-key="elecKwh" type="text" inputmode="decimal" /></label>
+            <label>€/kWh <input data-key="elecCostPerKwh" type="text" inputmode="decimal" /></label>
+          </div>
+
+          <div class="row">
+            <label>Water m³ <input data-key="waterM3" type="text" inputmode="decimal" /></label>
+            <label>€/m³ <input data-key="waterCostPerM3" type="text" inputmode="decimal" /></label>
+          </div>
+
+          <ul class="results">
+            <li><span>Yield</span><strong data-result="yield">–</strong></li>
+            <li><span>Revenue</span><strong data-result="revenue">–</strong></li>
+            <li><span>Total cost</span><strong data-result="totalCost">–</strong></li>
+            <li><span>Profit</span><strong data-result="profit">–</strong></li>
+            <li><span>Gross margin %</span><strong data-result="margin">–</strong></li>
+            <li><span>Cost / kg</span><strong data-result="costPerKg">–</strong></li>
+          </ul>
+        </section>
+      </template>
+
+      <!-- Where factories are inserted -->
+      <div id="factories-container" class="cards-3"></div>
+
+      <h3 style="margin-top:12px">Network totals</h3>
+      <ul class="results">
+        <li><span>Total produced kg</span><strong id="net-producedKg">–</strong></li>
+        <li><span>Total revenue</span><strong id="net-revenue">–</strong></li>
+        <li><span>Total cost</span><strong id="net-total-cost">–</strong></li>
+        <li><span>Total profit</span><strong id="net-profit">–</strong></li>
+        <li><span>Gross margin %</span><strong id="net-margin">–</strong></li>
+        <li><span>Avg cost / kg</span><strong id="net-cost-kg">–</strong></li>
+      </ul>
+    </section>
+  </main>
+
+  <script>
+    // ============= Helpers =============
+    const locale = 'is-IS'; // format outputs with Icelandic-style decimals
+    const qsel = (s, r=document) => r.querySelector(s);
+    const qall = (s, r=document) => Array.from(r.querySelectorAll(s));
+    const setText = (sel, val) => { const el = typeof sel==='string'? qsel(sel) : sel; if (el) el.textContent = val; };
+
+    // Accept "1.234,56" or "1,234.56" or "1234,56" or "1234.56"
+    const toNumber = (v) => {
+      if (v == null) return NaN;
+      const s0 = String(v).trim().replace(/\s/g,'').replace(/(\d)[\u00A0\s](\d)/g,'$1$2');
+      if (!s0) return NaN;
+      // If it contains a comma but not a dot, treat comma as decimal
+      if (/,/.test(s0) && !/\./.test(s0)) return Number(s0.replace(/\./g,'').replace(',', '.'));
+      // Otherwise, strip thousands separators (commas or NBSP)
+      return Number(s0.replace(/(?<=\d)[\u00A0,](?=\d{3}\b)/g, ''));
+    };
+
+    const fmt = (n, digits=2) =>
+      Number.isFinite(n) ? new Intl.NumberFormat(locale, {minimumFractionDigits:digits, maximumFractionDigits:digits}).format(n) : '–';
+
+    function workingDaysInMonth(year, monthIndex) {
+      let d = new Date(year, monthIndex, 1), wd = 0;
+      while (d.getMonth() === monthIndex) {
+        const day = d.getDay(); // 0 Sun ... 6 Sat
+        if (day !== 0 && day !== 6) wd++;
+        d.setDate(d.getDate() + 1);
+      }
+      return wd;
+    }
+
+    // ============= URL <-> Inputs sync =============
+    const bindings = {
+      // Key Numbers
+      producedKg: '#producedKg',
+      sellPriceDay: '#sellPriceDay',
+      rawUsedKg: '#rawUsedKg',
+      rawCostPerKg: '#rawCostPerKg',
+      packCostPerKg: '#packCostPerKg',
+      freightPerKg: '#freightPerKg',
+      // Factory Day (note: some have _day suffix to avoid clash)
+      staffCount: '#staffCount',
+      staffCostPerPerson: '#staffCostPerPerson',
+      supCount: '#supCount',
+      supCostPerPerson: '#supCostPerPerson',
+      staffHoursDay: '#staffHoursDay',
+      supHoursDay: '#supHoursDay',
+      rawUsedKg_day: '#rawUsedKg_day',
+      rawCostPerKg_day: '#rawCostPerKg_day',
+      packCostPerKg_day: '#packCostPerKg_day',
+      producedKg_day: '#producedKg_day',
+      sellPriceDay_day: '#sellPriceDay_day',
+      freightPerKg_day: '#freightPerKg_day',
+      elecKwh: '#elecKwh',
+      elecCostPerKwh: '#elecCostPerKwh',
+      waterM3: '#waterM3',
+      waterCostPerM3: '#waterCostPerM3',
+      housingCost: '#housingCost',
+      equipCost: '#equipCost',
+      adminCost: '#adminCost',
+      maintenanceCost: '#maintenanceCost',
+      deprCost: '#deprCost',
+      otherCost: '#otherCost',
+      iskPerEur: '#iskPerEur',
+      workingDays: '#workingDays',
+      month: '#month'
+    };
+
+    function applyQueryParams() {
+      const params = new URLSearchParams(location.search);
+      for (const [key, sel] of Object.entries(bindings)) {
+        const el = qsel(sel);
+        if (!el) continue;
+        const v = params.get(key);
+        if (v != null && v !== '') el.value = decodeURIComponent(v);
+      }
+    }
+
+    function syncUrlFromInputs() {
+      const params = new URLSearchParams();
+      for (const [key, sel] of Object.entries(bindings)) {
+        const el = qsel(sel);
+        if (el && el.value !== '') params.set(key, el.value);
+      }
+      const newUrl = `${location.pathname}?${params.toString()}${location.hash || ''}`;
+      history.replaceState(null, '', newUrl);
+    }
+
+    function attachSync() {
+      qall('input, select, textarea').forEach(el => {
+        el.addEventListener('input', () => { syncUrlFromInputs(); recalcAll(); });
+      });
+    }
+
+    // ============= Key Numbers calculator =============
+    function calcKeyNumbers() {
+      const producedKg = toNumber(qsel('#producedKg')?.value);
+      const sellPrice  = toNumber(qsel('#sellPriceDay')?.value);
+      const rawUsed    = toNumber(qsel('#rawUsedKg')?.value);
+      const rawCost    = toNumber(qsel('#rawCostPerKg')?.value);
+      const packCost   = toNumber(qsel('#packCostPerKg')?.value);
+      const freight = toNumber(qsel('#freightPerKg')?.value) || 0;
+
+      const yieldPct = (Number.isFinite(producedKg) && Number.isFinite(rawUsed) && rawUsed > 0)
+        ? (producedKg / rawUsed) * 100 : NaN;
+
+      const revenue = producedKg * sellPrice;
+      const totalCost = producedKg * (rawCost + packCost + freight);
+      const profit = revenue - totalCost;
+      const marginPct = revenue ? (profit / revenue) * 100 : NaN;
+      const profitPerKg = producedKg ? profit / producedKg : NaN;
+
+      setText('#key-net-kg', fmt(producedKg, 0));
+      setText('#key-revenue', fmt(revenue));
+      setText('#key-total-cost', fmt(totalCost));
+      setText('#key-profit', fmt(profit));
+      setText('#key-gm', Number.isFinite(marginPct) ? fmt(marginPct, 1) + ' %' : '–');
+      setText('#key-profit-kg', fmt(profitPerKg));
+      setText('#key-yield', Number.isFinite(yieldPct) ? fmt(yieldPct, 1) + ' %' : '–');
+    }
+
+    // ============= Factory Day calculator =============
+    function calcFactoryDay() {
+      const staffCount = toNumber(qsel('#staffCount')?.value);
+      const staffHrs = toNumber(qsel('#staffHoursDay')?.value) || 8;
+      const staffRate = toNumber(qsel('#staffCostPerPerson')?.value);
+
+      const supCount = toNumber(qsel('#supCount')?.value);
+      const supHrs = toNumber(qsel('#supHoursDay')?.value) || 8;
+      const supRate = toNumber(qsel('#supCostPerPerson')?.value);
+
+      const rawUsed = toNumber(qsel('#rawUsedKg_day')?.value);
+      const rawCost = toNumber(qsel('#rawCostPerKg_day')?.value);
+      const packCost = toNumber(qsel('#packCostPerKg_day')?.value);
+      const producedKg = toNumber(qsel('#producedKg_day')?.value);
+      const sellPrice = toNumber(qsel('#sellPriceDay_day')?.value);
+      const freight = toNumber(qsel('#freightPerKg_day')?.value);
+
+      const iskPerEur = toNumber(qsel('#iskPerEur')?.value);
+
+      const elecKwh = toNumber(qsel('#elecKwh')?.value);
+      const elecCost = toNumber(qsel('#elecCostPerKwh')?.value);
+      const waterM3 = toNumber(qsel('#waterM3')?.value);
+      const waterCost = toNumber(qsel('#waterCostPerM3')?.value);
+
+      const housingISK = toNumber(qsel('#housingCost')?.value);
+      const equipISK = toNumber(qsel('#equipCost')?.value);
+      const adminISK = toNumber(qsel('#adminCost')?.value);
+      const maintenance = toNumber(qsel('#maintenanceCost')?.value);
+      const depreciation = toNumber(qsel('#deprCost')?.value);
+      const other = toNumber(qsel('#otherCost')?.value);
+
+      // Working days (auto if empty)
+      const monthSel = qsel('#month')?.value;
+      let wd = toNumber(qsel('#workingDays')?.value);
+      if (!Number.isFinite(wd)) {
+        const today = monthSel ? new Date(monthSel + '-01') : new Date();
+        wd = workingDaysInMonth(today.getFullYear(), today.getMonth());
+        if (qsel('#workingDays')) qsel('#workingDays').value = wd;
+      }
+
+      const laborStaff = staffCount * staffHrs * staffRate;
+      const laborSup   = supCount * supHrs * supRate;
+
+      const material   = producedKg * packCost + rawUsed * rawCost;
+      const freightCost= producedKg * freight;
+
+      const utilities  = elecKwh * elecCost + waterM3 * waterCost;
+
+      const fixedDayEUR = (Number.isFinite(iskPerEur) && wd > 0)
+        ? ((housingISK + equipISK + adminISK) / iskPerEur) / wd : NaN;
+
+      const variableDay = laborStaff + laborSup + material + freightCost + utilities + maintenance + depreciation + other;
+      const revenue = producedKg * sellPrice;
+      const totalCost = (Number.isFinite(fixedDayEUR) ? fixedDayEUR : 0) + variableDay;
+      const profit = revenue - totalCost;
+      const marginPct = revenue ? (profit / revenue) * 100 : NaN;
+      const costPerKg = producedKg ? totalCost / producedKg : NaN;
+
+      setText('#day-yield', (Number.isFinite(producedKg) && Number.isFinite(rawUsed) && rawUsed > 0) ? fmt(producedKg / rawUsed * 100, 1) + ' %' : '–');
+      setText('#day-revenue', fmt(revenue));
+      setText('#day-total-cost', fmt(totalCost));
+      setText('#day-profit', fmt(profit));
+      setText('#day-margin', Number.isFinite(marginPct) ? fmt(marginPct, 1) + ' %' : '–');
+      setText('#day-cost-kg', fmt(costPerKg));
+
+      setText('#bd-labor-staff', fmt(laborStaff));
+      setText('#bd-labor-sup', fmt(laborSup));
+      setText('#bd-material', fmt(material));
+      setText('#bd-pack', fmt(producedKg * packCost));
+      setText('#bd-freight', fmt(freightCost));
+      setText('#bd-utilities', fmt(utilities));
+      setText('#bd-housing', Number.isFinite(fixedDayEUR) ? fmt((housingISK/iskPerEur)/wd) : '–');
+      setText('#bd-equip', Number.isFinite(fixedDayEUR) ? fmt((equipISK/iskPerEur)/wd) : '–');
+      setText('#bd-admin', Number.isFinite(fixedDayEUR) ? fmt((adminISK/iskPerEur)/wd) : '–');
+      setText('#bd-maint', fmt(maintenance));
+      setText('#bd-depr', fmt(depreciation));
+      setText('#bd-other', fmt(other));
+    }
+
+    // ============= Factory Network (template clone) =============
+    const FACTORY_COUNT = 3;
+    const factories = []; // [{inputs:{}, results:{}}, ...]
+    const factoryKeys = [
+      'producedKg','sellPriceDay','rawUsedKg','rawCostPerKg','packCostPerKg','freightPerKg',
+      'staffCount','staffCostPerPerson','supCount','supCostPerPerson',
+      'staffHoursDay','supHoursDay','elecKwh','elecCostPerKwh','waterM3','waterCostPerM3'
+    ];
+
+    function buildFactories() {
+      const container = qsel('#factories-container');
+      const tpl = qsel('#factory-template').content;
+
+      for (let i = 1; i <= FACTORY_COUNT; i++) {
+        const prefix = `f${i}`;
+        const clone = document.importNode(tpl, true);
+        clone.querySelector('.factory-number').textContent = i;
+
+        const inputs = {};
+        const results = {};
+
+        // Wire inputs
+        clone.querySelectorAll('[data-key]').forEach(input => {
+          const key = input.getAttribute('data-key');
+          const id = `${prefix}-${key}`;
+          input.id = id;                    // give it a concrete ID
+          bindings[id] = `#${id}`;         // register for URL sync
+          inputs[key] = input;
+        });
+
+        // Wire result slots
+        clone.querySelectorAll('[data-result]').forEach(span => {
+          const key = span.getAttribute('data-result');
+          results[key] = span;
+          span.id = `${prefix}-${key}`;
+        });
+
+        factories.push({ prefix, inputs, results });
+        container.appendChild(clone);
+      }
+    }
+
+    function calcFactory(factory) {
+      const g = k => toNumber(factory.inputs[k]?.value);
+
+      const producedKg = g('producedKg');
+      const sellPrice  = g('sellPriceDay');
+      const rawUsed    = g('rawUsedKg');
+      const rawCost    = g('rawCostPerKg');
+      const packCost   = g('packCostPerKg');
+      const freight    = g('freightPerKg');
+
+      const staffCnt   = g('staffCount');
+      const staffHr    = g('staffHoursDay') || 8;
+      const staffRate  = g('staffCostPerPerson');
+
+      const supCnt     = g('supCount');
+      const supHr      = g('supHoursDay') || 8;
+      const supRate    = g('supCostPerPerson');
+
+      const elecKwh    = g('elecKwh');
+      const elecCost   = g('elecCostPerKwh');
+      const waterM3    = g('waterM3');
+      const waterCost  = g('waterCostPerM3');
+
+      const yieldPct = (Number.isFinite(rawUsed) && rawUsed > 0 && Number.isFinite(producedKg))
+  ? (producedKg / rawUsed) * 100
+  : NaN;
+      const revenue    = producedKg * sellPrice;
+      const labor      = (staffCnt * staffHr * staffRate) + (supCnt * supHr * supRate);
+      const material   = (producedKg * packCost) + (rawUsed * rawCost);
+      const freightCost= producedKg * freight;
+      const utilities  = elecKwh * elecCost + waterM3 * waterCost;
+
+      const totalCost  = labor + material + freightCost + utilities;
+      const profit     = revenue - totalCost;
+      const marginPct  = revenue ? (profit / revenue) * 100 : NaN;
+      const costPerKg  = producedKg ? totalCost / producedKg : NaN;
+
+      setText(factory.results.yield, Number.isFinite(yieldPct) ? fmt(yieldPct, 1) + ' %' : '–');
+      setText(factory.results.revenue, fmt(revenue));
+      setText(factory.results.totalCost, fmt(totalCost));
+      setText(factory.results.profit, fmt(profit));
+      setText(factory.results.margin, Number.isFinite(marginPct) ? fmt(marginPct, 1) + ' %' : '–');
+      setText(factory.results.costPerKg, fmt(costPerKg));
+
+      return { producedKg, revenue, totalCost, profit };
+    }
+
+    function calcNetwork() {
+      let totalKg = 0, totalRev = 0, totalCost = 0, totalProfit = 0;
+      factories.forEach(f => {
+        const r = calcFactory(f);
+        totalKg    += Number.isFinite(r.producedKg) ? r.producedKg : 0;
+        totalRev   += Number.isFinite(r.revenue)    ? r.revenue    : 0;
+        totalCost  += Number.isFinite(r.totalCost)  ? r.totalCost  : 0;
+        totalProfit+= Number.isFinite(r.profit)     ? r.profit     : 0;
+      });
+      setText('#net-producedKg', fmt(totalKg, 0));
+      setText('#net-revenue', fmt(totalRev));
+      setText('#net-total-cost', fmt(totalCost));
+      setText('#net-profit', fmt(totalProfit));
+      setText('#net-margin', totalRev ? fmt((totalProfit/totalRev)*100, 1) + ' %' : '–');
+      setText('#net-cost-kg', totalKg ? fmt(totalCost/totalKg) : '–');
+    }
+
+    // ============= Orchestration =============
+    function recalcAll() {
+      calcKeyNumbers();
+      calcFactoryDay();
+      calcNetwork();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      buildFactories();          // create f1/f2/f3 and register their fields in bindings
+      applyQueryParams();        // fill from ?query
+      attachSync();              // keep URL in sync as user types
+      recalcAll();               // initial compute
+    });
+  </script>
+</body>
+</html>
