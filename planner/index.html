@@ -413,21 +413,23 @@ function populateMonthSelect(){
   }
 }
 
-document.addEventListener('DOMContentLoaded', ()=>{
-  populateMonthSelect();   // build months
-  applyQueryParams?.();    // may set #month from URL
-  // NEW: prefill Working days from the selected month (if empty)
-  const m = q('#month')?.value;
+document.addEventListener('DOMContentLoaded', () => {
+  populateMonthSelect();      // build 12-month dropdown
+  applyQueryParams?.();       // read ?month, ?workingDays, etc.
+
+  // Prefill Working days from the selected month (if empty)
+  const m = q('#month')?.value;          // "MM"
   const wdBox = q('#workingDays');
   if (m && wdBox && !wdBox.value) {
-    const wd = workingDaysInMonth(m);  // m is "MM"
+    const wd = workingDaysInMonth(m);
     if (Number.isFinite(wd)) wdBox.value = String(wd);
   }
-  
-  attachSync();
-  calcKeyNumbers();
-  calcDay();
+
+  attachSync();               // wire up listeners
+  calcKeyNumbers();           // initial calc
+  calcDay();                  // also fills Working days if still empty
 });
+
 </script>
 
 </body>
