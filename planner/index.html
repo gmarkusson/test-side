@@ -408,6 +408,14 @@ function populateMonthSelect(){
 document.addEventListener('DOMContentLoaded', ()=>{
   populateMonthSelect();   // build months
   applyQueryParams?.();    // may set #month from URL
+  // NEW: prefill Working days from the selected month (if empty)
+  const m = q('#month')?.value;
+  const wdBox = q('#workingDays');
+  if (m && wdBox && !wdBox.value) {
+    const wd = workingDaysInMonth(m);  // m is "MM"
+    if (Number.isFinite(wd)) wdBox.value = String(wd);
+  }
+  
   attachSync();
   calcKeyNumbers();
   calcDay();
