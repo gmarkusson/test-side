@@ -1,581 +1,150 @@
 <!doctype html>
-<html lang="en" class="light">
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Premium Starter Site</title>
-  <meta name="description" content="A clean, responsive starter website you can customize.">
-  <meta property="og:title" content="Premium Starter Site">
-  <meta property="og:description" content="A clean, responsive starter website you can customize.">
-  <meta name="theme-color" content="#0f172a">
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="preload" href="styles.css" as="style">
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Factory Planner — Key Numbers</title>
+  <style>
+    :root {
+      --gap:14px; --pad:16px;
+      --bg:#f6f8fc;      /* page background */
+      --card:#ffffff;    /* card background */
+      --ink:#0b1320;     /* main text */
+      --muted:#4a5874;   /* secondary text */
+      --accent:#0b5fff;  /* headings/accent */
+      --border:#e4e9f2;  /* card borders */
+      --field-border:#d6dbe6;
+    }
+    html,body { margin:0; padding:0; background:var(--bg); color:var(--ink);
+      font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    header { padding:24px var(--pad); border-bottom:1px solid var(--border); }
+    h1 { margin:0 0 6px 0; font-size:22px; }
+    h2 { margin:0 0 10px 0; font-size:18px; color:var(--accent); }
+    main { padding: 20px var(--pad) 60px; display:grid; gap: 14px; }
+    section.card { background: var(--card); border:1px solid var(--border); border-radius:10px; padding:16px; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 14px; }
+    label { display:flex; flex-direction:column; gap:6px; color:var(--muted); font-weight:600; }
+    input { background:#fff; color:var(--ink); border:1px solid var(--field-border); border-radius:8px; padding:10px 12px; outline:none; }
+    input:focus { border-color:#2c6fff; box-shadow: 0 0 0 2px rgba(44,111,255,.14); }
+    .results { display:grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap:10px; margin:12px 0 0; padding:0; list-style:none; }
+    .results li { background:#fff; border:1px solid var(--border); border-radius:8px; padding:10px;
+      display:flex; justify-content:space-between; align-items:center; }
+    .results li span { color:var(--muted); }
+    .results li strong { font-size:15px; }
+  </style>
 </head>
 <body>
-  <header class="site-header">
-    <a class="logo" href="#home">Premium<span>Starter</span></a>
-
-    <button id="navToggle" class="hamburger" aria-label="Toggle navigation" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
-
-    <nav id="siteNav" class="site-nav" aria-label="Primary">
-      <a href="#home">Home</a>
-      <a href="#features">Features</a>
-      <a href="#about">About</a>
-      <a href="#kpis">Key Numbers</a>
-      <a href="#factory">Factory Day</a>
-      <a href="#network">Factory Network (3 factories)</a>
-      <a href="#contact">Contact</a>
-    </nav>
+  <header id="home">
+    <h1>Factory Planner (white)</h1>
+    <div class="muted">Type values or pass them via URL (commas as decimals are OK). The page auto-calculates and keeps the URL in sync.</div>
   </header>
 
-  <main id="home">
-    <!-- Hero -->
-    <section class="hero">
-      <div class="hero-content">
-        <h1>Build a simple website fast</h1>
-        <p>This starter gives you a responsive layout, smooth scrolling, and clean styles.</p>
-        <div class="cta-row">
-          <a class="btn primary" href="#features">See features</a>
-          <a class="btn" href="#contact">Contact us</a>
-        </div>
-      </div>
-      <div class="hero-visual" aria-hidden="true">
-        <svg viewBox="0 0 600 400" role="img" aria-label="decorative">
-          <defs>
-            <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-              <stop offset="0%" stop-color="#22d3ee"/>
-              <stop offset="100%" stop-color="#6366f1"/>
-            </linearGradient>
-          </defs>
-          <rect x="0" y="0" width="600" height="400" rx="24" fill="url(#g)"/>
-          <circle cx="120" cy="80" r="40" fill="#fff" opacity="0.2"/>
-          <circle cx="520" cy="320" r="60" fill="#fff" opacity="0.15"/>
-        </svg>
-      </div>
-    </section>
-
-    <!-- Features -->
-    <section id="features" class="features">
-      <h2>Features</h2>
-      <ul class="cards">
-        <li class="card">
-          <h3>Responsive</h3>
-          <p>Looks great on phones, tablets, and desktops.</p>
-        </li>
-        <li class="card">
-          <h3>Accessible</h3>
-          <p>Semantic HTML, aria labels, and focus styles built in.</p>
-        </li>
-        <li class="card">
-          <h3>Clean styles</h3>
-          <p>Modern typography and spacing you can tweak easily.</p>
-        </li>
-      </ul>
-    </section>
-
-    <!-- About -->
-    <section id="about" class="about">
-      <div class="about-inner">
-        <h2>About</h2>
-        <p>
-          This starter is pure HTML, CSS, and vanilla JS—no frameworks. Edit the content in
-          <code>index.html</code>, tweak styles in <code>styles.css</code>, and add interactivity in <code>script.js</code>.
-        </p>
-      </div>
-    </section>
-
-    <!-- Key Numbers (existing calculator) -->
-    <section id="kpis" class="kpis">
+  <main>
+    <!-- KEY NUMBERS ONLY (for Step 1) -->
+    <section class="card" id="key">
       <h2>Key Numbers</h2>
-
-      <div class="kpi-toolbar">
-        <label for="currencySelect">Currency</label>
-        <select id="currencySelect" name="currency">
-          <option value="ISK">ISK kr.</option>
-          <option value="EUR" selected>EUR €</option>
-          <option value="GBP">GBP £</option>
-          <option value="USD">USD $</option>
-          <option value="SEK">SEK kr</option>
-          <option value="NOK">NOK kr</option>
-          <option value="DKK">DKK kr</option>
-        </select>
+      <div class="grid">
+        <label>Produced kg (net)<input id="producedKg" inputmode="decimal" /></label>
+        <label>Selling price / kg<input id="sellPriceDay" inputmode="decimal" /></label>
+        <label>Raw used kg<input id="rawUsedKg" inputmode="decimal" /></label>
+        <label>Raw cost / kg<input id="rawCostPerKg" inputmode="decimal" /></label>
+        <label>Pack cost / kg<input id="packCostPerKg" inputmode="decimal" /></label>
+        <label>Freight / kg<input id="freightPerKg" inputmode="decimal" /></label>
       </div>
-
-      <form id="kpiForm" class="kpi-form" autocomplete="off" novalidate>
-        <div class="grid">
-          <label>Volume (kg)
-            <input type="text" inputmode="decimal" name="volumeKg" required placeholder="e.g. 1200">
-          </label>
-
-          <label>Sell price / kg
-            <input type="text" inputmode="decimal" name="sellPrice" required placeholder="e.g. 14,50">
-          </label>
-
-          <label>Raw cost / kg
-            <input type="text" inputmode="decimal" name="rawCost" required placeholder="e.g. 9,20">
-          </label>
-
-          <label>Processing + pack / kg
-            <input type="text" inputmode="decimal" name="procCost" required placeholder="e.g. 1,30">
-          </label>
-
-          <label>Freight / kg
-            <input type="text" inputmode="decimal" name="freight" value="0" required placeholder="0">
-          </label>
-
-          <label>Yield (%)
-            <input type="text" inputmode="decimal" name="yieldPct" value="100" required placeholder="100 = no loss">
-          </label>
-        </div>
-
-        <details class="webhook-details">
-          <summary>Optional: post results to a webhook</summary>
-          <label for="webhookUrl">Webhook URL (POST)</label>
-          <input type="url" id="webhookUrl" name="webhookUrl" placeholder="https://your-endpoint.example/receive">
-        </details>
-
-        <div class="cta-row">
-          <button class="btn primary" type="submit">Calculate</button>
-          <button class="btn" type="reset">Reset</button>
-        </div>
-      </form>
-
-      <div id="kpiResults" class="kpi-results" hidden>
-        <h3>Results</h3>
-        <ul class="cards">
-          <li class="card"><h4>Net saleable kg</h4><p id="r_netKg">–</p></li>
-          <li class="card"><h4>Revenue</h4><p id="r_revenue">–</p></li>
-          <li class="card"><h4>Total cost</h4><p id="r_totalCost">–</p></li>
-          <li class="card"><h4>Profit</h4><p id="r_profit">–</p></li>
-          <li class="card"><h4>Gross margin %</h4><p id="r_marginPct">–</p></li>
-          <li class="card"><h4>Profit / kg</h4><p id="r_profitPerKg">–</p></li>
-        </ul>
-        <p id="postStatus" class="hint"></p>
-      </div>
-    </section>
-
-    <!-- Factory Day (single site quick calc) -->
-    <section id="factory" class="kpis">
-      <h2>Factory Day</h2>
-      <p class="hint">Quick single-site day calculator. Fixed costs (ISK/month) convert to EUR/day using working days for the month.</p>
-
-      <form id="dayForm" class="kpi-form" autocomplete="off" novalidate>
-        <div class="grid">
-          <!-- Month & FX -->
-          <label>Month
-            <input type="month" name="month" id="dayMonth">
-          </label>
-          <label>Working days (auto)
-            <input type="text" name="workDays" id="dayWorkDays" readonly>
-          </label>
-          <label>ISK → EUR
-            <input type="text" inputmode="decimal" name="iskToEur" value="0.0067" required>
-          </label>
-
-          <!-- Labor -->
-          <label>Staff — people
-            <input type="text" inputmode="numeric" name="staffCount" value="10" required>
-          </label>
-          <label>Staff daytime hours
-            <input type="text" inputmode="decimal" name="staffDayHours" value="8" required>
-          </label>
-          <label>Staff overtime hours
-            <input type="text" inputmode="decimal" name="staffOtHours" value="0" required>
-          </label>
-          <label>Staff €/h (daytime)
-            <input type="text" inputmode="decimal" name="staffDayRate" value="15" required>
-          </label>
-          <label>Staff €/h (overtime)
-            <input type="text" inputmode="decimal" name="staffOtRate" value="22.5" required>
-          </label>
-
-          <label>Supervisors — people
-            <input type="text" inputmode="numeric" name="supCount" value="2" required>
-          </label>
-          <label>Supervisors daytime hours
-            <input type="text" inputmode="decimal" name="supDayHours" value="8" required>
-          </label>
-          <label>Supervisors overtime hours
-            <input type="text" inputmode="decimal" name="supOtHours" value="0" required>
-          </label>
-          <label>Supervisors €/h (daytime)
-            <input type="text" inputmode="decimal" name="supDayRate" value="20" required>
-          </label>
-          <label>Supervisors €/h (overtime)
-            <input type="text" inputmode="decimal" name="supOtRate" value="30" required>
-          </label>
-
-          <!-- Materials -->
-          <label>Raw used (kg)
-            <input type="text" inputmode="decimal" name="rawUsedKg" value="1200" required>
-          </label>
-          <label>Raw cost / kg — €/kg
-            <input type="text" inputmode="decimal" name="rawCostPerKg" value="7,90" required>
-          </label>
-          <label>Packaging / kg — €/kg
-            <input type="text" inputmode="decimal" name="packCostPerKg" value="0,60" required>
-          </label>
-
-          <!-- Output -->
-          <label>Produced (kg)
-            <input type="text" inputmode="decimal" name="producedKg" value="1000" required>
-          </label>
-          <label>Selling price / kg — €/kg
-            <input type="text" inputmode="decimal" name="sellPriceDay" value="14,50" required>
-          </label>
-
-          <!-- Fixed costs ISK/month -->
-          <label>Housing (ISK / month)
-            <input type="text" inputmode="decimal" name="housingIsk" value="500000" required>
-          </label>
-          <label>Equipment rent (ISK / month)
-            <input type="text" inputmode="decimal" name="equipIsk" value="300000" required>
-          </label>
-          <label>Administration (ISK / month)
-            <input type="text" inputmode="decimal" name="adminIsk" value="700000" required>
-          </label>
-<label for="exchangeRate">ISK per EUR</label>
-<input type="number" id="exchangeRate" name="exchangeRate" step="0.01" placeholder="e.g. 150" required>
-
-          <!-- Other EUR/day -->
-          <label>Freight / kg — €/kg
-            <input type="text" inputmode="decimal" name="freightPerKg" value="0,15">
-          </label>
-          <label>Utilities — €/day
-            <input type="text" inputmode="decimal" name="utilitiesDay" value="0">
-          </label>
-          <label>Maintenance — €/day
-            <input type="text" inputmode="decimal" name="maintenanceCost" value="120">
-          </label>
-          <label>Depreciation — €/day
-            <input type="text" inputmode="decimal" name="deprCost" value="180">
-          </label>
-          <label>Other overheads — €/day
-            <input type="text" inputmode="decimal" name="otherCost" value="0">
-          </label>
-        </div>
-
-        <div class="cta-row">
-          <button class="btn primary" type="submit">Calculate day</button>
-          <button class="btn" type="reset">Reset</button>
-        </div>
-      </form>
-
-      <div id="dayResults" class="kpi-results" hidden>
-        <h3>Daily Results</h3>
-        <ul class="cards">
-          <li class="card"><h4>Yield (%)</h4><p id="d_yieldPct">–</p></li>
-          <li class="card"><h4>Revenue</h4><p id="d_revenue">–</p></li>
-          <li class="card"><h4>Total cost</h4><p id="d_totalCost">–</p></li>
-          <li class="card"><h4>Profit</h4><p id="d_profit">–</p></li>
-          <li class="card"><h4>Margin %</h4><p id="d_marginPct">–</p></li>
-          <li class="card"><h4>Cost / kg</h4><p id="d_costPerKg">–</p></li>
-        </ul>
-
-        <h4>Breakdown</h4>
-        <ul class="cards">
-          <li class="card"><h4>Labor (staff)</h4><p id="d_laborStaff">–</p></li>
-          <li class="card"><h4>Labor (supervisors)</h4><p id="d_laborSup">–</p></li>
-          <li class="card"><h4>Raw material</h4><p id="d_rawCost">–</p></li>
-          <li class="card"><h4>Packaging</h4><p id="d_packCost">–</p></li>
-          <li class="card"><h4>Freight</h4><p id="d_freightCost">–</p></li>
-          <li class="card"><h4>Utilities</h4><p id="d_utilities">–</p></li>
-
-          <li class="card"><h4>Housing (EUR/day)</h4><p id="d_housing">–</p></li>
-          <li class="card"><h4>Equipment (EUR/day)</h4><p id="d_equip">–</p></li>
-          <li class="card"><h4>Administration (EUR/day)</h4><p id="d_admin">–</p></li>
-
-          <li class="card"><h4>Maintenance</h4><p id="d_maint">–</p></li>
-          <li class="card"><h4>Depreciation</h4><p id="d_depr">–</p></li>
-          <li class="card"><h4>Other</h4><p id="d_other">–</p></li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- Factory Network: 3 factories -->
-    <section id="network" class="kpis">
-      <h2>Factory Network (3 factories)</h2>
-      <p class="hint">
-        Salmon Factory and Whitefish Factory share <strong>Building A</strong> (housing + equipment) allocated by produced kg.
-        Smokehouse is in <strong>Building B</strong> and pays its own rent. Administration is shared across all three.
-        Enter fixed costs in <strong>ISK / month</strong>; they convert to <strong>EUR / day</strong> using auto-calculated working days for the selected month.
-      </p>
-
-      <form id="netForm" class="kpi-form" autocomplete="off" novalidate>
-        <div class="grid">
-          <!-- Month & FX -->
-          <label>Month
-            <input type="month" name="month" id="netMonth">
-          </label>
-          <label>Working days (auto)
-            <input type="text" name="workDays" id="netWorkDays" readonly>
-          </label>
-          <label>ISK → EUR
-            <input type="text" inputmode="decimal" name="iskToEur" value="0.0067" required>
-          </label>
-
-          <!-- Fixed costs (ISK/month) -->
-          <label>Building A — Housing (ISK / month)
-            <input type="text" inputmode="decimal" name="bA_housing" value="600000">
-          </label>
-          <label>Building A — Equipment (ISK / month)
-            <input type="text" inputmode="decimal" name="bA_equip" value="350000">
-          </label>
-
-          <label>Building B — Smokehouse rent (ISK / month)
-            <input type="text" inputmode="decimal" name="bB_rent" value="400000">
-          </label>
-
-          <label>Administration (ISK / month) — shared
-            <input type="text" inputmode="decimal" name="adminIsk" value="900000">
-          </label>
-        </div>
-
-        <!-- Salmon Factory -->
-        <h3>Salmon Factory</h3>
-        <div class="grid">
-          <label>Staff — people
-            <input type="text" inputmode="numeric" name="sal_staffCount" value="12">
-          </label>
-          <label>Staff daytime hours
-            <input type="text" inputmode="decimal" name="sal_staffDayHours" value="8">
-          </label>
-          <label>Staff overtime hours
-            <input type="text" inputmode="decimal" name="sal_staffOtHours" value="0">
-          </label>
-          <label>Staff €/h (daytime)
-            <input type="text" inputmode="decimal" name="sal_staffDayRate" value="15">
-          </label>
-          <label>Staff €/h (overtime)
-            <input type="text" inputmode="decimal" name="sal_staffOtRate" value="22.5">
-          </label>
-
-          <label>Supervisors — people
-            <input type="text" inputmode="numeric" name="sal_supCount" value="2">
-          </label>
-          <label>Supervisors daytime hours
-            <input type="text" inputmode="decimal" name="sal_supDayHours" value="8">
-          </label>
-          <label>Supervisors overtime hours
-            <input type="text" inputmode="decimal" name="sal_supOtHours" value="0">
-          </label>
-          <label>Supervisors €/h (daytime)
-            <input type="text" inputmode="decimal" name="sal_supDayRate" value="20">
-          </label>
-          <label>Supervisors €/h (overtime)
-            <input type="text" inputmode="decimal" name="sal_supOtRate" value="30">
-          </label>
-
-          <label>Raw used (kg)
-            <input type="text" inputmode="decimal" name="sal_rawKg" value="1200">
-          </label>
-          <label>Raw cost / kg — €/kg
-            <input type="text" inputmode="decimal" name="sal_rawCost" value="7,90">
-          </label>
-          <label>Produced (kg)
-            <input type="text" inputmode="decimal" name="sal_prodKg" value="1000">
-          </label>
-          <label>Sell price / kg — €/kg
-            <input type="text" inputmode="decimal" name="sal_sell" value="14,50">
-          </label>
-          <label>Packaging / kg — €/kg
-            <input type="text" inputmode="decimal" name="sal_pack" value="0,60">
-          </label>
-          <label>Freight / kg — €/kg
-            <input type="text" inputmode="decimal" name="sal_freight" value="0,15">
-          </label>
-          <label>Utilities — €/day
-            <input type="text" inputmode="decimal" name="sal_utils" value="0">
-          </label>
-        </div>
-
-        <!-- Whitefish Factory -->
-        <h3>Whitefish Factory</h3>
-        <div class="grid">
-          <label>Staff — people
-            <input type="text" inputmode="numeric" name="wh_staffCount" value="8">
-          </label>
-          <label>Staff daytime hours
-            <input type="text" inputmode="decimal" name="wh_staffDayHours" value="8">
-          </label>
-          <label>Staff overtime hours
-            <input type="text" inputmode="decimal" name="wh_staffOtHours" value="0">
-          </label>
-          <label>Staff €/h (daytime)
-            <input type="text" inputmode="decimal" name="wh_staffDayRate" value="14">
-          </label>
-          <label>Staff €/h (overtime)
-            <input type="text" inputmode="decimal" name="wh_staffOtRate" value="21">
-          </label>
-
-          <label>Supervisors — people
-            <input type="text" inputmode="numeric" name="wh_supCount" value="1">
-          </label>
-          <label>Supervisors daytime hours
-            <input type="text" inputmode="decimal" name="wh_supDayHours" value="8">
-          </label>
-          <label>Supervisors overtime hours
-            <input type="text" inputmode="decimal" name="wh_supOtHours" value="0">
-          </label>
-          <label>Supervisors €/h (daytime)
-            <input type="text" inputmode="decimal" name="wh_supDayRate" value="19">
-          </label>
-          <label>Supervisors €/h (overtime)
-            <input type="text" inputmode="decimal" name="wh_supOtRate" value="28.5">
-          </label>
-
-          <label>Raw used (kg)
-            <input type="text" inputmode="decimal" name="wh_rawKg" value="800">
-          </label>
-          <label>Raw cost / kg — €/kg
-            <input type="text" inputmode="decimal" name="wh_rawCost" value="5,20">
-          </label>
-          <label>Produced (kg)
-            <input type="text" inputmode="decimal" name="wh_prodKg" value="650">
-          </label>
-          <label>Sell price / kg — €/kg
-            <input type="text" inputmode="decimal" name="wh_sell" value="9,80">
-          </label>
-          <label>Packaging / kg — €/kg
-            <input type="text" inputmode="decimal" name="wh_pack" value="0,45">
-          </label>
-          <label>Freight / kg — €/kg
-            <input type="text" inputmode="decimal" name="wh_freight" value="0,12">
-          </label>
-          <label>Utilities — €/day
-            <input type="text" inputmode="decimal" name="wh_utils" value="0">
-          </label>
-        </div>
-
-        <!-- Smokehouse (Building B) -->
-        <h3>Smokehouse (Building B)</h3>
-        <div class="grid">
-          <label>Staff — people
-            <input type="text" inputmode="numeric" name="sm_staffCount" value="6">
-          </label>
-          <label>Staff daytime hours
-            <input type="text" inputmode="decimal" name="sm_staffDayHours" value="8">
-          </label>
-          <label>Staff overtime hours
-            <input type="text" inputmode="decimal" name="sm_staffOtHours" value="0">
-          </label>
-          <label>Staff €/h (daytime)
-            <input type="text" inputmode="decimal" name="sm_staffDayRate" value="15">
-          </label>
-          <label>Staff €/h (overtime)
-            <input type="text" inputmode="decimal" name="sm_staffOtRate" value="22.5">
-          </label>
-
-          <label>Supervisors — people
-            <input type="text" inputmode="numeric" name="sm_supCount" value="1">
-          </label>
-          <label>Supervisors daytime hours
-            <input type="text" inputmode="decimal" name="sm_supDayHours" value="8">
-          </label>
-          <label>Supervisors overtime hours
-            <input type="text" inputmode="decimal" name="sm_supOtHours" value="0">
-          </label>
-          <label>Supervisors €/h (daytime)
-            <input type="text" inputmode="decimal" name="sm_supDayRate" value="21">
-          </label>
-          <label>Supervisors €/h (overtime)
-            <input type="text" inputmode="decimal" name="sm_supOtRate" value="31.5">
-          </label>
-
-          <label>Raw used (kg)
-            <input type="text" inputmode="decimal" name="sm_rawKg" value="500">
-          </label>
-          <label>Raw cost / kg — €/kg
-            <input type="text" inputmode="decimal" name="sm_rawCost" value="9,80">
-          </label>
-          <label>Produced (kg)
-            <input type="text" inputmode="decimal" name="sm_prodKg" value="450">
-          </label>
-          <label>Sell price / kg — €/kg
-            <input type="text" inputmode="decimal" name="sm_sell" value="18,00">
-          </label>
-          <label>Packaging / kg — €/kg
-            <input type="text" inputmode="decimal" name="sm_pack" value="0,75">
-          </label>
-          <label>Freight / kg — €/kg
-            <input type="text" inputmode="decimal" name="sm_freight" value="0,18">
-          </label>
-          <label>Utilities — €/day
-            <input type="text" inputmode="decimal" name="sm_utils" value="0">
-          </label>
-        </div>
-
-        <div class="cta-row" style="margin-top:1rem">
-          <button class="btn primary" type="submit">Calculate network</button>
-          <button class="btn" type="reset">Reset</button>
-        </div>
-      </form>
-
-      <div id="netResults" class="kpi-results" hidden>
-        <h3>Network Results</h3>
-        <ul class="cards">
-          <li class="card"><h4>Total revenue</h4><p id="n_revenue">–</p></li>
-          <li class="card"><h4>Total cost</h4><p id="n_totalCost">–</p></li>
-          <li class="card"><h4>Profit</h4><p id="n_profit">–</p></li>
-          <li class="card"><h4>Margin %</h4><p id="n_marginPct">–</p></li>
-          <li class="card"><h4>Cost / kg</h4><p id="n_costPerKg">–</p></li>
-        </ul>
-
-        <h4>Per factory</h4>
-        <ul class="cards">
-          <li class="card"><h4>Salmon Factory</h4><p id="n_salmon">–</p></li>
-          <li class="card"><h4>Whitefish Factory</h4><p id="n_whitefish">–</p></li>
-          <li class="card"><h4>Smokehouse</h4><p id="n_smoke">–</p></li>
-        </ul>
-
-        <h4>Fixed costs (EUR/day)</h4>
-        <ul class="cards">
-          <li class="card"><h4>Building A — Housing</h4><p id="n_bA_housing">–</p></li>
-          <li class="card"><h4>Building A — Equipment</h4><p id="n_bA_equip">–</p></li>
-          <li class="card"><h4>Building B — Rent</h4><p id="n_bB_rent">–</p></li>
-          <li class="card"><h4>Administration</h4><p id="n_admin">–</p></li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- Contact -->
-    <section id="contact" class="contact">
-      <h2>Contact</h2>
-      <p>Have questions? Reach out to us anytime.</p>
-      <form class="contact-form" autocomplete="off" novalidate>
-        <label for="c_name">Your name</label>
-        <input id="c_name" type="text" name="name" required>
-
-        <label for="c_email">Your email</label>
-        <input id="c_email" type="email" name="email" required>
-
-        <label for="c_msg">Message</label>
-        <textarea id="c_msg" name="message" rows="4" required></textarea>
-
-        <button class="btn primary" type="submit">Send</button>
-      </form>
+      <ul class="results">
+        <li><span>Net saleable kg</span><strong id="key-net-kg">–</strong></li>
+        <li><span>Revenue</span><strong id="key-revenue">–</strong></li>
+        <li><span>Total cost</span><strong id="key-total-cost">–</strong></li>
+        <li><span>Profit</span><strong id="key-profit">–</strong></li>
+        <li><span>Gross margin %</span><strong id="key-gm">–</strong></li>
+        <li><span>Profit / kg</span><strong id="key-profit-kg">–</strong></li>
+        <li style="display:none"><span>Yield</span><strong id="key-yield">–</strong></li>
+      </ul>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <p>&copy; 2025 Premium Starter Site. All rights reserved.</p>
-      <nav class="footer-nav" aria-label="Footer">
-        <a href="#home">Home</a>
-        <a href="#features">Features</a>
-        <a href="#about">About</a>
-        <a href="#kpis">Key Numbers</a>
-        <a href="#factory">Factory Day</a>
-        <a href="#network">Factory Network (3 factories)</a>
-        <a href="#contact">Contact</a>
-      </nav>
-    </div>
-  </footer>
+  <script>
+    // --- Helpers ---
+    const locale = 'is-IS';
+    const q = (s, r=document) => r.querySelector(s);
+    const qa = (s, r=document) => Array.from(r.querySelectorAll(s));
+    const setText = (sel, val) => { const el = typeof sel==='string'? q(sel) : sel; if (el) el.textContent = val; };
 
-  <!-- Load JS safely at the end -->
-  <script defer src="script.js?v=1"></script>
+    // Accept "1.234,56" or "1,234.56" or "1234,56" or "1234.56"
+    function toNumber(v){
+      if (v == null) return NaN;
+      const s = String(v).trim().replace(/\s/g,'');
+      if (!s) return NaN;
+      if (s.includes(',') && !s.includes('.')) return Number(s.replace(/\./g,'').replace(',', '.'));
+      return Number(s.replace(/,/g,''));
+    }
+    const fmt = (n, digits=2) =>
+      Number.isFinite(n) ? new Intl.NumberFormat(locale,{minimumFractionDigits:digits,maximumFractionDigits:digits}).format(n) : '–';
+
+    // --- URL <-> Inputs sync (Step 1 scope: Key Numbers only) ---
+    const bindings = {
+      producedKg: '#producedKg',
+      sellPriceDay: '#sellPriceDay',
+      rawUsedKg: '#rawUsedKg',
+      rawCostPerKg: '#rawCostPerKg',
+      packCostPerKg: '#packCostPerKg',
+      freightPerKg: '#freightPerKg'
+    };
+
+    function applyQueryParams(){
+      const params = new URLSearchParams(location.search);
+      for (const [key, sel] of Object.entries(bindings)) {
+        const el = q(sel); if (!el) continue;
+        const v = params.get(key);
+        if (v != null && v !== '') el.value = decodeURIComponent(v);
+      }
+    }
+    function syncUrlFromInputs(){
+      const params = new URLSearchParams();
+      for (const [key, sel] of Object.entries(bindings)) {
+        const el = q(sel);
+        if (el && el.value !== '') params.set(key, el.value);
+      }
+      history.replaceState(null, '', `${location.pathname}?${params.toString()}`);
+    }
+    function attachSync(){
+      qa('input').forEach(el => {
+        el.addEventListener('input', () => { syncUrlFromInputs(); calcKeyNumbers(); });
+      });
+    }
+
+    // --- Key Numbers calc ---
+    function calcKeyNumbers(){
+      const producedKg = toNumber(q('#producedKg')?.value);
+      const sellPrice  = toNumber(q('#sellPriceDay')?.value);
+      const rawUsed    = toNumber(q('#rawUsedKg')?.value);
+      const rawCost    = toNumber(q('#rawCostPerKg')?.value);
+      const packCost   = toNumber(q('#packCostPerKg')?.value) || 0;
+      const freight    = toNumber(q('#freightPerKg')?.value) || 0;
+
+      const yieldPct = (Number.isFinite(producedKg) && Number.isFinite(rawUsed) && rawUsed > 0)
+        ? (producedKg / rawUsed) * 100 : NaN;
+
+      const revenue   = producedKg * sellPrice;
+      const totalCost = producedKg * (rawCost + packCost + freight);
+      const profit    = revenue - totalCost;
+      const marginPct = revenue ? (profit / revenue) * 100 : NaN;
+      const profitKg  = producedKg ? profit / producedKg : NaN;
+
+      setText('#key-net-kg', fmt(producedKg, 0));
+      setText('#key-revenue', fmt(revenue));
+      setText('#key-total-cost', fmt(totalCost));
+      setText('#key-profit', fmt(profit));
+      setText('#key-gm', Number.isFinite(marginPct) ? fmt(marginPct, 1) + ' %' : '–');
+      setText('#key-profit-kg', fmt(profitKg));
+      setText('#key-yield', Number.isFinite(yieldPct) ? fmt(yieldPct, 1) + ' %' : '–');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      applyQueryParams();
+      attachSync();
+      calcKeyNumbers();
+    });
+  </script>
 </body>
 </html>
