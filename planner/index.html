@@ -254,11 +254,24 @@ function calcKeyNumbers(){
   const yieldPct=Number.isFinite(yieldIn)? yieldIn
     : (Number.isFinite(producedKg)&&Number.isFinite(rawUsed)&&rawUsed>0)? (producedKg/rawUsed)*100 : NaN;
 
-  const revenue  =producedKg*sellPrice;
-  const totalCost=producedKg*(rawCost+packCost+freight);
-  const profit   =revenue-totalCost;
-  const marginPct=revenue? (profit/revenue)*100 : NaN;
-  const profitKg =producedKg? profit/producedKg : NaN;
+  // revenue
+const revenue = producedKg * sellPrice;
+
+// costs (raw depends on rawUsed; pack & freight depend on producedKg)
+const rawMatCost = (Number.isFinite(rawUsed) && Number.isFinite(rawCost))
+  ? rawUsed * rawCost
+  : NaN;
+
+const packC    = Number.isFinite(producedKg) ? producedKg * packCost : 0;
+const freightC = Number.isFinite(producedKg) ? producedKg * freight  : 0;
+
+const totalCost = (Number.isFinite(rawMatCost) ? rawMatCost : 0) + packC + freightC;
+
+// profit & ratios
+const profit    = Number.isFinite(revenue) ? revenue - totalCost : NaN;
+const marginPct = Number.isFinite(revenue) && revenue !== 0 ? (profit / revenue) * 100 : NaN;
+const profitKg  = Number.isFinite(producedKg) && producedKg > 0 ? profit / producedKg : NaN;
+
 
   setText('#key-net-kg', fmt(producedKg,0));
   setText('#key-revenue', fmt(revenue));
