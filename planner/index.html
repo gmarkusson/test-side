@@ -410,19 +410,21 @@ function populateMonthSelect() {
   if (!sel) return;
   sel.innerHTML = '';
 
-  const now = new Date();
-  // Build options for the next 18 months (including current)
-  for (let i = 0; i < 18; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const val = `${y}-${m}`;
-    const text = d.toLocaleString('en', { month: 'long', year: 'numeric' });
+  const months = Array.from({length:12}, (_,i) =>
+    new Date(2000, i, 1).toLocaleString('en', { month: 'long' })
+  );
 
+  months.forEach((label, i) => {
+    const m = String(i + 1).padStart(2, '0');   // "01".."12"
     const opt = document.createElement('option');
-    opt.value = val;          // stays "YYYY-MM" for our calc
-    opt.textContent = text;   // nice label: "August 2025"
+    opt.value = m;           // value is just the month number
+    opt.textContent = label; // label like "August"
     sel.appendChild(opt);
+  });
+
+  // default to current month if nothing in URL
+  if (!sel.value) {
+    sel.value = String(new Date().getMonth() + 1).padStart(2, '0');
   }
 }
 q('#month')?.addEventListener('change', () => {
