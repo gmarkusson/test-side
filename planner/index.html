@@ -167,6 +167,14 @@ function toNumber(v) {
     });
   });
 }
+// Format integers with Icelandic thousands separators (no decimals)
+const nfIntIS = new Intl.NumberFormat('is-IS', { maximumFractionDigits: 0 });
+
+function formatIntInput(el) {
+  if (!el) return;
+  const n = toNumber(el.value);
+  if (Number.isFinite(n)) el.value = nfIntIS.format(Math.round(n));
+}
 
 
     function calcKeyNumbers(){
