@@ -22,12 +22,19 @@
     .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0 0;padding:0;list-style:none}
     .results li{background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px;display:flex;justify-content:space-between;align-items:center}
     .results li span{color:var(--muted)} .results li strong{font-size:15px}
+  .actions{display:flex;gap:10px;margin-top:10px}
+.btn{display:inline-block;background:var(--accent);color:#fff;border:1px solid var(--accent);
+  padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:600}
+.btn:hover,.btn:focus{background:#094de8;border-color:#094de8}
   </style>
 </head>
 <body>
   <header id="home">
     <h1>Factory Planner (white)</h1>
     <div class="muted">Type values or pass them via URL (commas as decimals are OK). The page auto-calculates and keeps the URL in sync.</div>
+  <div class="actions">
+  <a class="btn" href="fixed-costs.html">Fixed costs</a>
+</div>
   </header>
 
   <main>
