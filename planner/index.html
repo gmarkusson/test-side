@@ -165,19 +165,21 @@ const bindings={
 };
 
 function applyQueryParams(){
-  const p=new URLSearchParams(location.search);
-  for(const [k,sel] of Object.entries(bindings)){
-    const el=q(sel); if(!el) continue;
-    const v=p.get(k); if(v!=null && v!=='') el.value=decodeURIComponent(v);
-  }
-}
+  const p = new URLSearchParams(location.search);
+  for (const [k, sel] of Object.entries(bindings)) {
+    const el = q(sel); if (!el) continue;
+    let v = p.get(k);
+    if (v == null || v === '') continue;
 
-function syncUrlFromInputs(){
-  const p=new URLSearchParams();
-  for(const [k,sel] of Object.entries(bindings)){
-    const el=q(sel); if(el && el.value!=='') p.set(k,el.value);
+    if (k === 'month') {
+      // Accept ?month=2025-08, 8, 08 — normalize to "MM"
+      if (/^\d{4}-\d{2}$/.test(v)) v = v.slice(5);     // "2025-08" -> "08"
+      if (/^\d{1,2}$/.test(v))     v = v.padStart(2,'0'); // "8" -> "08"
+      el.value = v; // your <select> options are "01".."12"
+    } else {
+      el.value = decodeURIComponent(v);
+    }
   }
-  history.replaceState(null,'',`${location.pathname}?${p.toString()}`);
 }
 
 let lastEdited=null;
