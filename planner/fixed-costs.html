@@ -34,11 +34,31 @@
 .buildings{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
 .building{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px}
 .building h3{margin:0 0 8px;font-size:16px;color:var(--accent)}
-  /* Named cost rows */
-.rows .row{display:grid;grid-template-columns:1fr 150px 36px;gap:8px;margin:6px 0}
-.rows .row input{background:#fff;color:var(--ink);border:1px solid var(--field);border-radius:8px;padding:8px 10px;outline:none}
+ /* Named cost rows */
+.rows .row{
+  display:grid;
+  grid-template-columns: minmax(180px,1fr) minmax(220px,1.2fr) 140px 36px; /* name | description | amount | X */
+  gap:8px;
+  margin:6px 0;
+  align-items:center;
+}
+.rows .row input{
+  background:#fff;color:var(--ink);border:1px solid var(--field);
+  border-radius:8px;padding:8px 10px;outline:none
+}
 .rows .row input:focus{border-color:#2c6fff;box-shadow:0 0 0 2px rgba(44,111,255,.14)}
-.rows .row .del{height:36px;width:36px;border-radius:8px;border:1px solid var(--border);background:#fff;cursor:pointer}
+.rows .row .amt{ text-align:right; }
+.rows .row .del{
+  height:36px;width:36px;border-radius:8px;border:1px solid var(--border);background:#fff;cursor:pointer
+}
+
+/* Stack nicely on small screens */
+@media (max-width: 680px){
+  .rows .row{ grid-template-columns: 1fr 1fr; }
+  .rows .row .amt{ grid-column: 1 / 2; }
+  .rows .row .del{ grid-column: 2 / 3; justify-self:end; }
+}
+
   </style>
 </head>
 <body>
