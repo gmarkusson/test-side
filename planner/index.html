@@ -269,18 +269,28 @@ function calcKeyNumbers(){
   setText('#key-yield', Number.isFinite(yieldPct) ? fmt(yieldPct, 1) + ' %' : '–');
 }
 // --- Factory Day helpers ---
-function workingDaysInMonth(ym) {
-  // ym: "YYYY-MM" (e.g., "2025-08")
-  if (!ym || !/^\d{4}-\d{2}$/.test(ym)) return NaN;
-  const [y, m] = ym.split('-').map(Number);
-  let d = new Date(y, m - 1, 1);
-  const end = new Date(y, m, 0).getDate();
+function workingDaysInMonth(val) {
+  let y, m;
+
+  if (/^\d{2}$/.test(val)) {                 // "08"
+    y = new Date().getFullYear();
+    m = Number(val);
+  } else if (/^\d{4}-\d{2}$/.test(val)) {    // "2025-08" (still supported)
+    [y, m] = val.split('-').map(Number);
+  } else {
+    return NaN;
+  }
+
+  // count Mon–Fri in the month
+  const end = new Date(y, m, 0).getDate();   // last day of month
   let days = 0;
-  for (let day = 1; day <= end; day++) {
-    d.setDate(day);
-    const dow = d.getDay(); // 0=Sun,6=Sat
+  for (let d = 1; d <= end; d++) {
+    const dow = new Date(y, m - 1, d).getDay(); // 0=Sun..6=Sat
     if (dow !== 0 && dow !== 6) days++;
   }
+  return days;
+}
+
   return days;
 }
 
