@@ -195,7 +195,7 @@ function formatIntInput(el) {
   // If Raw used is empty but Yield % is provided → compute Raw used
   if (!Number.isFinite(rawUsed) && Number.isFinite(producedKg) && Number.isFinite(yieldIn) && yieldIn > 0) {
     const computedRaw = producedKg / (yieldIn / 100);
-    rawUsedEl.value = String(Math.round(computedRaw));  // integer kg
+    rawUsedEl.value = nfIntIS.format(Math.round(computedRaw)); // with thousands separator
     rawUsed = computedRaw;
     changed = true;
   }
