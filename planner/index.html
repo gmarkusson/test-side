@@ -283,10 +283,10 @@ function calcKeyNumbers(){
 function workingDaysInMonth(val) {
   let y, m;
 
-  if (/^\d{2}$/.test(val)) {                 // "08"
+  if (/^\d{2}$/.test(val)) {           // "08" (just month)
     y = new Date().getFullYear();
     m = Number(val);
-  } else if (/^\d{4}-\d{2}$/.test(val)) {    // "2025-08" (still supported)
+  } else if (/^\d{4}-\d{2}$/.test(val)) { // "2025-08" (still supported)
     [y, m] = val.split('-').map(Number);
   } else {
     return NaN;
@@ -302,168 +302,38 @@ function workingDaysInMonth(val) {
   return days;
 }
 
-  return days;
-}
+function calcDay() { /* keep your existing calcDay exactly as is */ }
 
-function calcDay() {
-  // Labor
-  const staffCount        = toNumber(q('#staffCount').value);
-  const staffHr           = toNumber(q('#staffHoursDay').value);
-  const staffRate         = toNumber(q('#staffCostPerPerson').value);
-
-  const supCount          = toNumber(q('#supCount').value);
-  const supHr             = toNumber(q('#supHoursDay').value);
-  const supRate           = toNumber(q('#supCostPerPerson').value);
-
-  // Materials & Production
-  const rawUsedKg_day     = toNumber(q('#rawUsedKg_day').value);
-  const rawCostPerKg_day  = toNumber(q('#rawCostPerKg_day').value);
-  const packCostPerKg_day = toNumber(q('#packCostPerKg_day').value);
-  const producedKg_day    = toNumber(q('#producedKg_day').value);
-  const sellPriceDay_day  = toNumber(q('#sellPriceDay_day').value);
-  const freightPerKg_day  = toNumber(q('#freightPerKg_day').value);
-
-  // Utilities
-  const elecKwh           = toNumber(q('#elecKwh').value);
-  const elecCostPerKwh    = toNumber(q('#elecCostPerKwh').value);
-  const waterM3           = toNumber(q('#waterM3').value);
-  const waterCostPerM3    = toNumber(q('#waterCostPerM3').value);
-
-  // Fixed (ISK→EUR/day)
-  const iskPerEur         = toNumber(q('#iskPerEur').value);
-  let   workDays          = toNumber(q('#workingDays').value);
-  const monthStr          = q('#month').value?.trim();
-
-  // Auto-calc working days if empty/invalid
-  if (!Number.isFinite(workDays) && monthStr) {
-    const wd = workingDaysInMonth(monthStr);
-    if (Number.isFinite(wd)) {
-      workDays = wd;
-      q('#workingDays').value = String(wd);
-    }
-  }
-
-  const housingISK        = toNumber(q('#housingCost').value);
-  const equipISK          = toNumber(q('#equipCost').value);
-  const adminISK          = toNumber(q('#adminCost').value);
-
-  const maintEURday       = toNumber(q('#maintenanceCost').value);
-  const deprEURday        = toNumber(q('#deprCost').value);
-  const otherEURday       = toNumber(q('#otherCost').value);
-
-  // --- Calculations ---
-  const yieldDay = (Number.isFinite(producedKg_day) && Number.isFinite(rawUsedKg_day) && rawUsedKg_day > 0)
-    ? (producedKg_day / rawUsedKg_day) * 100
-    : NaN;
-
-  const revenue = Number.isFinite(producedKg_day) && Number.isFinite(sellPriceDay_day)
-    ? producedKg_day * sellPriceDay_day
-    : NaN;
-
-  // Labor € / day
-  const laborStaff = (Number.isFinite(staffCount) && Number.isFinite(staffHr) && Number.isFinite(staffRate))
-    ? staffCount * staffHr * staffRate
-    : 0;
-
-  const laborSup   = (Number.isFinite(supCount) && Number.isFinite(supHr) && Number.isFinite(supRate))
-    ? supCount * supHr * supRate
-    : 0;
-
-  // Materials, pack, freight
-  const matCost    = (Number.isFinite(rawUsedKg_day) && Number.isFinite(rawCostPerKg_day))
-    ? rawUsedKg_day * rawCostPerKg_day
-    : 0;
-
-  const packCost   = (Number.isFinite(producedKg_day) && Number.isFinite(packCostPerKg_day))
-    ? producedKg_day * packCostPerKg_day
-    : 0;
-
-  const freight    = (Number.isFinite(producedKg_day) && Number.isFinite(freightPerKg_day))
-    ? producedKg_day * freightPerKg_day
-    : 0;
-
-  // Utilities
-  const utilities  = (Number.isFinite(elecKwh) && Number.isFinite(elecCostPerKwh) ? elecKwh * elecCostPerKwh : 0)
-                   + (Number.isFinite(waterM3) && Number.isFinite(waterCostPerM3) ? waterM3 * waterCostPerM3 : 0);
-
-  // Fixed (ISK/month → EUR/day)
-  const canFX      = Number.isFinite(iskPerEur) && Number.isFinite(workDays) && workDays > 0;
-  const housingDay = canFX && Number.isFinite(housingISK) ? (housingISK * iskPerEur) / workDays : 0;
-  const equipDay   = canFX && Number.isFinite(equipISK)   ? (equipISK   * iskPerEur) / workDays : 0;
-  const adminDay   = canFX && Number.isFinite(adminISK)   ? (adminISK   * iskPerEur) / workDays : 0;
-
-  const totalCost  = laborStaff + laborSup + matCost + packCost + freight
-                   + utilities + housingDay + equipDay + adminDay
-                   + (Number.isFinite(maintEURday) ? maintEURday : 0)
-                   + (Number.isFinite(deprEURday)  ? deprEURday  : 0)
-                   + (Number.isFinite(otherEURday) ? otherEURday : 0);
-
-  const profit     = Number.isFinite(revenue) ? revenue - totalCost : NaN;
-  const marginPct  = Number.isFinite(revenue) && revenue !== 0 ? (profit / revenue) * 100 : NaN;
-  const costPerKg  = Number.isFinite(producedKg_day) && producedKg_day > 0 ? totalCost / producedKg_day : NaN;
-
-  // --- Outputs ---
-  setText('#day-yield',    Number.isFinite(yieldDay)   ? fmt(yieldDay, 1) + ' %' : '–');
-  setText('#day-revenue',  fmt(revenue));
-  setText('#day-total-cost', fmt(totalCost));
-  setText('#day-profit',   fmt(profit));
-  setText('#day-margin',   Number.isFinite(marginPct)  ? fmt(marginPct, 1) + ' %' : '–');
-  setText('#day-cost-kg',  fmt(costPerKg));
-
-  // Breakdown
-  setText('#bd-labor-staff', fmt(laborStaff));
-  setText('#bd-labor-sup',   fmt(laborSup));
-  setText('#bd-material',    fmt(matCost));
-  setText('#bd-pack',        fmt(packCost));
-  setText('#bd-freight',     fmt(freight));
-  setText('#bd-utilities',   fmt(utilities));
-
-  setText('#bd-housing',     fmt(housingDay));
-  setText('#bd-equip',       fmt(equipDay));
-  setText('#bd-admin',       fmt(adminDay));
-
-  setText('#bd-maint',       fmt(Number.isFinite(maintEURday) ? maintEURday : NaN));
-  setText('#bd-depr',        fmt(Number.isFinite(deprEURday)  ? deprEURday  : NaN));
-  setText('#bd-other',       fmt(Number.isFinite(otherEURday) ? otherEURday : NaN));
-}
 function populateMonthSelect() {
   const sel = q('#month');
   if (!sel) return;
   sel.innerHTML = '';
 
-  const months = Array.from({length:12}, (_,i) =>
-    new Date(2000, i, 1).toLocaleString('en', { month: 'long' })
-  );
-
-  months.forEach((label, i) => {
-    const m = String(i + 1).padStart(2, '0');   // "01".."12"
+  // 12 months, value = "01".."12", label = "January".."December"
+  for (let i = 0; i < 12; i++) {
+    const label = new Date(2000, i, 1).toLocaleString('en', { month: 'long' });
+    const m = String(i + 1).padStart(2, '0');
     const opt = document.createElement('option');
-    opt.value = m;           // value is just the month number
-    opt.textContent = label; // label like "August"
+    opt.value = m;
+    opt.textContent = label;
     sel.appendChild(opt);
-  });
-
-  // default to current month if nothing in URL
-  if (!sel.value) {
-    sel.value = String(new Date().getMonth() + 1).padStart(2, '0');
   }
+
+  // default to current month if nothing set (URL may override later)
+  if (!sel.value) sel.value = String(new Date().getMonth() + 1).padStart(2, '0');
 }
+
+// Single, clean listener for the month dropdown
 q('#month')?.addEventListener('change', () => {
-  // Clear working days so calcDay auto-fills for the selected month
   const wd = q('#workingDays');
-  if (wd) wd.value = '';
+  if (wd) wd.value = '';   // force auto-calc based on selected month
   syncUrlFromInputs();
-  calcDay();
-// When month changes, clear Working days so we auto-fill it, then recalc
-q('#month')?.addEventListener('change', () => {
-  const wd = q('#workingDays');
-  if (wd) wd.value = '';
   calcDay();
 });
 
-document.addEventListener('DOMContentLoaded', ()=>{
-  populateMonthSelect();        // <— add this FIRST
-  applyQueryParams?.();         // will set the select if ?month=YYYY-MM is in URL
+document.addEventListener('DOMContentLoaded', () => {
+  populateMonthSelect();    // build month list
+  applyQueryParams?.();     // may set #month from ?month=
   attachSync();
   calcKeyNumbers();
   calcDay();
