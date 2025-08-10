@@ -201,18 +201,26 @@
 
   <script>
     // Category choices
+// === Category lists & helper (paste as-is) ===
 const MONTH_CATS = [
-  {value:'housing',  label:'Housing (ISK/mo)'},
-  {value:'equipment',label:'Equipment (ISK/mo)'},
-  {value:'admin',    label:'Admin (ISK/mo)'},
-  {value:'rentals',  label:'Rentals (ISK/mo)'},
-  {value:'spares',   label:'Spare parts (ISK/mo)'},
-  {value:'other',    label:'Other (ISK/mo)'},
+  { value: 'housing',   label: 'Housing (ISK/mo)' },
+  { value: 'equipment', label: 'Equipment (ISK/mo)' },
+  { value: 'admin',     label: 'Admin (ISK/mo)' },
+  { value: 'rentals',   label: 'Rentals (ISK/mo)' },
+  { value: 'spares',    label: 'Spare parts (ISK/mo)' },
+  { value: 'other',     label: 'Other (ISK/mo)' },
 ];
+
 const DAY_CATS = [
-  {value:'maint', label:'Maintenance (€/day)'},
-  {value:'other', label:'Other (€/day)'},
+  { value: 'maint', label: 'Maintenance (€/day)' },
+  { value: 'other', label: 'Other (€/day)' },
 ];
+
+function fillCategorySelect(selectEl, isMonthly) {
+  const cats = isMonthly ? MONTH_CATS : DAY_CATS;
+  selectEl.innerHTML = cats.map(c => `<option value="${c.value}">${c.label}</option>`).join('');
+}
+
 
   // ------- helpers -------
   const locale='is-IS';
