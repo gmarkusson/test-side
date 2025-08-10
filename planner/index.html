@@ -380,16 +380,27 @@ function calcDay(){
 }
 
 function populateMonthSelect(){
-  const sel=q('#month'); if(!sel) return;
-  sel.innerHTML='';
-  for(let i=0;i<12;i++){
-    const label=new Date(2000,i,1).toLocaleString('en',{month:'long'});
-    const m=String(i+1).padStart(2,'0');
-    const opt=document.createElement('option');
-    opt.value=m; opt.textContent=label;
+  const sel = q('#month'); if (!sel) return;
+  sel.innerHTML = '';
+
+  for (let i = 0; i < 12; i++) {
+    const label = new Date(2000, i, 1).toLocaleString('en', { month: 'long' });
+    const m = String(i + 1).padStart(2, '0');   // "01".."12"
+    const opt = document.createElement('option');
+    opt.value = m;
+    opt.textContent = label;
     sel.appendChild(opt);
   }
-  if(!sel.value) sel.value=String(new Date().getMonth()+1).padStart(2,'0');
+
+  // Default to current month unless URL already set it
+  if (!sel.value) sel.value = String(new Date().getMonth() + 1).padStart(2, '0');
+
+  // >>> NEW: fill Working days right now <<<
+  const wdBox = q('#workingDays');
+  if (wdBox && (!wdBox.value || !Number.isFinite(toNumber(wdBox.value)))) {
+    const wd = workingDaysInMonth(sel.value);   // sel.value is "MM"
+    if (Number.isFinite(wd)) wdBox.value = String(wd);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
