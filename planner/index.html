@@ -205,6 +205,12 @@
   setText('#key-profit-kg', fmt(profitKg));
   setText('#key-yield', Number.isFinite(yieldPct) ? fmt(yieldPct, 1) + ' %' : '–');
 }
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof applyQueryParams === 'function') applyQueryParams();
+  attachSync();      // wire up input listeners + URL sync
+  calcKeyNumbers();  // initial compute
+});
+ 
   </script>
 </body>
 </html>
