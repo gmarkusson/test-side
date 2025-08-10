@@ -153,13 +153,12 @@
   const rawCost    = toNumber(q('#rawCostPerKg')?.value);
   const packCost   = toNumber(q('#packCostPerKg')?.value) || 0;
   const freight    = toNumber(q('#freightPerKg')?.value) || 0;
-  let   yieldIn    = toNumber(q('#yieldPct')?.value);  // <- new
+  let   yieldIn    = toNumber(q('#yieldPct')?.value);  // new
 
   const rawUsedEl = q('#rawUsedKg');
   const yieldEl   = q('#yieldPct');
   let changed = false;
 
-  // --- NEW: compute the missing one ---
   // If Raw used is empty but Yield % is provided → compute Raw used
   if (!Number.isFinite(rawUsed) && Number.isFinite(producedKg) && Number.isFinite(yieldIn) && yieldIn > 0) {
     const computedRaw = producedKg / (yieldIn / 100);
@@ -176,17 +175,14 @@
     changed = true;
   }
 
-  // If we programmatically filled an input, keep URL in sync
   if (changed) syncUrlFromInputs();
 
-  // Pick a yield to display (prefer the input, else compute)
   const yieldPct = Number.isFinite(yieldIn)
     ? yieldIn
     : (Number.isFinite(producedKg) && Number.isFinite(rawUsed) && rawUsed > 0)
         ? (producedKg / rawUsed) * 100
         : NaN;
 
-  // Usual KPI math
   const revenue   = producedKg * sellPrice;
   const totalCost = producedKg * (rawCost + packCost + freight);
   const profit    = revenue - totalCost;
