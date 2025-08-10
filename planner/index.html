@@ -197,6 +197,17 @@ function attachSync(){
   q('#rawUsedKg')?.addEventListener('blur', ()=>formatIntInput(q('#rawUsedKg')));
   q('#producedKg_day')?.addEventListener('blur', ()=>formatIntInput(q('#producedKg_day')));
   q('#rawUsedKg_day')?.addEventListener('blur', ()=>formatIntInput(q('#rawUsedKg_day')));
+// Month select → clear working days so it auto-fills, then recalc
+const monthSel = q('#month');
+if (monthSel) {
+  monthSel.addEventListener('change', () => {
+    const wd = q('#workingDays');
+    if (wd) wd.value = '';      // force auto-calc from selected month
+    calcDay();                  // update results
+    syncUrlFromInputs();        // keep the URL in sync
+  });
+}
+
 }
 
 // integer formatter
