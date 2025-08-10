@@ -434,6 +434,25 @@ function populateMonthSelect(){
   }
 }
 
+  // Read defaults saved by fixed-costs.html and fill ONLY empty fields
+const LS_PREFIX = 'fp:';  // must match fixed-costs.html
+const FIXED_DEFAULT_IDS = [
+  'iskPerEur','workingDays',
+  'housingCost','equipCost','adminCost',
+  'maintenanceCost','deprCost','otherCost',
+  'elecKwh','elecCostPerKwh','waterM3','waterCostPerM3'
+];
+
+function loadDefaultsFromStorage() {
+  FIXED_DEFAULT_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (el.value !== '' && el.value != null) return;     // do NOT override URL/manual values
+    const v = localStorage.getItem(LS_PREFIX + id);
+    if (v != null && v !== '') el.value = v;
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   populateMonthSelect();      // build 12-month dropdown
   applyQueryParams?.();       // read ?month, ?workingDays, etc.
