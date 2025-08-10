@@ -309,7 +309,7 @@
       const rawUsed    = toNumber(qsel('#rawUsedKg')?.value);
       const rawCost    = toNumber(qsel('#rawCostPerKg')?.value);
       const packCost   = toNumber(qsel('#packCostPerKg')?.value);
-      const freight = toNumber(qsel('#freightPerKg')?.value) || 0;
+      const freight    = toNumber(qsel('#freightPerKg')?.value);
 
       const yieldPct = (Number.isFinite(producedKg) && Number.isFinite(rawUsed) && rawUsed > 0)
         ? (producedKg / rawUsed) * 100 : NaN;
