@@ -183,30 +183,33 @@ function syncUrlFromInputs(){
 let lastEdited = null;
 
 function attachSync(){
-  qa('input, select, textarea').forEach(el=>{
-    el.addEventListener('input', ()=>{
-      // remember which field was edited
-      if (el.id==='yieldPct') lastEdited='yield';
-      else if (el.id==='rawUsedKg') lastEdited='raw';
-// Some browsers don't fire 'input' for <select>, so listen for 'change' too
-qa('select').forEach(el => {
-  el.addEventListener('change', () => {
-    syncUrlFromInputs();
-    calcKeyNumbers();
-    calcDay();
-  });
-});
+  // input listeners
+  qa('input, select, textarea').forEach(el => {
+    el.addEventListener('input', () => {
+      if (el.id === 'yieldPct')      lastEdited = 'yield';
+      else if (el.id === 'rawUsedKg') lastEdited = 'raw';
 
       syncUrlFromInputs();
       calcKeyNumbers();
       calcDay();
     });
   });
-  // thousand-separator on blur for integer inputs
-  q('#producedKg')?.addEventListener('blur', ()=>formatIntInput(q('#producedKg')));
-  q('#rawUsedKg')?.addEventListener('blur', ()=>formatIntInput(q('#rawUsedKg')));
-  q('#producedKg_day')?.addEventListener('blur', ()=>formatIntInput(q('#producedKg_day')));
-  q('#rawUsedKg_day')?.addEventListener('blur', ()=>formatIntInput(q('#rawUsedKg_day')));
+
+  // some browsers don't fire 'input' for <select>, so also listen for 'change'
+  qa('select').forEach(el => {
+    el.addEventListener('change', () => {
+      syncUrlFromInputs();
+      calcKeyNumbers();
+      calcDay();
+    });
+  });
+
+  // thousand-separator on blur for integers
+  q('#producedKg')?.addEventListener('blur', () => formatIntInput(q('#producedKg')));
+  q('#rawUsedKg')?.addEventListener('blur', () => formatIntInput(q('#rawUsedKg')));
+  q('#producedKg_day')?.addEventListener('blur', () => formatIntInput(q('#producedKg_day')));
+  q('#rawUsedKg_day')?.addEventListener('blur', () => formatIntInput(q('#rawUsedKg_day')));
+}
 // Month select → clear working days so it auto-fills, then recalc
 const monthSel = q('#month');
 if (monthSel) {
