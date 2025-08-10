@@ -200,6 +200,20 @@
   </main>
 
   <script>
+    // Category choices
+const MONTH_CATS = [
+  {value:'housing',  label:'Housing (ISK/mo)'},
+  {value:'equipment',label:'Equipment (ISK/mo)'},
+  {value:'admin',    label:'Admin (ISK/mo)'},
+  {value:'rentals',  label:'Rentals (ISK/mo)'},
+  {value:'spares',   label:'Spare parts (ISK/mo)'},
+  {value:'other',    label:'Other (ISK/mo)'},
+];
+const DAY_CATS = [
+  {value:'maint', label:'Maintenance (€/day)'},
+  {value:'other', label:'Other (€/day)'},
+];
+
   // ------- helpers -------
   const locale='is-IS';
   const q=(s,r=document)=>r.querySelector(s);
