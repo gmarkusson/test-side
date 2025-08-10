@@ -443,6 +443,11 @@ q('#month')?.addEventListener('change', () => {
   if (wd) wd.value = '';
   syncUrlFromInputs();
   calcDay();
+// When month changes, clear Working days so we auto-fill it, then recalc
+q('#month')?.addEventListener('change', () => {
+  const wd = q('#workingDays');
+  if (wd) wd.value = '';
+  calcDay();
 });
 
 document.addEventListener('DOMContentLoaded', ()=>{
