@@ -226,61 +226,69 @@ function formatIntInput(el){ if(!el) return; const n=toNumber(el.value); if(Numb
 
 // Key Numbers
 function calcKeyNumbers(){
-  const producedKg=toNumber(q('#producedKg').value);
-  const sellPrice =toNumber(q('#sellPriceDay').value);
-  let   rawUsed   =toNumber(q('#rawUsedKg').value);
-  const rawCost   =toNumber(q('#rawCostPerKg').value);
-  const packCost  =toNumber(q('#packCostPerKg').value)||0;
-  const freight   =toNumber(q('#freightPerKg').value)||0;
-  let   yieldIn   =toNumber(q('#yieldPct').value);
+  const producedKg = toNumber(q('#producedKg').value);
+  const sellPrice  = toNumber(q('#sellPriceDay').value);
 
-  const rawUsedEl=q('#rawUsedKg'); const yieldEl=q('#yieldPct'); let changed=false;
+  // per-kg costs (treat blanks as 0)
+  const rawCost    = toNumber(q('#rawCostPerKg').value)    || 0;
+  const packCost   = toNumber(q('#packCostPerKg').value)   || 0;
+  const freight    = toNumber(q('#freightPerKg').value)    || 0;
 
-  if(Number.isFinite(producedKg)){
-    if(Number.isFinite(yieldIn)&&yieldIn>0 && (lastEdited==='yield'||!Number.isFinite(rawUsed))){
-      const computedRaw=producedKg/(yieldIn/100);
-      rawUsed=computedRaw;
-      if(rawUsedEl){ rawUsedEl.value=String(Math.round(computedRaw)); formatIntInput(rawUsedEl); }
-      changed=true;
-    }else if(Number.isFinite(rawUsed)&&rawUsed>0 && (lastEdited==='raw'||!Number.isFinite(yieldIn))){
-      const computedYield=(producedKg/rawUsed)*100;
-      yieldIn=computedYield;
-      if(yieldEl) yieldEl.value=computedYield.toFixed(1);
-      changed=true;
+  const rawUsedEl  = q('#rawUsedKg');
+  const yieldEl    = q('#yieldPct');
+
+  const rawUsedIn  = toNumber(rawUsedEl.value);
+  const yieldIn    = toNumber(yieldEl.value);
+
+  // Effective values used for math (don’t depend on what we write back)
+  let rawUsedEff = Number.isFinite(rawUsedIn) ? rawUsedIn : NaN;
+  let yieldEff   = Number.isFinite(yieldIn)   ? yieldIn   : NaN;
+
+  if (Number.isFinite(producedKg)) {
+    if (Number.isFinite(yieldIn) && yieldIn > 0) {
+      // Derive raw used from yield
+      rawUsedEff = producedKg / (yieldIn / 100);
+      // Only write back if user edited yield (or raw was empty) to avoid loops
+      if (lastEdited === 'yield' || !Number.isFinite(rawUsedIn)) {
+        rawUsedEl.value = nfIntIS.format(Math.round(rawUsedEff));
+      }
+    } else if (Number.isFinite(rawUsedIn) && rawUsedIn > 0) {
+      // Derive yield from raw used
+      yieldEff = (producedKg / rawUsedIn) * 100;
+      if (lastEdited === 'raw' || !Number.isFinite(yieldIn)) {
+        yieldEl.value = yieldEff.toFixed(1);
+      }
     }
   }
-  if(changed) syncUrlFromInputs();
 
-  const yieldPct=Number.isFinite(yieldIn)? yieldIn
-    : (Number.isFinite(producedKg)&&Number.isFinite(rawUsed)&&rawUsed>0)? (producedKg/rawUsed)*100 : NaN;
+  // Keep URL in sync after we may have written to inputs
+  syncUrlFromInputs();
 
-  // revenue
-const revenue = producedKg * sellPrice;
+  // --- Math ---
+  const revenue    = (Number.isFinite(producedKg) && Number.isFinite(sellPrice))
+                    ? producedKg * sellPrice : NaN;
 
-// costs (raw depends on rawUsed; pack & freight depend on producedKg)
-const rawMatCost = (Number.isFinite(rawUsed) && Number.isFinite(rawCost))
-  ? rawUsed * rawCost
-  : NaN;
+  const rawMatCost = Number.isFinite(rawUsedEff) ? rawUsedEff * rawCost : NaN;
+  const packC      = Number.isFinite(producedKg) ? producedKg * packCost : NaN;
+  const freightC   = Number.isFinite(producedKg) ? producedKg * freight  : NaN;
 
-const packC    = Number.isFinite(producedKg) ? producedKg * packCost : 0;
-const freightC = Number.isFinite(producedKg) ? producedKg * freight  : 0;
+  const totalCost  = [rawMatCost, packC, freightC]
+                      .reduce((s,v)=>s + (Number.isFinite(v) ? v : 0), 0);
 
-const totalCost = (Number.isFinite(rawMatCost) ? rawMatCost : 0) + packC + freightC;
+  const profit     = Number.isFinite(revenue) ? revenue - totalCost : NaN;
+  const marginPct  = (Number.isFinite(revenue) && revenue !== 0) ? (profit / revenue) * 100 : NaN;
+  const profitKg   = (Number.isFinite(producedKg) && producedKg > 0) ? profit / producedKg : NaN;
 
-// profit & ratios
-const profit    = Number.isFinite(revenue) ? revenue - totalCost : NaN;
-const marginPct = Number.isFinite(revenue) && revenue !== 0 ? (profit / revenue) * 100 : NaN;
-const profitKg  = Number.isFinite(producedKg) && producedKg > 0 ? profit / producedKg : NaN;
-
-
-  setText('#key-net-kg', fmt(producedKg,0));
-  setText('#key-revenue', fmt(revenue));
-  setText('#key-total-cost', fmt(totalCost));
-  setText('#key-profit', fmt(profit));
-  setText('#key-gm', Number.isFinite(marginPct)? fmt(marginPct,1)+' %':'–');
+  // --- Outputs ---
+  setText('#key-net-kg',    fmt(producedKg, 0));
+  setText('#key-revenue',   fmt(revenue));
+  setText('#key-total-cost',fmt(totalCost));
+  setText('#key-profit',    fmt(profit));
+  setText('#key-gm',        Number.isFinite(marginPct) ? fmt(marginPct,1)+' %' : '–');
   setText('#key-profit-kg', fmt(profitKg));
-  setText('#key-yield', Number.isFinite(yieldPct)? fmt(yieldPct,1)+' %':'–');
+  setText('#key-yield',     Number.isFinite(yieldEff) ? fmt(yieldEff,1)+' %' : '–');
 }
+
 
 // --- Factory Day helpers ---
 function workingDaysInMonth(val){
