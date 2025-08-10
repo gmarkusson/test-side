@@ -200,53 +200,70 @@ function attachSync(){
 // Format integers with Icelandic thousands separators (no decimals)
 const nfIntIS = new Intl.NumberFormat('is-IS', { maximumFractionDigits: 0 });
 
-function formatIntInput(el) {
-  if (!el) return;
-  const n = toNumber(el.value);
-  if (Number.isFinite(n)) el.value = nfIntIS.format(Math.round(n));
-}
-
-
-    function calcKeyNumbers(){
+<script>
+function calcKeyNumbers() {
   const producedKg = toNumber(q('#producedKg')?.value);
   const sellPrice  = toNumber(q('#sellPriceDay')?.value);
   let   rawUsed    = toNumber(q('#rawUsedKg')?.value);
   const rawCost    = toNumber(q('#rawCostPerKg')?.value);
   const packCost   = toNumber(q('#packCostPerKg')?.value) || 0;
   const freight    = toNumber(q('#freightPerKg')?.value) || 0;
-  let   yieldIn    = toNumber(q('#yieldPct')?.value);  // new
+  let   yieldIn    = toNumber(q('#yieldPct')?.value);
 
- 
-  // --- Keep Raw used and Yield % linked, based on what was edited last ---
+  // Keep Raw used and Yield % linked based on the last edited field
   const rawUsedEl = q('#rawUsedKg');
   const yieldEl   = q('#yieldPct');
   let changed = false;
 
-  // 3a) If user edited Yield → recompute Raw used
- // --- Recompute depending on what was edited ---
-if (Number.isFinite(producedKg)) {
-  // If Yield % changed (or Raw is empty), compute Raw used
-  if (Number.isFinite(yieldIn) && yieldIn > 0 &&
-      (lastEdited === 'yield' || !Number.isFinite(rawUsed))) {
-    const computedRaw = producedKg / (yieldIn / 100);
-    rawUsed = computedRaw;
-    if (rawUsedEl) {
-      rawUsedEl.value = String(Math.round(computedRaw));
-      // format with thousands separators for the input
-      formatIntInput(rawUsedEl);
+  if (Number.isFinite(producedKg)) {
+    // If Yield changed (or Raw is empty), compute Raw used
+    if (Number.isFinite(yieldIn) && yieldIn > 0 &&
+        (lastEdited === 'yield' || !Number.isFinite(rawUsed))) {
+      const computedRaw = producedKg / (yieldIn / 100);
+      rawUsed = computedRaw;
+      if (rawUsedEl) {
+        rawUsedEl.value = String(Math.round(computedRaw));
+        formatIntInput(rawUsedEl); // thousands separator
+      }
+      changed = true;
     }
-    changed = true;
+    // Else if Raw changed (or Yield is empty), compute Yield %
+    else if (Number.isFinite(rawUsed) && rawUsed > 0 &&
+             (lastEdited === 'raw' || !Number.isFinite(yieldIn))) {
+      const computedYield = (producedKg / rawUsed) * 100;
+      yieldIn = computedYield;
+      if (yieldEl) yieldEl.value = computedYield.toFixed(1);
+      changed = true;
+    }
   }
-  // Otherwise, if Raw used was edited (or Yield is empty), compute Yield %
-  else if (Number.isFinite(rawUsed) && rawUsed > 0 &&
-           (lastEdited === 'raw' || !Number.isFinite(yieldIn))) {
-    const computedYield = (producedKg / rawUsed) * 100;
-    yieldIn = computedYield;
-    if (yieldEl) yieldEl.value = computedYield.toFixed(1);
-    changed = true;
-  }
+
+  if (changed) syncUrlFromInputs();
+
+  // Final yield to display
+  const yieldPct = Number.isFinite(yieldIn)
+    ? yieldIn
+    : (Number.isFinite(producedKg) && Number.isFinite(rawUsed) && rawUsed > 0)
+        ? (producedKg / rawUsed) * 100
+        : NaN;
+
+  // KPI math
+  const revenue   = producedKg * sellPrice;
+  const totalCost = producedKg * (rawCost + packCost + freight);
+  const profit    = revenue - totalCost;
+  const marginPct = revenue ? (profit / revenue) * 100 : NaN;
+  const profitKg  = producedKg ? profit / producedKg : NaN;
+
+  // Output
+  setText('#key-net-kg', fmt(producedKg, 0));
+  setText('#key-revenue', fmt(revenue));
+  setText('#key-total-cost', fmt(totalCost));
+  setText('#key-profit', fmt(profit));
+  setText('#key-gm', Number.isFinite(marginPct) ? fmt(marginPct, 1) + ' %' : '–');
+  setText('#key-profit-kg', fmt(profitKg));
+  setText('#key-yield', Number.isFinite(yieldPct) ? fmt(yieldPct, 1) + ' %' : '–');
 }
-  }
+</script>
+
 
   if (changed) syncUrlFromInputs();
 
