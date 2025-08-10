@@ -192,6 +192,24 @@ function syncUrlFromInputs(){
 
 let lastEdited=null;
 
+document.addEventListener('DOMContentLoaded', () => {
+  populateMonthSelect();
+  applyQueryParams?.();        // URL (if present) wins
+  loadDefaultsFromStorage();   // fill any blanks from localStorage
+
+  // If Working days still empty, derive from selected month
+  const m = q('#month')?.value;
+  const wdBox = q('#workingDays');
+  if (m && wdBox && !wdBox.value) {
+    const wd = workingDaysInMonth(m);  // m is "MM"
+    if (Number.isFinite(wd)) wdBox.value = String(wd);
+  }
+
+  attachSync();
+  calcKeyNumbers();
+  calcDay();
+});
+  
 function attachSync(){
   // 'input' listeners
   qa('input, select, textarea').forEach(el=>{
