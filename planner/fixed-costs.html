@@ -529,15 +529,21 @@ const STORE_KEY = 'fp:fixed:v2';
 /* ---- Add a row (works for monthly & daily) ---- */
 function addCostRow(rowsEl, preset={}){
   const isMonthly = rowsEl.classList.contains('monthly');
-  const row = document.createElement('div');
-  row.className = 'row';
-  row.innerHTML = `
+ const row = document.createElement('div');
+row.className = 'row';
+row.innerHTML = `
   <input class="name" placeholder="Name (e.g. Rent, Waste pickup)" />
   <select class="cat"></select>
   <input class="desc" placeholder="Description (optional)" />
   <input class="amt" inputmode="decimal" />
   <button class="del" type="button">×</button>
 `;
+
+// Fill with monthly categories
+fillCategorySelect(row.querySelector('.cat'), true);
+
+container.appendChild(row); // (whatever your container variable is)
+
   rowsEl.appendChild(row);
   row.addEventListener('input', saveAll);
   row.querySelector('.del').addEventListener('click', ()=>{ row.remove(); saveAll(); });
