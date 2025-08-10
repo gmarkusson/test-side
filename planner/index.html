@@ -178,17 +178,25 @@ function toNumber(v) {
     function syncUrlFromInputs(){ const p=new URLSearchParams();
       for(const [k,sel] of Object.entries(bindings)){ const el=q(sel); if(el&&el.value!=='') p.set(k,el.value); }
       history.replaceState(null,'',`${location.pathname}?${p.toString()}`); }
-    let lastEdited = null;   // 'yield' | 'raw' | null
-    function attachSync(){
+let lastEdited = null;  // put this once near the top of the script
+
+function attachSync(){
   document.querySelectorAll('input, select, textarea').forEach(el => {
     el.addEventListener('input', () => {
-      if (typeof syncUrlFromInputs === 'function') syncUrlFromInputs(); // safe guard
+      // NEW: remember which field was edited
+      if (el.id === 'yieldPct')      lastEdited = 'yield';
+      else if (el.id === 'rawUsedKg') lastEdited = 'raw';
+
+      if (typeof syncUrlFromInputs === 'function') syncUrlFromInputs();
       calcKeyNumbers();
     });
   });
+
+  // Keep these (your thousand-separator on blur)
   q('#producedKg')?.addEventListener('blur', () => formatIntInput(q('#producedKg')));
   q('#rawUsedKg')?.addEventListener('blur', () => formatIntInput(q('#rawUsedKg')));
-    }
+}
+
 // Format integers with Icelandic thousands separators (no decimals)
 const nfIntIS = new Intl.NumberFormat('is-IS', { maximumFractionDigits: 0 });
 
