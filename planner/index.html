@@ -144,7 +144,15 @@
     function syncUrlFromInputs(){ const p=new URLSearchParams();
       for(const [k,sel] of Object.entries(bindings)){ const el=q(sel); if(el&&el.value!=='') p.set(k,el.value); }
       history.replaceState(null,'',`${location.pathname}?${p.toString()}`); }
-    function attachSync(){ qa('input').forEach(el=> el.addEventListener('input',()=>{ syncUrlFromInputs(); calcKeyNumbers(); })); }
+    function attachSync(){
+  document.querySelectorAll('input, select, textarea').forEach(el => {
+    el.addEventListener('input', () => {
+      if (typeof syncUrlFromInputs === 'function') syncUrlFromInputs(); // safe guard
+      calcKeyNumbers();
+    });
+  });
+}
+
 
     function calcKeyNumbers(){
   const producedKg = toNumber(q('#producedKg')?.value);
