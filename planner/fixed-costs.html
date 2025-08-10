@@ -355,5 +355,79 @@
     q('#copyBtn').addEventListener('click', copyToPlanner);
   });
   </script>
+  <script>
+(function(){
+  const LS_PREFIX = 'fp:'; // same prefix the main page uses
+  const $ = id => document.getElementById(id);
+
+  // tiny parser: treat blanks as 0
+  const n = id => {
+    const v = ($(id)?.value || '').replace(/\u00A0/g,'').replace(/\s/g,'');
+    const x = Number(v.replace(',', '.'));
+    return Number.isFinite(x) ? x : 0;
+  };
+
+  // load existing values into the new fields (if present)
+  function hydrate(){
+    // If you already saved these before, pull them back
+    ['bA_housingISK','bA_maintMonth','bA_sparesMonth','bA_rentMonth',
+     'bB_housingISK','bB_maintMonth','bB_sparesMonth','bB_rentMonth']
+    .forEach(id=>{
+      const k = LS_PREFIX + id;
+      const v = localStorage.getItem(k);
+      if (v!=null && v!=='') { const el=$(id); if (el && !el.value) el.value = v; }
+    });
+  }
+
+  function recalcAndStore(){
+    // persist raw inputs so they come back on reload
+    ['bA_housingISK','bA_maintMonth','bA_sparesMonth','bA_rentMonth',
+     'bB_housingISK','bB_maintMonth','bB_sparesMonth','bB_rentMonth']
+    .forEach(id=> localStorage.setItem(LS_PREFIX + id, $(id)?.value || ''));
+
+    // working days (needed to convert monthly→daily)
+    const wdLS = localStorage.getItem(LS_PREFIX + 'workingDays');
+    const workingDays = Number(wdLS) && Number(wdLS) > 0 ? Number(wdLS) : 22;
+
+    // ---- totals per month (by currency) ----
+    const housingISK_month =
+      n('bA_housingISK') + n('bB_housingISK');
+
+    const maintenanceEUR_month =
+      n('bA_maintMonth') + n('bB_maintMonth') +
+      n('bA_sparesMonth') + n('bB_sparesMonth');
+
+    const rentalsEUR_month =
+      n('bA_rentMonth') + n('bB_rentMonth');
+
+    // ---- write what the main page expects ----
+    // keep housing as ISK/month; the main page converts ISK→EUR/day itself
+    localStorage.setItem(LS_PREFIX + 'housingCost', String(housingISK_month));
+
+    // maintenance: €/month → €/day
+    const maintenancePerDay = workingDays > 0 ? (maintenanceEUR_month / workingDays) : 0;
+    localStorage.setItem(LS_PREFIX + 'maintenanceCost', maintenancePerDay.toFixed(2));
+
+    // rentals: push into "Other (€/day)" on the main page
+    const otherPerDay = workingDays > 0 ? (rentalsEUR_month / workingDays) : 0;
+    localStorage.setItem(LS_PREFIX + 'otherCost', otherPerDay.toFixed(2));
+  }
+
+  // recalc whenever a building input changes
+  document.addEventListener('input', (e)=>{
+    if (e.target.closest('#buildings')) recalcAndStore();
+  });
+
+  // optional: if you have a save button with id="saveDefaults"
+  document.getElementById('saveDefaults')?.addEventListener('click', (e)=>{
+    e.preventDefault();
+    recalcAndStore();
+  });
+
+  hydrate();
+  recalcAndStore(); // initial
+})();
+</script>
+
 </body>
 </html>
