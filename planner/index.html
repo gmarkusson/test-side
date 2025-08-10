@@ -51,6 +51,79 @@
         <li style="display:none"><span>Yield</span><strong id="key-yield">–</strong></li>
       </ul>
     </section>
+  <!-- FACTORY DAY -->
+<section class="card" id="day">
+  <h2>Factory Day</h2>
+
+  <h3 style="margin:0 0 8px;color:#0b5fff;font-size:16px">Labor</h3>
+  <div class="grid">
+    <label>Operators (count)<input id="staffCount" inputmode="numeric" /></label>
+    <label>€/operator/hr<input id="staffCostPerPerson" inputmode="decimal" /></label>
+    <label>Supervisors (count)<input id="supCount" inputmode="numeric" /></label>
+    <label>€/supervisor/hr<input id="supCostPerPerson" inputmode="decimal" /></label>
+    <label>Operator hours<input id="staffHoursDay" inputmode="decimal" value="8" /></label>
+    <label>Supervisor hours<input id="supHoursDay" inputmode="decimal" value="8" /></label>
+  </div>
+
+  <div style="height:1px;background:#e4e9f2;margin:10px 0"></div>
+  <h3 style="margin:0 0 8px;color:#0b5fff;font-size:16px">Materials & Production</h3>
+  <div class="grid">
+    <label>Raw used kg<input id="rawUsedKg_day" inputmode="decimal" /></label>
+    <label>Raw cost / kg<input id="rawCostPerKg_day" inputmode="decimal" /></label>
+    <label>Pack cost / kg<input id="packCostPerKg_day" inputmode="decimal" /></label>
+    <label>Produced kg (net)<input id="producedKg_day" inputmode="decimal" /></label>
+    <label>Selling price / kg<input id="sellPriceDay_day" inputmode="decimal" /></label>
+    <label>Freight / kg<input id="freightPerKg_day" inputmode="decimal" /></label>
+  </div>
+
+  <div style="height:1px;background:#e4e9f2;margin:10px 0"></div>
+  <h3 style="margin:0 0 8px;color:#0b5fff;font-size:16px">Utilities</h3>
+  <div class="grid">
+    <label>Electricity kWh<input id="elecKwh" inputmode="decimal" /></label>
+    <label>€/kWh<input id="elecCostPerKwh" inputmode="decimal" /></label>
+    <label>Water m³<input id="waterM3" inputmode="decimal" /></label>
+    <label>€/m³<input id="waterCostPerM3" inputmode="decimal" /></label>
+  </div>
+
+  <div style="height:1px;background:#e4e9f2;margin:10px 0"></div>
+  <h3 style="margin:0 0 8px;color:#0b5fff;font-size:16px">Fixed (ISK → EUR/day)</h3>
+  <div class="grid">
+    <label>ISK per EUR<input id="iskPerEur" inputmode="decimal" /></label>
+    <label>Working days (auto if empty)<input id="workingDays" inputmode="numeric" /></label>
+    <label>Housing (ISK/month)<input id="housingCost" inputmode="decimal" /></label>
+    <label>Equipment (ISK/month)<input id="equipCost" inputmode="decimal" /></label>
+    <label>Admin (ISK/month)<input id="adminCost" inputmode="decimal" /></label>
+    <label>Maintenance (€/day)<input id="maintenanceCost" inputmode="decimal" /></label>
+    <label>Depreciation (€/day)<input id="deprCost" inputmode="decimal" /></label>
+    <label>Other (€/day)<input id="otherCost" inputmode="decimal" /></label>
+    <label>Month (YYYY-MM)<input id="month" placeholder="2025-08" /></label>
+  </div>
+
+  <ul class="results">
+    <li><span>Yield</span><strong id="day-yield">–</strong></li>
+    <li><span>Revenue</span><strong id="day-revenue">–</strong></li>
+    <li><span>Total cost</span><strong id="day-total-cost">–</strong></li>
+    <li><span>Profit</span><strong id="day-profit">–</strong></li>
+    <li><span>Gross margin %</span><strong id="day-margin">–</strong></li>
+    <li><span>Cost / kg</span><strong id="day-cost-kg">–</strong></li>
+  </ul>
+
+  <h3 style="margin:10px 0 8px;color:#0b5fff;font-size:16px">Breakdown</h3>
+  <ul class="results">
+    <li><span>Labor (operators)</span><strong id="bd-labor-staff">–</strong></li>
+    <li><span>Labor (supervisors)</span><strong id="bd-labor-sup">–</strong></li>
+    <li><span>Material</span><strong id="bd-material">–</strong></li>
+    <li><span>Pack</span><strong id="bd-pack">–</strong></li>
+    <li><span>Freight</span><strong id="bd-freight">–</strong></li>
+    <li><span>Utilities</span><strong id="bd-utilities">–</strong></li>
+    <li><span>Housing €/day</span><strong id="bd-housing">–</strong></li>
+    <li><span>Equipment €/day</span><strong id="bd-equip">–</strong></li>
+    <li><span>Admin €/day</span><strong id="bd-admin">–</strong></li>
+    <li><span>Maintenance €/day</span><strong id="bd-maint">–</strong></li>
+    <li><span>Depreciation €/day</span><strong id="bd-depr">–</strong></li>
+    <li><span>Other €/day</span><strong id="bd-other">–</strong></li>
+  </ul>
+</
   </main>
 
   <script>
