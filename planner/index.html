@@ -137,7 +137,7 @@
       return Number(s.replace(/,/g,'')); }
     const fmt=(n,d=2)=>Number.isFinite(n)?new Intl.NumberFormat(locale,{minimumFractionDigits:d,maximumFractionDigits:d}).format(n):'–';
 
-    const bindings={producedKg:'#producedKg',sellPriceDay:'#sellPriceDay',rawUsedKg:'#rawUsedKg',rawCostPerKg:'#rawCostPerKg',packCostPerKg:'#packCostPerKg',freightPerKg:'#freightPerKg'};
+    const bindings={producedKg:'#producedKg',sellPriceDay:'#sellPriceDay',rawUsedKg:'#rawUsedKg',yieldPct: '#yieldPct',rawCostPerKg:'#rawCostPerKg',packCostPerKg:'#packCostPerKg',freightPerKg:'#freightPerKg'};
 
     function applyQueryParams(){ const p=new URLSearchParams(location.search);
       for(const [k,sel] of Object.entries(bindings)){ const el=q(sel); if(!el) continue; const v=p.get(k); if(v!=null&&v!=='') el.value=decodeURIComponent(v); } }
