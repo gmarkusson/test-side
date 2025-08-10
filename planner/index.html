@@ -178,6 +178,7 @@ function toNumber(v) {
     function syncUrlFromInputs(){ const p=new URLSearchParams();
       for(const [k,sel] of Object.entries(bindings)){ const el=q(sel); if(el&&el.value!=='') p.set(k,el.value); }
       history.replaceState(null,'',`${location.pathname}?${p.toString()}`); }
+    let lastEdited = null;   // 'yield' | 'raw' | null
     function attachSync(){
   document.querySelectorAll('input, select, textarea').forEach(el => {
     el.addEventListener('input', () => {
