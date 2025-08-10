@@ -147,30 +147,60 @@
     function attachSync(){ qa('input').forEach(el=> el.addEventListener('input',()=>{ syncUrlFromInputs(); calcKeyNumbers(); })); }
 
     function calcKeyNumbers(){
-      const producedKg=toNumber(q('#producedKg')?.value);
-      const sellPrice =toNumber(q('#sellPriceDay')?.value);
-      const rawUsed   =toNumber(q('#rawUsedKg')?.value);
-      const rawCost   =toNumber(q('#rawCostPerKg')?.value);
-      const packCost  =toNumber(q('#packCostPerKg')?.value)||0;
-      const freight   =toNumber(q('#freightPerKg')?.value)||0;
+  const producedKg = toNumber(q('#producedKg')?.value);
+  const sellPrice  = toNumber(q('#sellPriceDay')?.value);
+  let   rawUsed    = toNumber(q('#rawUsedKg')?.value);
+  const rawCost    = toNumber(q('#rawCostPerKg')?.value);
+  const packCost   = toNumber(q('#packCostPerKg')?.value) || 0;
+  const freight    = toNumber(q('#freightPerKg')?.value) || 0;
+  let   yieldIn    = toNumber(q('#yieldPct')?.value);  // <- new
 
-      const yieldPct=(Number.isFinite(producedKg)&&Number.isFinite(rawUsed)&&rawUsed>0)?(producedKg/rawUsed)*100:NaN;
-      const revenue=producedKg*sellPrice;
-      const totalCost=producedKg*(rawCost+packCost+freight);
-      const profit=revenue-totalCost;
-      const marginPct=revenue?(profit/revenue)*100:NaN;
-      const profitKg=producedKg?profit/producedKg:NaN;
+  const rawUsedEl = q('#rawUsedKg');
+  const yieldEl   = q('#yieldPct');
+  let changed = false;
 
-      setText('#key-net-kg',fmt(producedKg,0));
-      setText('#key-revenue',fmt(revenue));
-      setText('#key-total-cost',fmt(totalCost));
-      setText('#key-profit',fmt(profit));
-      setText('#key-gm',Number.isFinite(marginPct)?fmt(marginPct,1)+' %':'–');
-      setText('#key-profit-kg',fmt(profitKg));
-      setText('#key-yield',Number.isFinite(yieldPct)?fmt(yieldPct,1)+' %':'–');
-    }
+  // --- NEW: compute the missing one ---
+  // If Raw used is empty but Yield % is provided → compute Raw used
+  if (!Number.isFinite(rawUsed) && Number.isFinite(producedKg) && Number.isFinite(yieldIn) && yieldIn > 0) {
+    const computedRaw = producedKg / (yieldIn / 100);
+    rawUsedEl.value = String(Math.round(computedRaw));  // integer kg
+    rawUsed = computedRaw;
+    changed = true;
+  }
 
-    document.addEventListener('DOMContentLoaded',()=>{ applyQueryParams(); attachSync(); calcKeyNumbers(); });
+  // If Yield % is empty but Raw used is provided → compute Yield %
+  if (!Number.isFinite(yieldIn) && Number.isFinite(producedKg) && Number.isFinite(rawUsed) && rawUsed > 0) {
+    const computedYield = (producedKg / rawUsed) * 100;
+    yieldEl.value = computedYield.toFixed(1);           // 1 decimal
+    yieldIn = computedYield;
+    changed = true;
+  }
+
+  // If we programmatically filled an input, keep URL in sync
+  if (changed) syncUrlFromInputs();
+
+  // Pick a yield to display (prefer the input, else compute)
+  const yieldPct = Number.isFinite(yieldIn)
+    ? yieldIn
+    : (Number.isFinite(producedKg) && Number.isFinite(rawUsed) && rawUsed > 0)
+        ? (producedKg / rawUsed) * 100
+        : NaN;
+
+  // Usual KPI math
+  const revenue   = producedKg * sellPrice;
+  const totalCost = producedKg * (rawCost + packCost + freight);
+  const profit    = revenue - totalCost;
+  const marginPct = revenue ? (profit / revenue) * 100 : NaN;
+  const profitKg  = producedKg ? profit / producedKg : NaN;
+
+  setText('#key-net-kg', fmt(producedKg, 0));
+  setText('#key-revenue', fmt(revenue));
+  setText('#key-total-cost', fmt(totalCost));
+  setText('#key-profit', fmt(profit));
+  setText('#key-gm', Number.isFinite(marginPct) ? fmt(marginPct, 1) + ' %' : '–');
+  setText('#key-profit-kg', fmt(profitKg));
+  setText('#key-yield', Number.isFinite(yieldPct) ? fmt(yieldPct, 1) + ' %' : '–');
+}
   </script>
 </body>
 </html>
