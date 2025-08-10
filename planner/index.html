@@ -220,23 +220,56 @@ function formatIntInput(el) {
   const yieldEl   = q('#yieldPct');
   let changed = false;
 
-  // If Raw used is empty but Yield % is provided → compute Raw used
-  if (!Number.isFinite(rawUsed) && Number.isFinite(producedKg) && Number.isFinite(yieldIn) && yieldIn > 0) {
+  // --- Keep Raw used and Yield % linked, based on what was edited last ---
+  const rawUsedEl = q('#rawUsedKg');
+  const yieldEl   = q('#yieldPct');
+  let changed = false;
+
+  // 3a) If user edited Yield → recompute Raw used
+  if (lastEdited === 'yield' &&
+      Number.isFinite(producedKg) && Number.isFinite(yieldIn) && yieldIn > 0) {
     const computedRaw = producedKg / (yieldIn / 100);
-    rawUsedEl.value = nfIntIS.format(Math.round(computedRaw)); // with thousands separator
+    // format with thousands if you added nfIntIS; otherwise just round
+    rawUsedEl.value =
+      (typeof nfIntIS !== 'undefined')
+        ? nfIntIS.format(Math.round(computedRaw))
+        : String(Math.round(computedRaw));
     rawUsed = computedRaw;
     changed = true;
   }
 
-  // If Yield % is empty but Raw used is provided → compute Yield %
-  if (!Number.isFinite(yieldIn) && Number.isFinite(producedKg) && Number.isFinite(rawUsed) && rawUsed > 0) {
+  // 3b) If user edited Raw used → recompute Yield
+  else if (lastEdited === 'raw' &&
+           Number.isFinite(producedKg) && Number.isFinite(rawUsed) && rawUsed > 0) {
     const computedYield = (producedKg / rawUsed) * 100;
-    yieldEl.value = computedYield.toFixed(1);           // 1 decimal
+    yieldEl.value = computedYield.toFixed(1);
     yieldIn = computedYield;
     changed = true;
   }
 
+  // 3c) Fallback: if one is empty, compute it from the other
+  else {
+    if (!Number.isFinite(rawUsed) &&
+        Number.isFinite(producedKg) && Number.isFinite(yieldIn) && yieldIn > 0) {
+      const computedRaw = producedKg / (yieldIn / 100);
+      rawUsedEl.value =
+        (typeof nfIntIS !== 'undefined')
+          ? nfIntIS.format(Math.round(computedRaw))
+          : String(Math.round(computedRaw));
+      rawUsed = computedRaw;
+      changed = true;
+    }
+    if (!Number.isFinite(yieldIn) &&
+        Number.isFinite(producedKg) && Number.isFinite(rawUsed) && rawUsed > 0) {
+      const computedYield = (producedKg / rawUsed) * 100;
+      yieldEl.value = computedYield.toFixed(1);
+      yieldIn = computedYield;
+      changed = true;
+    }
+  }
+
   if (changed) syncUrlFromInputs();
+
 
   const yieldPct = Number.isFinite(yieldIn)
     ? yieldIn
