@@ -134,21 +134,40 @@
     const setText=(sel,val)=>{const el=typeof sel==='string'?q(sel):sel;if(el)el.textContent=val;};
 function toNumber(v) {
   if (v == null) return NaN;
-  const s0 = String(v).trim();
-  if (!s0) return NaN;
+  let s = String(v).trim()
+    .replace(/\u00A0/g, '')   // NBSP
+    .replace(/\s/g, '');      // spaces
 
-  // If it has a comma but no dot, comma is decimal; strip any dots used as thousands
-  if (/,/.test(s0) && !/\./.test(s0)) {
-    return Number(s0.replace(/\./g, '').replace(',', '.'));
+  if (!s) return NaN;
+
+  const hasComma = s.includes(',');
+  const hasDot   = s.includes('.');
+
+  if (hasComma && hasDot) {
+    // Use the right-most punctuation as the decimal; remove the other as thousands
+    if (s.lastIndexOf(',') > s.lastIndexOf('.')) {
+      s = s.replace(/\./g, '').replace(',', '.');  // 1.234,56 -> 1234.56
+    } else {
+      s = s.replace(/,/g, '');                     // 1,234.56 -> 1234.56
+    }
+  } else if (hasComma) {
+    // Only commas: treat as thousands if grouped, otherwise decimal
+    const parts = s.split(',');
+    const looksLikeThousands = parts.length > 1 &&
+      parts.every((p, i) => (i === 0 ? p.length <= 3 : p.length === 3));
+    s = looksLikeThousands ? s.replace(/,/g, '') : s.replace(',', '.');
+  } else if (hasDot) {
+    // Only dots: if grouped like thousands, strip; else decimal
+    const parts = s.split('.');
+    const looksLikeThousands = parts.length > 1 &&
+      parts.every((p, i) => (i === 0 ? p.length <= 3 : p.length === 3));
+    if (looksLikeThousands) s = s.replace(/\./g, '');
   }
 
-  // Otherwise: strip thousands separators (NBSP/space/comma/dot) when followed by 3 digits
-  const s1 = s0
-    .replace(/[\u00A0 ](?=\d{3}\b)/g, '')
-    .replace(/,(?=\d{3}\b)/g, '')
-    .replace(/\.(?=\d{3}\b)/g, '');
-  return Number(s1);
+  const n = Number(s);
+  return Number.isFinite(n) ? n : NaN;
 }
+
 
     const fmt=(n,d=2)=>Number.isFinite(n)?new Intl.NumberFormat(locale,{minimumFractionDigits:d,maximumFractionDigits:d}).format(n):'–';
 
