@@ -473,7 +473,9 @@
       const waterM3    = g('waterM3');
       const waterCost  = g('waterCostPerM3');
 
-      const yieldPct   = (producedKg && rawUsed) ? (producedKg / rawUsed) * 100 : NaN;
+      const yieldPct = (Number.isFinite(rawUsed) && rawUsed > 0 && Number.isFinite(producedKg))
+  ? (producedKg / rawUsed) * 100
+  : NaN;
       const revenue    = producedKg * sellPrice;
       const labor      = (staffCnt * staffHr * staffRate) + (supCnt * supHr * supRate);
       const material   = (producedKg * packCost) + (rawUsed * rawCost);
