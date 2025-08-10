@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Factory Planner — Fixed Costs & Utilities</title>
+  <style>
+    :root{
+      --gap:14px;--pad:16px;
+      --bg:#f6f8fc;--card:#ffffff;--ink:#0b1320;--muted:#4a5874;--accent:#0b5fff;--border:#e4e9f2;--field:#d6dbe6;
+    }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+      font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    header{padding:24px var(--pad);border-bottom:1px solid var(--border)}
+    h1{margin:0 0 6px;font-size:22px}
+    main{padding:20px var(--pad) 60px;display:grid;gap:14px}
+    section.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+    label{display:flex;flex-direction:column;gap:6px;color:var(--muted);font-weight:600}
+    input{background:#fff;color:var(--ink);border:1px solid var(--field);border-radius:8px;padding:10px 12px;outline:none}
+    input:focus{border-color:#2c6fff;box-shadow:0 0 0 2px rgba(44,111,255,.14)}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    button,a.button{border:1px solid var(--border);background:#fff;padding:10px 14px;border-radius:8px;text-decoration:none;color:var(--ink);cursor:pointer}
+    button.primary,a.button.primary{background:#0b5fff;color:#fff;border-color:#0b5fff}
+    .muted{color:var(--muted)}
+  </style>
+</head>
+<body>
+<header>
+  <h1>Fixed Costs & Utilities</h1>
+  <div class="muted">Set your default fixed costs. They’ll auto-fill in the planner unless overridden by the URL.</div>
+</header>
+
+<main>
+  <section class="card">
+    <h2 style="margin:0 0 10px;color:#0b5fff;font-size:18px">FX & Workdays</h2>
+    <div class="grid">
+      <label>ISK per EUR<input id="iskPerEur" inputmode="decimal"></label>
+      <label>Working days (default)<input id="workingDays" inputmode="numeric"></label>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 style="margin:0 0 10px;color:#0b5fff;font-size:18px">Monthly Fixed (ISK → EUR/day in planner)</h2>
+    <div class="grid">
+      <label>Housing (ISK/month)<input id="housingCost" inputmode="decimal"></label>
+      <label>Equipment (ISK/month)<input id="equipCost" inputmode="decimal"></label>
+      <label>Admin (ISK/month)<input id="adminCost" inputmode="decimal"></label>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 style="margin:0 0 10px;color:#0b5fff;font-size:18px">Daily Fixed (EUR/day)</h2>
+    <div class="grid">
+      <label>Maintenance (€/day)<input id="maintenanceCost" inputmode="decimal"></label>
+      <label>Depreciation (€/day)<input id="deprCost" inputmode="decimal"></label>
+      <label>Other (€/day)<input id="otherCost" inputmode="decimal"></label>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 style="margin:0 0 10px;color:#0b5fff;font-size:18px">Utilities</h2>
+    <div class="grid">
+      <label>Electricity kWh<input id="elecKwh" inputmode="decimal"></label>
+      <label>€/kWh<input id="elecCostPerKwh" inputmode="decimal"></label>
+      <label>Water m³<input id="waterM3" inputmode="decimal"></label>
+      <label>€/m³<input id="waterCostPerM3" inputmode="decimal"></label>
+    </div>
+  </section>
+
+  <div class="row">
+    <button class="primary" id="save">Save defaults</button>
+    <button id="clear">Reset all</button>
+    <a class="button" href="index.html">Back to Planner</a>
+  </div>
+</main>
+
+<script>
+  // Keep keys identical to your planner’s input IDs
+  const ids = [
+    'iskPerEur','workingDays',
+    'housingCost','equipCost','adminCost',
+    'maintenanceCost','deprCost','otherCost',
+    'elecKwh','elecCostPerKwh','waterM3','waterCostPerM3'
+  ];
+  const LS_PREFIX = 'fp:'; // namespace
+
+  function loadFromStorage(){
+    ids.forEach(id=>{
+      const el=document.getElementById(id);
+      if(!el) return;
+      const v=localStorage.getItem(LS_PREFIX+id);
+      if(v!=null) el.value = v;
+    });
+  }
+
+  function saveToStorage(){
+    ids.forEach(id=>{
+      const el=document.getElementById(id);
+      if(!el) return;
+      // store raw string; planner’s toNumber() handles parsing
+      const v = el.value.trim();
+      if(v==='') localStorage.removeItem(LS_PREFIX+id);
+      else localStorage.setItem(LS_PREFIX+id, v);
+    });
+  }
+
+  document.getElementById('save').addEventListener('click', ()=>{
+    saveToStorage();
+    // quick visual feedback
+    const btn = document.getElementById('save');
+    const old = btn.textContent;
+    btn.textContent = 'Saved ✓';
+    setTimeout(()=>btn.textContent=old, 1200);
+  });
+
+  document.getElementById('clear').addEventListener('click', ()=>{
+    ids.forEach(id=>localStorage.removeItem(LS_PREFIX+id));
+    loadFromStorage(); // clears fields
+  });
+
+  loadFromStorage();
+</script>
+</body>
+</html>
