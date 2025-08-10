@@ -166,7 +166,9 @@ function toNumber(v) {
       calcKeyNumbers();
     });
   });
-}
+  q('#producedKg')?.addEventListener('blur', () => formatIntInput(q('#producedKg')));
+  q('#rawUsedKg')?.addEventListener('blur', () => formatIntInput(q('#rawUsedKg')));
+    }
 // Format integers with Icelandic thousands separators (no decimals)
 const nfIntIS = new Intl.NumberFormat('is-IS', { maximumFractionDigits: 0 });
 
