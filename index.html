@@ -436,7 +436,6 @@
           input.id = id;                    // give it a concrete ID
           bindings[id] = `#${id}`;         // register for URL sync
           inputs[key] = input;
-          input.addEventListener('input', () => { syncUrlFromInputs(); recalcAll(); });
         });
 
         // Wire result slots
