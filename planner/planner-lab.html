@@ -161,32 +161,42 @@
 
     <!-- ========================= FACTORY B ========================= -->
     <div class="card factory" id="fxB" data-factory="B">
-      <h2>Factory B <span class="badge" data-badge="B">Ready</span></h2>
-      <div class="split">
-        <div class="row">
-  <label>Month</label>
-  <div>
-    <select class="month"></select>
-    <div class="selected-month small"></div>  <!-- shows Selected: <Month> -->
-  </div>
-</div>
-
-          <div class="row"><label>Working days</label><input type="text" class="num num-int workingDays" placeholder="auto from month"></div>
-          <div class="small">Auto weekdays (Mon–Fri) for <span class="yr"></span>. Manual edit overrides auto.</div>
-        </div>
+  <h2>Factory B <span class="badge" data-badge="B">Ready</span></h2>
+  <div class="split">
+    <!-- LEFT COLUMN (add this wrapper div) -->
+    <div>
+      <div class="row">
+        <label>Month</label>
         <div>
-          <div class="row">
-            <label title="1 € costs this many ISK">ISK per EUR</label>
-            <input type="text" class="num iskPerEur short" placeholder="e.g. 153,50" aria-describedby="fxB-help-isk">
-          </div>
-          <div id="fxB-help-isk" class="small">1 € = this many ISK (used to convert ISK monthly costs to EUR/day).</div>
-
-          <div class="row">
-            <label>Price (EUR/kg)</label>
-            <input type="text" class="num pricePerKg short" placeholder="e.g. 6,90">
-          </div>
+          <select class="month"></select>
+          <div class="selected-month small"></div>
         </div>
       </div>
+
+      <div class="row">
+        <label>Working days</label>
+        <input type="text" class="num num-int workingDays" placeholder="auto from month">
+      </div>
+      <div class="small">Auto weekdays (Mon–Fri) for <span class="yr"></span>. Manual edit overrides auto.</div>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div>
+      <div class="row">
+        <label title="1 € costs this many ISK">ISK per EUR</label>
+        <input type="text" class="num iskPerEur short" placeholder="e.g. 153,50" aria-describedby="fxB-help-isk">
+      </div>
+      <div id="fxB-help-isk" class="small">1 € = this many ISK (used to convert ISK monthly costs to EUR/day).</div>
+
+      <div class="row">
+        <label>Price (EUR/kg)</label>
+        <input type="text" class="num pricePerKg short" placeholder="e.g. 6,90">
+      </div>
+    </div>
+  </div>
+  <!-- …rest of Factory B stays the same… -->
+</div>
+
 
       <hr>
 
