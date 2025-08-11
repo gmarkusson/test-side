@@ -82,13 +82,11 @@
           <div id="fxA-help-isk" class="small">1 € = this many ISK (used to convert ISK monthly costs to EUR/day).</div>
           <div class="row"><label>Price (EUR/kg)</label><input type="text" class="num pricePerKg short" placeholder="e.g. 6,90"></div>
 
-          <!-- New: labor hours & rates (all ISK) -->
+          <!-- Labor hours & rates (ISK) -->
           <div class="row"><label>DV hours (daytime)</label><input type="text" class="num dvHours short" placeholder="e.g. 120"></div>
-          <div class="row"><label>DV rate (ISK/hour)</label><input type="text" class="num dvRateISK short" placeholder="e.g. 4.200"></div>
-
+          <div class="row"><label>DV rate (ISK/hour)</label><input type="text" class="num dvRateISK short" placeholder="e.g. 3.000"></div>
           <div class="row"><label>YV hours (overtime)</label><input type="text" class="num yvHours short" placeholder="e.g. 20"></div>
-          <div class="row"><label>YV rate (ISK/hour)</label><input type="text" class="num yvRateISK short" placeholder="e.g. 5.800"></div>
-
+          <div class="row"><label>YV rate (ISK/hour)</label><input type="text" class="num yvRateISK short" placeholder="e.g. 4.500"></div>
           <div class="row"><label>Labor from hours (ISK/day)</label><input type="text" class="num laborFromHoursDay readonly short" readonly></div>
         </div>
       </div>
@@ -155,11 +153,9 @@
           <div class="row"><label>Price (EUR/kg)</label><input type="text" class="num pricePerKg short" placeholder="e.g. 6,90"></div>
 
           <div class="row"><label>DV hours (daytime)</label><input type="text" class="num dvHours short" placeholder="e.g. 120"></div>
-          <div class="row"><label>DV rate (ISK/hour)</label><input type="text" class="num dvRateISK short" placeholder="e.g. 4.200"></div>
-
+          <div class="row"><label>DV rate (ISK/hour)</label><input type="text" class="num dvRateISK short" placeholder="e.g. 3.000"></div>
           <div class="row"><label>YV hours (overtime)</label><input type="text" class="num yvHours short" placeholder="e.g. 20"></div>
-          <div class="row"><label>YV rate (ISK/hour)</label><input type="text" class="num yvRateISK short" placeholder="e.g. 5.800"></div>
-
+          <div class="row"><label>YV rate (ISK/hour)</label><input type="text" class="num yvRateISK short" placeholder="e.g. 4.500"></div>
           <div class="row"><label>Labor from hours (ISK/day)</label><input type="text" class="num laborFromHoursDay readonly short" readonly></div>
         </div>
       </div>
@@ -226,11 +222,9 @@
           <div class="row"><label>Price (EUR/kg)</label><input type="text" class="num pricePerKg short" placeholder="e.g. 6,90"></div>
 
           <div class="row"><label>DV hours (daytime)</label><input type="text" class="num dvHours short" placeholder="e.g. 120"></div>
-          <div class="row"><label>DV rate (ISK/hour)</label><input type="text" class="num dvRateISK short" placeholder="e.g. 4.200"></div>
-
+          <div class="row"><label>DV rate (ISK/hour)</label><input type="text" class="num dvRateISK short" placeholder="e.g. 3.000"></div>
           <div class="row"><label>YV hours (overtime)</label><input type="text" class="num yvHours short" placeholder="e.g. 20"></div>
-          <div class="row"><label>YV rate (ISK/hour)</label><input type="text" class="num yvRateISK short" placeholder="e.g. 5.800"></div>
-
+          <div class="row"><label>YV rate (ISK/hour)</label><input type="text" class="num yvRateISK short" placeholder="e.g. 4.500"></div>
           <div class="row"><label>Labor from hours (ISK/day)</label><input type="text" class="num laborFromHoursDay readonly short" readonly></div>
         </div>
       </div>
@@ -298,34 +292,12 @@ function toNumber(value){
   let s = (''+value).replace(/\s|\u00A0/g,'').trim();
   if (s === '') return NaN;
 
-  // Robust is-IS parsing:
-  // - Accept "3.000" and "3,000" as 3000
-  // - Accept "153,50" as 153.50
-  // - Accept "153.50" as 153.50
+  // Locale-aware parsing for is-IS: comma decimal, dot thousand
   if (LOCALE === 'is-IS'){
-    const hasComma = s.includes(',');
-    const hasDot   = s.includes('.');
-
-    if (hasComma && hasDot){
-      // assume dot thousands, comma decimal: "3.000,75"
-      s = s.replace(/\./g,'').replace(',', '.');
-    } else if (hasComma && !hasDot){
-      // ambiguous: "3,000" (thousands) vs "153,50" (decimal)
-      const last = s.split(',').pop();
-      if (/^\d{3}$/.test(last) && s.replace(/,/g,'').length>3){
-        // treat as thousands
-        s = s.replace(/,/g,'');
-      } else {
-        // decimal
-        s = s.replace(',', '.');
-      }
-    } else if (!hasComma && hasDot){
-      // Could be thousands "3.000" or decimal "153.5"
-      const last = s.split('.').pop();
-      if (/^\d{3}$/.test(last) && (s.match(/\./g)||[]).length>=1){
-        s = s.replace(/\./g,''); // thousands groups
-      }
-      // else leave decimal dot as-is
+    if (s.includes(',')){
+      s = s.replace(/\./g,'').replace(',', '.');  // "3.000,75" -> "3000.75"
+    } else {
+      s = s.replace(/\./g,'');                    // "3.000" -> "3000"
     }
     const n = Number(s);
     return Number.isFinite(n) ? n : NaN;
@@ -357,7 +329,7 @@ function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(
 const FACTORIES=['A','B','C'];
 const FIELD_KEYS=[
   'month','workingDays','iskPerEur','pricePerKg',
-  'dvHours','dvRateISK','yvHours','yvRateISK',
+  'dvHours','dvRateISK','yvHours','yvRateISK',   // NEW fields
   'rawKg','yieldPct','netKg','laborOps','laborSup',
   'materialsDay','packDay','freightDay','deprDay'
 ];
@@ -461,7 +433,8 @@ class FactoryPane{
   }
 
   wireFormatting(){
-    this.root.querySelectorAll('input.num').forEach(inp=>{
+    // don't attach formatting to readonly computed fields
+    this.root.querySelectorAll('input.num:not(.readonly)').forEach(inp=>{
       inp.addEventListener('focus', ()=>{
         const n=toNumber(inp.value);
         if(Number.isFinite(n)){
@@ -546,6 +519,7 @@ class FactoryPane{
     return { iskDay, eurDay, total };
   }
 
+  // NEW: calculate labor from hours in ISK/day, return both ISK and EUR/day
   laborFromHoursCosts(){
     const dvH = toNumber(this.refs.dvHours.value) || 0;
     const yvH = toNumber(this.refs.yvHours.value) || 0;
@@ -553,11 +527,11 @@ class FactoryPane{
     const yvR = toNumber(this.refs.yvRateISK.value) || 0; // ISK/hour
     const fx  = toNumber(this.refs.iskPerEur.value) || 0;  // ISK per EUR
 
-    const iskDay = (dvH * dvR) + (yvH * yvR);              // ISK/day
-    const eurDay = fx > 0 ? (iskDay / fx) : NaN;           // EUR/day
+    const iskDay = (dvH * dvR) + (yvH * yvR);
+    const eurDay = fx > 0 ? (iskDay / fx) : 0;
 
     this.refs.laborFromHoursDay.value = Number.isFinite(iskDay) ? fmt(iskDay) : '';
-    return { iskDay, eurDay: Number.isFinite(eurDay) ? eurDay : 0 };
+    return { iskDay, eurDay };
   }
 
   compute(){
@@ -573,7 +547,7 @@ class FactoryPane{
     const price=toNumber(this.refs.pricePerKg.value);
     const { total: fixedDay }=this.fixedPerDay();
 
-    // NEW: labor from hours (ISK shown, EUR added to costs)
+    // NEW: labor from hours (show ISK/day, use EUR/day in totals)
     const { eurDay: laborHoursEUR } = this.laborFromHoursCosts();
 
     const parts=[
@@ -583,7 +557,7 @@ class FactoryPane{
       toNumber(this.refs.packDay.value)||0,
       toNumber(this.refs.freightDay.value)||0,
       toNumber(this.refs.deprDay.value)||0,
-      laborHoursEUR||0,       // include new labor component (EUR/day)
+      laborHoursEUR||0,         // include labor from hours (EUR/day)
       fixedDay||0
     ];
     const dayCost=parts.reduce((a,b)=>a+b,0);
