@@ -191,6 +191,8 @@
     const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
     const setText=(sel,val)=>{const el=typeof sel==='string'?q(sel):sel;if(el)el.textContent=val;};
     const fmt=(n,d=2)=>Number.isFinite(n)? new Intl.NumberFormat(locale,{minimumFractionDigits:d,maximumFractionDigits:d}).format(n) : '–';
+      };
+};
     function toNumber(v){
       if(v==null) return NaN;
       let s=String(v).trim().replace(/\u00A0/g,'').replace(/\s/g,'');
