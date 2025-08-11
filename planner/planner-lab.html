@@ -54,6 +54,12 @@
     .compare th,.compare td{padding:8px 10px;text-align:left}
     .compare th{color:var(--muted);font-weight:600;font-size:13px}
     .chip{display:inline-block;background:var(--chip);border:1px solid var(--border);padding:4px 8px;border-radius:999px;font-size:12px}
+    /* --- Narrow path fix: ISK per EUR & Price sizing --- */
+.factory .split .row { grid-template-columns: 140px auto; } /* labels get room, inputs don’t squish */
+input.short { width: 140px; min-width: 140px; }            /* keep placeholders readable */
+@media (max-width: 640px){
+  input.short { width: 100%; min-width: 0; }               /* full width on small screens */
+}
   </style>
 </head>
 <body>
