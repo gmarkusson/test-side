@@ -318,14 +318,15 @@ function loadBuildings(){
           else if (cat==='admin') per[idx].admin += amt;
         });
 
-        qa('.monthly-eur .row', bEl).forEach(r=>{
-          const cat = r.querySelector('.cat')?.value || '';
-          const amt = toNumber(r.querySelector('.amt')?.value)||0;
-          if (cat==='maintenance') per[idx].maint += amt;
-          else if (cat==='rentals') per[idx].rentals += amt;
-          else if (cat==='spares')  per[idx].spares += amt;
-          else per[idx].othereur += amt; // otherEur
-        });
+       qa('.monthly-eur .row', bEl).forEach(r=>{
+  const cat = r.querySelector('.cat')?.value || '';
+  const amt = toNumber(r.querySelector('.amt')?.value)||0;
+  if (cat==='maintenance')      per[idx].maint    += amt;
+  else if (cat==='rentals')     per[idx].rentals  += amt;
+  else if (cat==='spares')      per[idx].spares   += amt;
+  else if (cat==='otherEur')    per[idx].othereur += amt;
+});
+
 
         qa('.daily-eur .row', bEl).forEach(r=>{
           const amt = toNumber(r.querySelector('.amt')?.value)||0;
