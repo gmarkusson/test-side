@@ -443,22 +443,28 @@ qa('.monthly-eur .row', bEl).forEach(r=>{
 
     function copyToPlanner(){
       const t = saveDefaults();
-      const qs = new URLSearchParams();
-      const add=(k,v)=>{ if(v!=null && v!=='') qs.set(k,String(v)); };
+const qs = new URLSearchParams();
 
-      add('iskPerEur', q('#iskPerEur').value);
-      if(q('#workingDays').value!=='') add('workingDays', q('#workingDays').value);
-      add('housingCost',   t.t_housing);
-      add('equipCost',     t.t_equipment);
-      add('adminCost',     t.t_admin);
-      add('maintenanceCost', t.t_maint_day.toFixed(2));
-      add('otherCost',       t.t_other_day.toFixed(2));
-      add('elecKwh',       t.elec);
-      add('elecCostPerKwh', q('#elecCostPerKwh').value);
-      add('waterM3',       t.water);
-      add('waterCostPerM3', q('#waterCostPerM3').value);
+addStr(qs, 'iskPerEur', q('#iskPerEur').value);
+if(q('#workingDays').value!=='') addStr(qs, 'workingDays', q('#workingDays').value);
 
-      location.href = './?' + qs.toString() + '#day';
+// monthly ISK (numbers; include only if non-zero)
+addNum(qs, 'housingCost',   t.t_housing);
+addNum(qs, 'equipCost',     t.t_equipment);
+addNum(qs, 'adminCost',     t.t_admin);
+
+// €/day totals
+addNum(qs, 'maintenanceCost', t.t_maint_day.toFixed(2));
+addNum(qs, 'otherCost',        t.t_other_day.toFixed(2));
+
+// utilities usage + unit costs
+addNum(qs, 'elecKwh',         t.elec);
+addStr(qs, 'elecCostPerKwh',  q('#elecCostPerKwh').value);
+addNum(qs, 'waterM3',         t.water);
+addStr(qs, 'waterCostPerM3',  q('#waterCostPerM3').value);
+
+location.href = './?' + qs.toString() + '#day';
+
     }
 
     function resetAll(){
