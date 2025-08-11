@@ -497,8 +497,9 @@ location.href = './?' + qs.toString() + '#day';
           addCostRow(q('.daily-eur', b));
           updateTotals(); saveBuildings();
         });
-        b.querySelector('.elec').addEventListener('input', ()=>{updateTotals(); saveBuildings();});
-        b.querySelector('.water').addEventListener('input',()=>{updateTotals(); saveBuildings();});
+        b.querySelector('.elec').addEventListener('input', debouncedSaveTotals);
+b.querySelector('.water').addEventListener('input', debouncedSaveTotals);
+
       });
 
       // top buttons
