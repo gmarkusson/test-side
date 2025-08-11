@@ -159,11 +159,12 @@
       </div>
     </div>
 
-    <!-- ========================= FACTORY B ========================= -->
-    <div class="card factory" id="fxB" data-factory="B">
+  <!-- ========================= FACTORY B ========================= -->
+<div class="card factory" id="fxB" data-factory="B">
   <h2>Factory B <span class="badge" data-badge="B">Ready</span></h2>
+
   <div class="split">
-    <!-- LEFT COLUMN (add this wrapper div) -->
+    <!-- LEFT COLUMN -->
     <div>
       <div class="row">
         <label>Month</label>
@@ -194,47 +195,45 @@
       </div>
     </div>
   </div>
-  <!-- …rest of Factory B stays the same… -->
+
+  <hr>
+
+  <div class="split">
+    <div>
+      <div class="row"><label>Raw used kg</label><input type="text" class="num rawKg" placeholder="e.g. 1.500"></div>
+      <div class="row"><label>Yield %</label><input type="text" class="num yieldPct" placeholder="e.g. 63,5"></div>
+      <div class="row"><label>Net saleable kg</label><input type="text" class="num netKg" placeholder="auto if set"></div>
+    </div>
+    <div>
+      <div class="row"><label>Labor — operators</label><input type="text" class="num laborOps" placeholder="EUR/day"></div>
+      <div class="row"><label>Labor — supervisors</label><input type="text" class="num laborSup" placeholder="EUR/day"></div>
+      <div class="row"><label>Materials</label><input type="text" class="num materialsDay" placeholder="EUR/day"></div>
+      <div class="row"><label>Pack</label><input type="text" class="num packDay" placeholder="EUR/day"></div>
+      <div class="row"><label>Freight</label><input type="text" class="num freightDay" placeholder="EUR/day"></div>
+      <div class="row"><label>Depreciation</label><input type="text" class="num deprDay" placeholder="EUR/day"></div>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:4px">
+    <label>Fixed costs (per day)</label>
+    <div class="stack">
+      <span class="badge">ISK→EUR/day: <span class="fcIskDay">–</span></span>
+      <span class="badge">EUR/day: <span class="fcEurDay">–</span></span>
+      <span class="badge">Total fixed/day: <span class="fcTotalDay">–</span></span>
+    </div>
+  </div>
+
+  <div class="card" style="padding:10px">
+    <div class="totals">
+      <div class="line"><span>Revenue (EUR)</span><strong class="kn_revenue">–</strong></div>
+      <div class="line"><span>Total cost (EUR/day)</span><strong class="kn_totalCost">–</strong></div>
+      <div class="line"><span>Profit (EUR/day)</span><strong class="kn_profit">–</strong></div>
+      <div class="line"><span>Gross margin %</span><strong class="kn_margin">–</strong></div>
+      <div class="line"><span>Profit / kg (EUR)</span><strong class="kn_profitPerKg">–</strong></div>
+    </div>
+  </div>
 </div>
 
-
-      <hr>
-
-      <div class="split">
-        <div>
-          <div class="row"><label>Raw used kg</label><input type="text" class="num rawKg" placeholder="e.g. 1.500"></div>
-          <div class="row"><label>Yield %</label><input type="text" class="num yieldPct" placeholder="e.g. 63,5"></div>
-          <div class="row"><label>Net saleable kg</label><input type="text" class="num netKg" placeholder="auto if set"></div>
-        </div>
-        <div>
-          <div class="row"><label>Labor — operators</label><input type="text" class="num laborOps" placeholder="EUR/day"></div>
-          <div class="row"><label>Labor — supervisors</label><input type="text" class="num laborSup" placeholder="EUR/day"></div>
-          <div class="row"><label>Materials</label><input type="text" class="num materialsDay" placeholder="EUR/day"></div>
-          <div class="row"><label>Pack</label><input type="text" class="num packDay" placeholder="EUR/day"></div>
-          <div class="row"><label>Freight</label><input type="text" class="num freightDay" placeholder="EUR/day"></div>
-          <div class="row"><label>Depreciation</label><input type="text" class="num deprDay" placeholder="EUR/day"></div>
-        </div>
-      </div>
-
-      <div class="row" style="margin-top:4px">
-        <label>Fixed costs (per day)</label>
-        <div class="stack">
-          <span class="badge">ISK→EUR/day: <span class="fcIskDay">–</span></span>
-          <span class="badge">EUR/day: <span class="fcEurDay">–</span></span>
-          <span class="badge">Total fixed/day: <span class="fcTotalDay">–</span></span>
-        </div>
-      </div>
-
-      <div class="card" style="padding:10px">
-        <div class="totals">
-          <div class="line"><span>Revenue (EUR)</span><strong class="kn_revenue">–</strong></div>
-          <div class="line"><span>Total cost (EUR/day)</span><strong class="kn_totalCost">–</strong></div>
-          <div class="line"><span>Profit (EUR/day)</span><strong class="kn_profit">–</strong></div>
-          <div class="line"><span>Gross margin %</span><strong class="kn_margin">–</strong></div>
-          <div class="line"><span>Profit / kg (EUR)</span><strong class="kn_profitPerKg">–</strong></div>
-        </div>
-      </div>
-    </div>
 
     <!-- ========================= FACTORY C ========================= -->
     <div class="card factory" id="fxC" data-factory="C">
