@@ -179,7 +179,36 @@
       }
       history.replaceState(null, '', `${location.pathname}?${p.toString()}`);
     }
+function applyMonthlyParamsToDaily() {
+  const p = new URLSearchParams(location.search);
 
+  // Only act if the daily fields are empty
+  const maintEl = document.getElementById('maintenanceCost');
+  const otherEl = document.getElementById('otherCost');
+  if (!maintEl || !otherEl) return;
+  if (maintEl.value && otherEl.value) return;
+
+  // Working days to divide by
+  let wd = toNumber(document.getElementById('workingDays')?.value);
+  if (!Number.isFinite(wd)) {
+    const m = document.getElementById('month')?.value;
+    wd = Number.isFinite(workingDaysInMonth?.(m)) ? workingDaysInMonth(m) : 22;
+  }
+
+  const toN = (k) => toNumber(p.get(k));
+  const maintMonth = (toN('maintEurMonth') || 0) + (toN('sparesEurMonth') || 0);
+  const otherMonth = (toN('rentalsEurMonth') || 0)
+                   + (toN('electricityEurMonth') || 0)
+                   + (toN('waterEurMonth') || 0)
+                   + (toN('otherEurMonth') || 0);
+
+  if (Number.isFinite(wd) && wd > 0) {
+    if (!maintEl.value && maintMonth) maintEl.value = (maintMonth / wd).toFixed(2);
+    if (!otherEl.value && otherMonth) otherEl.value = (otherMonth / wd).toFixed(2);
+  }
+}
+
+    
     // Read from URL first, else localStorage fp:* (what fixed-costs.html saves)
     const LS_PREFIX='fp:';
     function getParamOrStoreNum(param, storeKey=param){
