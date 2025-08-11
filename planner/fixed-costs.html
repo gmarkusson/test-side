@@ -27,10 +27,8 @@
     .buildings{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:14px}
     .building{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px}
     .building h3{margin:0 0 8px;font-size:16px;color:#1b2746}
-
     .section-sub{margin:12px 0 6px;color:#4a5874;font-weight:700}
 
-    /* Cost rows */
     .rows{display:grid;gap:8px}
     .row{
       display:grid;
@@ -42,12 +40,10 @@
     .row .amt{text-align:right}
     .row .del{height:36px;width:36px;border-radius:8px;border:1px solid var(--border);background:#fff;cursor:pointer}
 
-    /* Results blocks */
     ul.results{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0 0;padding:0;list-style:none}
     .results li{background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px;display:flex;justify-content:space-between;align-items:center}
     .results li span{color:var(--muted)} .results li strong{font-size:15px}
     .mini{margin-top:10px}
-    .note{font-size:12px;color:var(--muted)}
 
     @media (max-width:680px){
       .row{grid-template-columns: 1fr 1fr; grid-auto-rows:auto}
@@ -64,9 +60,9 @@
     <div class="muted">Add monthly ISK costs and monthly € costs per building. Totals are saved for the planner.</div>
     <div class="actions">
       <a class="btn secondary" href="./">← Back to planner</a>
-      <button id="copyBtn" class="btn" type="button">Copy to planner now</button>
-      <button id="saveBtn" class="btn secondary" type="button">Save defaults</button>
-      <button id="resetBtn" class="btn secondary" type="button">Reset saved</button>
+      <button id="copyBtn" class="btn">Copy to planner now</button>
+      <button id="saveBtn" class="btn secondary">Save defaults</button>
+      <button id="resetBtn" class="btn secondary">Reset saved</button>
     </div>
   </header>
 
@@ -80,7 +76,7 @@
         </label>
         <label>Working days (per month)
           <input id="workingDays" inputmode="numeric" placeholder="e.g. 21" />
-          <span class="note">Optional. Planner can auto-calc from month if left blank.</span>
+          <span class="muted" style="font-size:12px">Optional. Planner can auto-calc from month if left blank.</span>
         </label>
       </div>
     </section>
@@ -161,14 +157,12 @@
   </main>
 
   <script>
-    /* ---------- helpers ---------- */
+    /* ---------- tiny helpers ---------- */
     const locale='is-IS';
     const q=(s,r=document)=>r.querySelector(s);
     const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
     const setText=(sel,val)=>{const el=typeof sel==='string'?q(sel):sel;if(el)el.textContent=val;};
     const fmt=(n,d=2)=>Number.isFinite(n)? new Intl.NumberFormat(locale,{minimumFractionDigits:d,maximumFractionDigits:d}).format(n) : '–';
-
-    // robust number parser (handles , and . and thousands)
     function toNumber(v){
       if(v==null) return NaN;
       let s=String(v).trim().replace(/\u00A0/g,'').replace(/\s/g,'');
@@ -180,9 +174,9 @@
       const n=Number(s); return Number.isFinite(n)? n : NaN;
     }
 
-    // debounce
+    // debounced recalc+save
     const debounce=(fn,ms=120)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}};
-    const debouncedSave = debounce(()=>{ updateTotals(); saveBuildings(); }, 120);
+    const debouncedRecalcSave = debounce(()=>{ updateTotals(); saveBuildings(); }, 120);
 
     /* ---------- categories ---------- */
     const CATS_MONTH_ISK = [
@@ -198,24 +192,22 @@
       {value:'water',       label:'Water (€/mo)'},
       {value:'otherEur',    label:'Other (€/mo)'}
     ];
-    function fillCat(selectEl, list){
-      selectEl.innerHTML = list.map(c=>`<option value="${c.value}">${c.label}</option>`).join('');
-    }
+    const fillCat=(el,list)=>{ el.innerHTML=list.map(c=>`<option value="${c.value}">${c.label}</option>`).join(''); };
 
-    // amount formatting (IS locale)
-    const nfISK = new Intl.NumberFormat('is-IS', { maximumFractionDigits: 0 });
-    const nfEUR = new Intl.NumberFormat('is-IS', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    function formatAmtInput(input, decimals){
-      const n = toNumber(input.value);
-      if(!Number.isFinite(n)) return;
-      input.value = decimals === 0 ? nfISK.format(Math.round(n)) : nfEUR.format(n);
-    }
+    // amount formatters
+    const nfISK = new Intl.NumberFormat('is-IS',{maximumFractionDigits:0});
+    const nfEUR = new Intl.NumberFormat('is-IS',{minimumFractionDigits:2,maximumFractionDigits:2});
     function attachAmtFormatting(input, decimals){
-      input.addEventListener('focus', () => {
+      if(!input) return;
+      input.addEventListener('focus', ()=>{
         const n = toNumber(input.value);
         if(Number.isFinite(n)) input.value = String(n);
       });
-      input.addEventListener('blur', () => formatAmtInput(input, decimals));
+      input.addEventListener('blur', ()=>{
+        const n = toNumber(input.value);
+        if(!Number.isFinite(n)) return;
+        input.value = decimals===0 ? nfISK.format(Math.round(n)) : nfEUR.format(n);
+      });
     }
 
     /* ---------- row builder ---------- */
@@ -230,11 +222,9 @@
         <button class="del" type="button">×</button>
       `;
 
-      // Category choices based on container
       if (rowsEl.classList.contains('monthly-isk')) fillCat(row.querySelector('.cat'), CATS_MONTH_ISK);
       else fillCat(row.querySelector('.cat'), CATS_MONTH_EUR);
 
-      // Presets
       if (preset.name) row.querySelector('.name').value = preset.name;
       if (preset.desc) row.querySelector('.desc').value = preset.desc;
       if (preset.amt)  row.querySelector('.amt').value  = preset.amt;
@@ -242,22 +232,20 @@
 
       rowsEl.appendChild(row);
 
-      // hook up formatting for the amount field
       const isISK = rowsEl.classList.contains('monthly-isk');
       const amtEl = row.querySelector('.amt');
       attachAmtFormatting(amtEl, isISK ? 0 : 2);
-      if (preset.amt) formatAmtInput(amtEl, isISK ? 0 : 2);
+      if (preset.amt) amtEl.dispatchEvent(new Event('blur')); // format immediately
 
-      // listeners
-      row.addEventListener('input', debouncedSave);
+      row.addEventListener('input', debouncedRecalcSave);
       row.querySelector('.del').addEventListener('click', ()=>{
         row.remove();
-        debouncedSave();
+        debouncedRecalcSave();
       });
     }
 
     /* ---------- serialize / restore ---------- */
-    const STORE_KEY = 'fp:fixed:v5';   // new version to avoid old corrupt saves
+    const STORE_KEY='fp:fixed:v5';
     function serializeBuilding(bEl){
       const pack = (sel)=> qa(`${sel} .row`, bEl).map(r=>({
         name: r.querySelector('.name')?.value?.trim() || '',
@@ -265,61 +253,49 @@
         desc: r.querySelector('.desc')?.value?.trim() || '',
         amt:  r.querySelector('.amt') ?.value?.trim() || ''
       }));
-      return {
-        title: q('h3', bEl)?.textContent || '',
-        monthlyISK: pack('.monthly-isk'),
-        monthlyEUR: pack('.monthly-eur')
-      };
+      return { title:q('h3',bEl)?.textContent||'', monthlyISK:pack('.monthly-isk'), monthlyEUR:pack('.monthly-eur') };
     }
     function restoreBuilding(bEl, data={}){
       (data.monthlyISK||[]).forEach(x=> addCostRow(q('.monthly-isk', bEl), x));
       (data.monthlyEUR||[]).forEach(x=> addCostRow(q('.monthly-eur', bEl), x));
     }
-    function saveBuildings(){
-      const data = qa('.building').map(serializeBuilding);
-      localStorage.setItem(STORE_KEY, JSON.stringify(data));
-    }
+    function saveBuildings(){ const data=qa('.building').map(serializeBuilding); localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
     function loadBuildings(){
       try{
         let data = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
-        if (!Array.isArray(data)) data = [];
-        const buildings = [q('#bA'), q('#bB')];
-        buildings.forEach((bEl,i)=> restoreBuilding(bEl, data[i]||{}));
+        if (!Array.isArray(data)) data=[];
+        [q('#bA'), q('#bB')].forEach((bEl,i)=> restoreBuilding(bEl, data[i]||{}));
       }catch(e){}
     }
 
-    /* ---------- totals & persistence to planner ---------- */
+    /* ---------- totals & persistence ---------- */
     const LS_PREFIX='fp:';
     function updateTotals(){
-      const buildings = [q('#bA'), q('#bB')];
-      const per = buildings.map(()=>({
-        housing:0, equipment:0, admin:0,          // ISK/mo
-        maint:0, rentals:0, spares:0, elec:0, water:0, othereur:0 // €/mo
-      }));
+      const buildings=[q('#bA'), q('#bB')];
+      const per = buildings.map(()=>({housing:0,equipment:0,admin:0,maint:0,rentals:0,spares:0,elec:0,water:0,othereur:0}));
 
-      buildings.forEach((bEl, idx)=>{
+      buildings.forEach((bEl,idx)=>{
         qa('.monthly-isk .row', bEl).forEach(r=>{
-          const cat = r.querySelector('.cat')?.value || '';
-          const amt = toNumber(r.querySelector('.amt')?.value)||0;
-          if (cat==='housing')     per[idx].housing   += amt;
-          else if (cat==='equipment') per[idx].equipment += amt;
-          else if (cat==='admin')  per[idx].admin     += amt;
+          const cat=r.querySelector('.cat')?.value||'';
+          const amt=toNumber(r.querySelector('.amt')?.value)||0;
+          if (cat==='housing') per[idx].housing+=amt;
+          else if(cat==='equipment') per[idx].equipment+=amt;
+          else if(cat==='admin') per[idx].admin+=amt;
         });
-
         qa('.monthly-eur .row', bEl).forEach(r=>{
-          const cat = r.querySelector('.cat')?.value || '';
-          const amt = toNumber(r.querySelector('.amt')?.value)||0;
-          if (cat==='maintenance') per[idx].maint    += amt;
-          else if (cat==='rentals')per[idx].rentals  += amt;
-          else if (cat==='spares') per[idx].spares   += amt;
-          else if (cat==='electricity') per[idx].elec+= amt;
-          else if (cat==='water')  per[idx].water    += amt;
-          else if (cat==='otherEur') per[idx].othereur += amt;
+          const cat=r.querySelector('.cat')?.value||'';
+          const amt=toNumber(r.querySelector('.amt')?.value)||0;
+          if (cat==='maintenance') per[idx].maint+=amt;
+          else if (cat==='rentals') per[idx].rentals+=amt;
+          else if (cat==='spares') per[idx].spares+=amt;
+          else if (cat==='electricity') per[idx].elec+=amt;
+          else if (cat==='water') per[idx].water+=amt;
+          else if (cat==='otherEur') per[idx].othereur+=amt;
         });
       });
 
-      // write per-building mini
-      per.forEach((b, i)=>{
+      // per-building mini
+      per.forEach((b,i)=>{
         setText(`#b${i}-housing`,   fmt(b.housing,0));
         setText(`#b${i}-equipment`, fmt(b.equipment,0));
         setText(`#b${i}-admin`,     fmt(b.admin,0));
@@ -342,9 +318,9 @@
         elec:a.elec+b.elec,
         water:a.water+b.water,
         othereur:a.othereur+b.othereur
-      }), {housing:0,equipment:0,admin:0,maint:0,rentals:0,spares:0,elec:0,water:0,othereur:0});
+      }),{housing:0,equipment:0,admin:0,maint:0,rentals:0,spares:0,elec:0,water:0,othereur:0});
 
-      // write totals UI
+      // totals UI
       setText('#t-housing',   fmt(agg.housing,0));
       setText('#t-equipment', fmt(agg.equipment,0));
       setText('#t-admin',     fmt(agg.admin,0));
@@ -357,53 +333,49 @@
 
       return {
         t_housing:agg.housing, t_equipment:agg.equipment, t_admin:agg.admin,
-        eur:{ maint:agg.maint, rentals:agg.rentals, spares:agg.spares, electricity:agg.elec, water:agg.water, other:agg.othereur }
+        eur:{maint:agg.maint,rentals:agg.rentals,spares:agg.spares,electricity:agg.elec,water:agg.water,other:agg.othereur}
       };
     }
 
     function saveDefaults(){
-      // save buildings + totals
+      // save rows + totals
       saveBuildings();
-      const totals = updateTotals();
+      const t=updateTotals();
 
       // globals
-      localStorage.setItem(LS_PREFIX+'iskPerEur',   q('#iskPerEur').value || '');
-      if (q('#workingDays').value!=='') localStorage.setItem(LS_PREFIX+'workingDays', q('#workingDays').value);
+      localStorage.setItem(LS_PREFIX+'iskPerEur', q('#iskPerEur').value||'');
+      if(q('#workingDays').value!=='') localStorage.setItem(LS_PREFIX+'workingDays', q('#workingDays').value);
 
       // ISK/month
-      localStorage.setItem(LS_PREFIX+'housingCost', String(totals.t_housing));
-      localStorage.setItem(LS_PREFIX+'equipCost',   String(totals.t_equipment));
-      localStorage.setItem(LS_PREFIX+'adminCost',   String(totals.t_admin));
+      localStorage.setItem(LS_PREFIX+'housingCost', String(t.t_housing));
+      localStorage.setItem(LS_PREFIX+'equipCost',   String(t.t_equipment));
+      localStorage.setItem(LS_PREFIX+'adminCost',   String(t.t_admin));
 
       // EUR/month buckets
-      localStorage.setItem(LS_PREFIX+'maintEurMonth',       String(totals.eur.maint.toFixed(2)));
-      localStorage.setItem(LS_PREFIX+'rentalsEurMonth',     String(totals.eur.rentals.toFixed(2)));
-      localStorage.setItem(LS_PREFIX+'sparesEurMonth',      String(totals.eur.spares.toFixed(2)));
-      localStorage.setItem(LS_PREFIX+'electricityEurMonth', String(totals.eur.electricity.toFixed(2)));
-      localStorage.setItem(LS_PREFIX+'waterEurMonth',       String(totals.eur.water.toFixed(2)));
-      localStorage.setItem(LS_PREFIX+'otherEurMonth',       String(totals.eur.other.toFixed(2)));
+      localStorage.setItem(LS_PREFIX+'maintEurMonth',       String(t.eur.maint.toFixed(2)));
+      localStorage.setItem(LS_PREFIX+'rentalsEurMonth',     String(t.eur.rentals.toFixed(2)));
+      localStorage.setItem(LS_PREFIX+'sparesEurMonth',      String(t.eur.spares.toFixed(2)));
+      localStorage.setItem(LS_PREFIX+'electricityEurMonth', String(t.eur.electricity.toFixed(2)));
+      localStorage.setItem(LS_PREFIX+'waterEurMonth',       String(t.eur.water.toFixed(2)));
+      localStorage.setItem(LS_PREFIX+'otherEurMonth',       String(t.eur.other.toFixed(2)));
 
       const btn=q('#saveBtn'); if(btn){const old=btn.textContent; btn.textContent='Saved ✓'; setTimeout(()=>btn.textContent=old,900);}
-      return totals;
+      return t;
     }
 
     function copyToPlanner(){
-      const t = saveDefaults();                 // ensures LS is fresh and totals UI is up to date
-      const qs = new URLSearchParams();
-
-      // include FX + (optional) working days so planner can convert
+      const t=saveDefaults();
+      const qs=new URLSearchParams();
       const addStr=(k,v)=>{ if(v!=null && String(v).trim()!=='') qs.set(k,String(v)); };
       const addNum=(k,v)=>{ const n=toNumber(v); if(Number.isFinite(n)) qs.set(k,String(n)); };
 
       addStr('iskPerEur', q('#iskPerEur').value);
       if(q('#workingDays').value!=='') addStr('workingDays', q('#workingDays').value);
 
-      // ISK/month
       addNum('housingCost', t.t_housing);
       addNum('equipCost',   t.t_equipment);
       addNum('adminCost',   t.t_admin);
 
-      // EUR/month buckets
       addNum('maintEurMonth',       t.eur.maint.toFixed(2));
       addNum('rentalsEurMonth',     t.eur.rentals.toFixed(2));
       addNum('sparesEurMonth',      t.eur.spares.toFixed(2));
@@ -411,7 +383,6 @@
       addNum('waterEurMonth',       t.eur.water.toFixed(2));
       addNum('otherEurMonth',       t.eur.other.toFixed(2));
 
-      // jump back to the planner
       location.href = './?' + qs.toString() + '#day';
     }
 
@@ -427,15 +398,15 @@
     }
 
     /* ---------- wiring ---------- */
-    function wireButtons(){
+    function wireUI(){
       qa('.building').forEach(b=>{
         b.querySelector('.add-monthly-isk').addEventListener('click', ()=>{
           addCostRow(q('.monthly-isk', b));
-          debouncedSave();
+          debouncedRecalcSave();
         });
         b.querySelector('.add-monthly-eur').addEventListener('click', ()=>{
           addCostRow(q('.monthly-eur', b));
-          debouncedSave();
+          debouncedRecalcSave();
         });
       });
 
@@ -445,19 +416,18 @@
     }
 
     document.addEventListener('DOMContentLoaded', ()=>{
-      // load globals
-      const LS_PREFIX='fp:';
+      // Load globals if previously saved
       q('#iskPerEur').value   = localStorage.getItem(LS_PREFIX+'iskPerEur')   || '';
       q('#workingDays').value = localStorage.getItem(LS_PREFIX+'workingDays') || '';
 
-      wireButtons();
-      loadBuildings();   // restore rows/values
+      wireUI();
+      loadBuildings();
 
-      // Ensure restored amounts are formatted & keep formatting for future edits
-      qa('.monthly-isk .row .amt').forEach(el => { attachAmtFormatting(el, 0); formatAmtInput(el, 0); });
-      qa('.monthly-eur .row .amt').forEach(el => { attachAmtFormatting(el, 2); formatAmtInput(el, 2); });
+      // Ensure any restored amounts are formatted & keep formatting behaviour
+      qa('.monthly-isk .row .amt').forEach(el=>{ attachAmtFormatting(el,0); el.dispatchEvent(new Event('blur')); });
+      qa('.monthly-eur .row .amt').forEach(el=>{ attachAmtFormatting(el,2); el.dispatchEvent(new Event('blur')); });
 
-      updateTotals();    // compute totals into the UI once
+      updateTotals();
     });
   </script>
 </body>
