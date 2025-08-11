@@ -446,14 +446,19 @@ function attachAmtFormatting(input, decimals){
     }
 
     document.addEventListener('DOMContentLoaded', ()=>{
-      // globals (only iskPerEur / workingDays remain)
-      q('#iskPerEur').value   = localStorage.getItem(LS_PREFIX+'iskPerEur')   || '';
-      q('#workingDays').value = localStorage.getItem(LS_PREFIX+'workingDays') || '';
+  // ...your existing loads...
+  wireButtons();
+  loadBuildings();
 
-      wireButtons();
-      loadBuildings();
-      updateTotals();
-    });
+  // Format any restored amounts
+  qa('.monthly-isk .row .amt').forEach(el => attachAmtFormatting(el, 0));
+  qa('.monthly-isk .row .amt').forEach(el => formatAmtInput(el, 0));
+  qa('.monthly-eur .row .amt').forEach(el => attachAmtFormatting(el, 2));
+  qa('.monthly-eur .row .amt').forEach(el => formatAmtInput(el, 2));
+
+  updateTotals();
+});
+
   </script>
 </body>
 </html>
