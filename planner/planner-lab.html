@@ -288,6 +288,21 @@ function toNumber(value){
   if (typeof value === 'number') return value;
   let s = (''+value).replace(/\s|\u00A0/g,'').trim();
   if (s === '') return NaN;
+
+  // Locale-aware parsing for is-IS: comma decimal, dot thousand
+  if (LOCALE === 'is-IS'){
+    if (s.includes(',')){
+      // e.g. "3.000,75" or "153,50"
+      s = s.replace(/\./g,'').replace(',', '.');
+    } else {
+      // e.g. "3.000" or "5400"
+      s = s.replace(/\./g,'');
+    }
+    const n = Number(s);
+    return Number.isFinite(n) ? n : NaN;
+  }
+
+  // Fallback for other locales
   const hasComma = s.includes(','), hasDot = s.includes('.');
   if (hasComma && hasDot){
     const lastComma=s.lastIndexOf(','), lastDot=s.lastIndexOf('.');
