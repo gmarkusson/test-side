@@ -50,6 +50,12 @@
     .stack{display:flex;gap:8px;flex-wrap:wrap}
     .split{display:grid;gap:10px}
     @media(min-width:520px){ .split{grid-template-columns:1fr 1fr} }
+    /* More space between the left and right columns inside each factory */
+.split { row-gap: 10px; column-gap: 28px; }     /* overrides the 10px default on the X axis */
+@media (min-width:520px){
+  .split { grid-template-columns: 1fr 1fr; column-gap: 28px; }  /* keep the wider gap on desktop */
+}
+
     hr{border:none;border-top:1px solid var(--border);margin:10px 0}
     .compare{margin-top:18px}
     .compare table{width:100%;border-collapse:separate;border-spacing:0 8px}
