@@ -33,14 +33,18 @@
     .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px}
     .factory{display:flex;flex-direction:column;gap:12px}
     .factory h2{margin:0 0 6px 0;font-size:18px;display:flex;align-items:center;justify-content:space-between}
+
+    /* Row: label | control */
     .row{display:grid;grid-template-columns:170px 1fr;gap:10px;align-items:center;margin:6px 0}
     label{color:var(--muted)}
+
     input[type="text"],select{
       width:100%;background:#fff;color:var(--text);border:1px solid var(--border);
       border-radius:10px;padding:9px 10px;font-size:14px;outline:none;
     }
     input[type="text"]:focus,select:focus{border-color:var(--accent)}
     .small{font-size:12px;color:var(--muted)}
+
     .totals{display:grid;gap:6px}
     .line{display:flex;justify-content:space-between;border-bottom:1px dashed var(--border);padding:5px 0}
     .grand{font-weight:700}
@@ -48,13 +52,10 @@
     .hl{color:var(--accent);font-weight:700}
     .money-ok{color:var(--ok)} .money-warn{color:var(--warn)} .money-bad{color:var(--bad)}
     .stack{display:flex;gap:8px;flex-wrap:wrap}
-    .split{display:grid;gap:10px}
+
+    /* Two-column area inside each factory */
+    .split{display:grid;row-gap:10px;column-gap:28px}
     @media(min-width:520px){ .split{grid-template-columns:1fr 1fr} }
-    /* More space between the left and right columns inside each factory */
-.split { row-gap: 10px; column-gap: 28px; }     /* overrides the 10px default on the X axis */
-@media (min-width:520px){
-  .split { grid-template-columns: 1fr 1fr; column-gap: 28px; }  /* keep the wider gap on desktop */
-}
 
     hr{border:none;border-top:1px solid var(--border);margin:10px 0}
     .compare{margin-top:18px}
@@ -63,21 +64,13 @@
     .compare th{color:var(--muted);font-weight:600;font-size:13px}
     .chip{display:inline-block;background:var(--chip);border:1px solid var(--border);padding:4px 8px;border-radius:999px;font-size:12px}
 
-    /* ===== FIX: make ISK per EUR & Price inputs wide enough ===== */
-    .factory .split .row { grid-template-columns: 150px auto; } /* give labels room */
-    input.short { width: 160px; min-width: 160px; }             /* keep placeholder visible */
+    /* ===== Right-column compact inputs ===== */
+    .factory .split .row { grid-template-columns: 150px auto; }
+    input.short { width:160px; min-width:160px; }
+    .row input.short { justify-self:start; box-sizing:border-box; } /* prevent grid stretch */
     @media (max-width:640px){
-      input.short { width: 100%; min-width: 0; }                /* full width on small screens */
+      input.short { width:100%; min-width:0; }
     }
-    /* Prevent Grid from stretching the two compact fields */
-.row input.short {
-  width: 160px;
-  min-width: 160px;
-  justify-self: start;   /* stops grid from forcing full width */
-  box-sizing: border-box;
-}
-    .help-row { margin-top: -6px; }        /* pulls help text closer to inputs */
-.help-row .small { font-size: 12px; color: var(--muted); }
   </style>
 </head>
 <body>
@@ -102,20 +95,17 @@
           <div class="small">Auto weekdays (Mon–Fri) for <span class="yr"></span>. Manual edit overrides auto.</div>
         </div>
         <div>
-          <!-- FIX: clearer placeholder + width + help text -->
           <div class="row">
-  <label title="1 € costs this many ISK">ISK per EUR</label>
-  <input type="text" class="num iskPerEur short" placeholder="e.g. 153,50" aria-describedby="fxA-help-isk">
-</div>
-<div class="row">
-  <label>Price (EUR/kg)</label>
-  <input type="text" class="num pricePerKg short" placeholder="e.g. 6,90">
-</div>
-<div class="row help-row">
-  <div id="fxA-help-isk" class="small" style="grid-column: 1 / -1;">
-    1 € = this many ISK (used to convert ISK monthly costs to EUR/day).
-  </div>
-</div>
+            <label title="1 € costs this many ISK">ISK per EUR</label>
+            <input type="text" class="num iskPerEur short" placeholder="e.g. 153,50" aria-describedby="fxA-help-isk">
+          </div>
+          <!-- Help text sits directly under ISK per EUR (as requested) -->
+          <div id="fxA-help-isk" class="small">1 € = this many ISK (used to convert ISK monthly costs to EUR/day).</div>
+
+          <div class="row">
+            <label>Price (EUR/kg)</label>
+            <input type="text" class="num pricePerKg short" placeholder="e.g. 6,90">
+          </div>
         </div>
       </div>
 
@@ -167,21 +157,16 @@
           <div class="small">Auto weekdays (Mon–Fri) for <span class="yr"></span>. Manual edit overrides auto.</div>
         </div>
         <div>
-          <!-- FIX: same as A -->
           <div class="row">
-  <label title="1 € costs this many ISK">ISK per EUR</label>
-  <input type="text" class="num iskPerEur short" placeholder="e.g. 153,50" aria-describedby="fxB-help-isk">
-</div>
-<div class="row">
-  <label>Price (EUR/kg)</label>
-  <input type="text" class="num pricePerKg short" placeholder="e.g. 6,90">
-</div>
-<div class="row help-row">
-  <div id="fxB-help-isk" class="small" style="grid-column: 1 / -1;">
-    1 € = this many ISK (used to convert ISK monthly costs to EUR/day).
-  </div>
-</div>
+            <label title="1 € costs this many ISK">ISK per EUR</label>
+            <input type="text" class="num iskPerEur short" placeholder="e.g. 153,50" aria-describedby="fxB-help-isk">
+          </div>
+          <div id="fxB-help-isk" class="small">1 € = this many ISK (used to convert ISK monthly costs to EUR/day).</div>
 
+          <div class="row">
+            <label>Price (EUR/kg)</label>
+            <input type="text" class="num pricePerKg short" placeholder="e.g. 6,90">
+          </div>
         </div>
       </div>
 
@@ -233,21 +218,16 @@
           <div class="small">Auto weekdays (Mon–Fri) for <span class="yr"></span>. Manual edit overrides auto.</div>
         </div>
         <div>
-          <!-- FIX: same as A -->
           <div class="row">
-  <label title="1 € costs this many ISK">ISK per EUR</label>
-  <input type="text" class="num iskPerEur short" placeholder="e.g. 153,50" aria-describedby="fxC-help-isk">
-</div>
-<div class="row">
-  <label>Price (EUR/kg)</label>
-  <input type="text" class="num pricePerKg short" placeholder="e.g. 6,90">
-</div>
-<div class="row help-row">
-  <div id="fxC-help-isk" class="small" style="grid-column: 1 / -1;">
-    1 € = this many ISK (used to convert ISK monthly costs to EUR/day).
-  </div>
-</div>
+            <label title="1 € costs this many ISK">ISK per EUR</label>
+            <input type="text" class="num iskPerEur short" placeholder="e.g. 153,50" aria-describedby="fxC-help-isk">
+          </div>
+          <div id="fxC-help-isk" class="small">1 € = this many ISK (used to convert ISK monthly costs to EUR/day).</div>
 
+          <div class="row">
+            <label>Price (EUR/kg)</label>
+            <input type="text" class="num pricePerKg short" placeholder="e.g. 6,90">
+          </div>
         </div>
       </div>
 
@@ -394,7 +374,6 @@ class FactoryPane{
       kn_revenue:q('.kn_revenue'), kn_totalCost:q('.kn_totalCost'), kn_profit:q('.kn_profit'), kn_margin:q('.kn_margin'), kn_profitPerKg:q('.kn_profitPerKg'),
       badge:this.root.querySelector(`[data-badge="${this.id}"]`)
     };
-    // Add missing year label if not present
     if (!this.refs.yr){ const l=this.root.querySelector('.small'); if(l){ const s=document.createElement('span'); s.className='yr'; l.prepend(s); this.refs.yr=s; } }
     this.refs.yr.textContent=this.year;
   }
@@ -412,7 +391,10 @@ class FactoryPane{
     this.root.querySelectorAll('input.num').forEach(inp=>{
       inp.addEventListener('focus', ()=>{
         const n=toNumber(inp.value);
-        if(Number.isFinite(n)){ if(inp.classList.contains('num-int')) inp.value=String(Math.trunc(n)); else inp.value=String(n).replace(/(?<=\d)\.0+$/,''); }
+        if(Number.isFinite(n)){
+          if(inp.classList.contains('num-int')) inp.value=String(Math.trunc(n));
+          else inp.value=String(n).replace(/(?<=\d)\.0+$/,'');
+        }
       });
       inp.addEventListener('blur', ()=>{
         const n=toNumber(inp.value);
@@ -472,7 +454,6 @@ class FactoryPane{
     return { iskDay, eurDay, total };
   }
   compute(){
-    // yield triad
     const raw=toNumber(this.refs.rawKg.value);
     const y=toNumber(this.refs.yieldPct.value);
     const net=toNumber(this.refs.netKg.value);
