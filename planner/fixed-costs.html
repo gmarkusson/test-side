@@ -443,22 +443,68 @@
       q('#copyBtn').addEventListener('click', copyToPlanner);
       q('#resetBtn').addEventListener('click', resetAll);
     }
+// --- Thousands separator helpers (IS locale) ---
+const nfIntIS = new Intl.NumberFormat('is-IS', { maximumFractionDigits: 0 });
 
-    document.addEventListener('DOMContentLoaded', ()=>{
-      // load globals
-      const LS_PREFIX='fp:';
-      q('#iskPerEur').value   = localStorage.getItem(LS_PREFIX+'iskPerEur')   || '';
-      q('#workingDays').value = localStorage.getItem(LS_PREFIX+'workingDays') || '';
+function formatInt(el){
+  const n = toNumber(el.value);
+  if (Number.isFinite(n)) el.value = nfIntIS.format(Math.round(n));
+}
 
-      wireButtons();
-      loadBuildings();   // restore rows/values
+function attachThousands(el){
+  if (!el) return;
+  el.addEventListener('focus', () => {
+    const n = toNumber(el.value);
+    if (Number.isFinite(n)) el.value = String(Math.round(n));
+  });
+  el.addEventListener('blur',  () => formatInt(el));
+}
 
-      // Ensure restored amounts are formatted & keep formatting for future edits
-      qa('.monthly-isk .row .amt').forEach(el => { attachAmtFormatting(el, 0); formatAmtInput(el, 0); });
-      qa('.monthly-eur .row .amt').forEach(el => { attachAmtFormatting(el, 2); formatAmtInput(el, 2); });
+// --- Working days ⇐ Month ---
+function updateWorkingDaysFromMonth(){
+  const sel = q('#month');
+  const box = q('#workingDays');
+  if (!sel || !box) return;
+  const wd = workingDaysInMonth(sel.value);   // accepts "MM" or "YYYY-MM"
+  if (Number.isFinite(wd)) box.value = String(wd);
+}
 
-      updateTotals();    // compute totals into the UI once
-    });
+    
+    document.addEventListener('DOMContentLoaded', () => {
+  // Month select + default working days
+  populateMonthSelect();
+  updateWorkingDaysFromMonth();                   // <- set once on load
+  q('#month')?.addEventListener('change', () => { // <- keep in sync on change
+    updateWorkingDaysFromMonth();
+    calcDay();
+    syncUrlFromInputs?.();
+  });
+
+  // Read query params (from "Copy to planner now")
+  applyQueryParams?.();
+
+  // LocalStorage -> inputs (+ derive €/day from monthly buckets if needed)
+  loadDefaultsFromStorage?.();
+
+  // If URL contains monthly buckets, convert them to €/day once
+  applyMonthlyParamsToDaily?.();
+
+  // Thousands separators for ISK/month fields
+  ['#housingCost', '#equipCost', '#adminCost'].forEach(sel => {
+    const el = q(sel);
+    attachThousands(el);
+    // If it already has a value, format it immediately
+    if (el && el.value) formatInt(el);
+  });
+
+  // Keep URL + calcs live
+  attachSync?.();
+
+  // Initial calculations
+  calcKeyNumbers?.();
+  calcDay?.();
+});
+
   </script>
 </body>
 </html>
