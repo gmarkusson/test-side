@@ -1,0 +1,36 @@
+/* Force Light Theme across the site */
+:root{
+  --bg:#ffffff;
+  --card:#f9fafb;
+  --muted:#6b7280;
+  --text:#111827;
+  --accent:#0ea5e9;
+  --ok:#10b981;
+  --warn:#f59e0b;
+  --bad:#ef4444;
+  --border:#d1d5db;
+  --chip:#e5e7eb;
+}
+
+/* Hard overrides to beat any earlier dark styles */
+html, body { background: var(--bg) !important; color: var(--text) !important; }
+
+.card { background: var(--card) !important; border-color: var(--border) !important; }
+
+input[type="text"], select {
+  background: #fff !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+}
+
+hr { border-top: 1px solid var(--border) !important; }
+
+.badge, .pill, .chip {
+  background: var(--chip) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+}
+
+a.button, button { background: var(--accent) !important; color: #fff !important; }
+
+.totals .line { border-bottom: 1px dashed var(--border) !important; }
