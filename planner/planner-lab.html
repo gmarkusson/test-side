@@ -71,6 +71,11 @@
     @media (max-width:640px){
       input.short { width:100%; min-width:0; }
     }
+    .selected-month {
+  margin-top: 4px;
+  color: var(--muted);
+  font-style: italic;
+}
   </style>
 </head>
 <body>
@@ -424,14 +429,31 @@ class FactoryPane{
     });
   }
   wireLogic(){
-    this.refs.month.addEventListener('change', ()=>{
-      const mv=toNumber(this.refs.month.value);
-      if(mv>=1&&mv<=12){
-        const auto=this.calcWorkingDays(mv);
-        if(!this.manualWD || !this.refs.workingDays.value.trim()){ this.refs.workingDays.value=fmt(auto,0); }
-        scheduleURLUpdate(); this.compute();
+  this.refs.month.addEventListener('change', ()=>{
+    const mv = toNumber(this.refs.month.value);
+    const monthName = this.refs.month.options[this.refs.month.selectedIndex]?.text || '';
+    
+    const display = this.root.querySelector('.selected-month');
+    if (display) {
+      display.textContent = monthName ? `Selected: ${monthName}` : '';
+    }
+
+    if(mv>=1 && mv<=12){
+      const auto = this.calcWorkingDays(mv);
+      if(!this.manualWD || !this.refs.workingDays.value.trim()){ 
+        this.refs.workingDays.value = fmt(auto,0); 
       }
-    });
+      scheduleURLUpdate(); 
+      this.compute();
+    }
+  });
+
+  this.refs.workingDays.addEventListener('input', ()=>{ this.manualWD=true; });
+  this.root.querySelectorAll('input,select').forEach(el=>{
+    el.addEventListener('change', ()=>this.compute());
+    el.addEventListener('input', debounce(()=>this.compute(),200));
+  });
+}
     this.refs.workingDays.addEventListener('input', ()=>{ this.manualWD=true; });
     this.root.querySelectorAll('input,select').forEach(el=>{
       el.addEventListener('change', ()=>this.compute());
