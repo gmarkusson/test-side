@@ -63,31 +63,6 @@
     @media (max-width:640px){
       input.short { width: 100%; min-width: 0; }                /* full width on small screens */
     }
-    /* === Fit the narrow area (labels + inputs) === */
-.factory .split .row {               /* give predictable columns */
-  grid-template-columns: 180px 220px;   /* label | input */
-  align-items: center;
-}
-.factory .row .num,
-.factory .row select {
-  width: 220px;                      /* show full placeholder like "e.g. 153,50" */
-  min-width: 220px;
-}
-
-/* Top-right small fields already have .short, but this keeps them consistent */
-input.short { width: 220px; min-width: 220px; }
-
-/* Responsive fallbacks */
-@media (max-width: 900px){
-  .grid3 { grid-template-columns: 1fr; }   /* one factory per row */
-}
-@media (max-width: 640px){
-  .factory .split { grid-template-columns: 1fr; }
-  .factory .split .row { grid-template-columns: 1fr; }
-  .factory .row .num,
-  .factory .row select,
-  input.short { width: 100%; min-width: 0; }
-}
   </style>
 </head>
 <body>
