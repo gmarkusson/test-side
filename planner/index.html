@@ -199,18 +199,6 @@ function syncUrlFromInputs(){
 
 let lastEdited=null;
 
-document.addEventListener('DOMContentLoaded', () => {
-  populateMonthSelect();
-  applyQueryParams?.();        // URL (if present) wins
-  loadDefaultsFromStorage();   // fill any blanks from localStorage
-
-  // If Working days still empty, derive from selected month
-  const m = q('#month')?.value;
-  const wdBox = q('#workingDays');
-  if (m && wdBox && !wdBox.value) {
-    const wd = workingDaysInMonth(m);  // m is "MM"
-    if (Number.isFinite(wd)) wdBox.value = String(wd);
-  }
 
   attachSync();
   calcKeyNumbers();
@@ -479,16 +467,30 @@ function loadDefaultsFromStorage() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  populateMonthSelect();      // build 12-month dropdown
-  applyQueryParams?.();       // read ?month, ?workingDays, etc.
+  // 1. Populate the month dropdown
+  populateMonthSelect();
 
-  // Prefill Working days from the selected month (if empty)
-  const m = q('#month')?.value;          // "MM"
+  // 2. Apply any query params from the URL to inputs
+  applyQueryParams?.();
+
+  // 3. Load defaults from localStorage (fp:* keys)
+  loadDefaultsFromStorage();
+
+  // 4. If Working days is still empty, derive from selected month
+  const m = q('#month')?.value;
   const wdBox = q('#workingDays');
   if (m && wdBox && !wdBox.value) {
     const wd = workingDaysInMonth(m);
     if (Number.isFinite(wd)) wdBox.value = String(wd);
   }
+
+  // 5. Attach sync handlers so UI <-> URL stays in sync
+  attachSync();
+
+  // 6. Run initial calculations
+  calcKeyNumbers();
+  calcDay();
+});
 
   attachSync();               // wire up listeners
   calcKeyNumbers();           // initial calc
