@@ -487,15 +487,15 @@ location.href = './?' + qs.toString() + '#day';
       qa('.building').forEach(b=>{
         b.querySelector('.add-monthly-isk').addEventListener('click', ()=>{
           addCostRow(q('.monthly-isk', b));
-          updateTotals(); saveBuildings();
+          debouncedSaveTotals();
         });
         b.querySelector('.add-monthly-eur').addEventListener('click', ()=>{
           addCostRow(q('.monthly-eur', b));
-          updateTotals(); saveBuildings();
+          debouncedSaveTotals();
         });
         b.querySelector('.add-daily-eur').addEventListener('click', ()=>{
           addCostRow(q('.daily-eur', b));
-          updateTotals(); saveBuildings();
+          debouncedSaveTotals();
         });
         b.querySelector('.elec').addEventListener('input', debouncedSaveTotals);
 b.querySelector('.water').addEventListener('input', debouncedSaveTotals);
