@@ -204,46 +204,53 @@
 const n=Number(s); return Number.isFinite(n)? n : NaN;
 }
 // --- tiny helpers ---
-const debounce = (fn, delay = 120) => { 
-  let t; 
-  return (...a) => { 
-    clearTimeout(t); 
-    t = setTimeout(() => fn(...a), delay); 
-  }; 
+const debounce = (fn, delay = 120) => {
+  let t;
+  return (...args) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...args), delay);
+  };
 };
 
-const debouncedSaveTotals = debounce(() => { 
-  updateTotals(); 
-  saveBuildings(); 
+// Debounced “recalc + save” used by inputs and buttons that add/remove rows
+const debouncedSaveTotals = debounce(() => {
+  updateTotals();
+  saveBuildings();
 }, 120);
 
-const addStr = (qs, k, v) => { 
-  if (v != null && String(v).trim() !== '') qs.set(k, String(v)); 
+// URL param helpers (used by copyToPlanner)
+const addStr = (qs, k, v) => {
+  if (v != null && String(v).trim() !== '') qs.set(k, String(v));
 };
-const addNum = (qs, k, v) => { 
-  const n = toNumber(v); 
-  if (Number.isFinite(n) && n !== 0) qs.set(k, String(n)); 
+const addNum = (qs, k, v) => {
+  const n = toNumber(v);
+  if (Number.isFinite(n) && n !== 0) qs.set(k, String(n));
 };
 
+/* ---------- categories ---------- */
+const CATS_MONTH_ISK = [
+  { value: 'housing',   label: 'Housing (ISK/mo)' },
+  { value: 'equipment', label: 'Equipment (ISK/mo)' },
+  { value: 'admin',     label: 'Admin (ISK/mo)' }
+];
 
-    /* ---------- categories ---------- */
-    const CATS_MONTH_ISK = [
-      {value:'housing',   label:'Housing (ISK/mo)'},
-      {value:'equipment', label:'Equipment (ISK/mo)'},
-      {value:'admin',     label:'Admin (ISK/mo)'}
-    ];
-    const CATS_MONTH_EUR = [
-      {value:'maintenance', label:'Maintenance (€/mo)'},
-      {value:'rentals',     label:'Rentals (€/mo)'},
-      {value:'spares',      label:'Spare parts (€/mo)'},
-      {value:'otherEur',    label:'Other (€/mo)'}
-    ];
-    const CATS_DAY_EUR = [
-      {value:'otherDay',    label:'Other (€/day)'}
-    ];
-    function fillCat(selectEl, list){
-      selectEl.innerHTML = list.map(c=>`<option value="${c.value}">${c.label}</option>`).join('');
-    }
+const CATS_MONTH_EUR = [
+  { value: 'maintenance', label: 'Maintenance (€/mo)' },
+  { value: 'rentals',     label: 'Rentals (€/mo)' },
+  { value: 'spares',      label: 'Spare parts (€/mo)' },
+  { value: 'otherEur',    label: 'Other (€/mo)' }
+];
+
+const CATS_DAY_EUR = [
+  { value: 'otherDay', label: 'Other (€/day)' }
+];
+
+function fillCat(selectEl, list){
+  selectEl.innerHTML = list
+    .map(c => `<option value="${c.value}">${c.label}</option>`)
+    .join('');
+}
+
 
     /* ---------- row builder ---------- */
     function addCostRow(rowsEl, preset={}){
