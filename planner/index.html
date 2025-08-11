@@ -454,20 +454,34 @@ function loadDefaultsFromStorage() {
 
 
     document.addEventListener('DOMContentLoaded', () => {
-      populateMonthSelect();
-      applyQueryParams?.();
-      loadDefaultsFromStorage();
-      // If Working days still empty, derive from selected month
-      const m = q('#month')?.value;
-      const wdBox = q('#workingDays');
-      if (m && wdBox && !wdBox.value) {
-        const wd = workingDaysInMonth(m);
-        if (Number.isFinite(wd)) wdBox.value = String(wd);
-      }
-      attachSync();
-      calcKeyNumbers();
-      calcDay();
-    });
+  // populate month dropdown if you have one
+  populateMonthSelect();
+
+  // read query params (like when using "Copy to planner now")
+  if (typeof applyQueryParams === 'function') {
+    applyQueryParams();
+  }
+
+  // load defaults from localStorage and derive €/day from monthly costs
+  loadDefaultsFromStorage();
+
+  // if query params include monthly costs, convert them to €/day
+  applyMonthlyParamsToDaily();
+
+  // set up listeners for field syncs
+  if (typeof attachSync === 'function') {
+    attachSync();
+  }
+
+  // calculate initial numbers
+  if (typeof calcKeyNumbers === 'function') {
+    calcKeyNumbers();
+  }
+  if (typeof calcDay === 'function') {
+    calcDay();
+  }
+});
+
   </script>
 </body>
 </html>
