@@ -1,346 +1,588 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Factory Planner — Key Numbers</title>
-<style>
-  :root{--gap:14px;--pad:16px;--bg:#f6f8fc;--card:#fff;--ink:#0b1320;--muted:#4a5874;--accent:#0b5fff;--border:#e4e9f2;--field:#d6dbe6}
-  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-  header{padding:24px var(--pad);border-bottom:1px solid var(--border)}
-  h1{margin:0 0 6px;font-size:22px}
-  h2{margin:0 0 10px;font-size:18px;color:var(--accent)}
-  main{padding:20px var(--pad) 60px;display:grid;gap:14px}
-  section.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
-  label{display:flex;flex-direction:column;gap:6px;color:var(--muted);font-weight:600}
-  input,select{background:#fff;color:var(--ink);border:1px solid var(--field);border-radius:8px;padding:10px 12px;outline:none}
-  input:focus,select:focus{border-color:#2c6fff;box-shadow:0 0 0 2px rgba(44,111,255,.14)}
-  .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0 0;padding:0;list-style:none}
-  .results li{background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px;display:flex;justify-content:space-between;align-items:center}
-  .results li span{color:var(--muted)} .results li strong{font-size:15px}
-  .actions{display:flex;gap:10px;margin-top:10px}
-  .btn{display:inline-block;background:var(--accent);color:#fff;border:1px solid var(--accent);padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:600}
-  .btn:hover,.btn:focus{background:#094de8;border-color:#094de8}
-</style>
+  <meta charset="utf-8" />
+  <title>Factory Planner — Key Numbers & Factory Day</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg:#0f172a;       /* slate-900 */
+      --card:#111827;     /* gray-900 */
+      --muted:#94a3b8;    /* slate-400 */
+      --text:#e5e7eb;     /* gray-200 */
+      --accent:#22d3ee;   /* cyan-400 */
+      --ok:#10b981;       /* emerald-500 */
+      --warn:#f59e0b;     /* amber-500 */
+      --bad:#ef4444;      /* red-500 */
+      --border:#1f2937;   /* gray-800 */
+      --chip:#0b1222;
+    }
+    html,body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;margin:0}
+    .wrap{max-width:1100px;margin:40px auto;padding:0 20px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+    h1{font-size:clamp(20px,3vw,28px);margin:0}
+    a.button,button{
+      background:var(--accent);color:#062028;border:none;border-radius:10px;
+      padding:10px 14px;font-weight:600;cursor:pointer;transition:filter .15s;
+    }
+    a.button:hover,button:hover{filter:brightness(1.05)}
+    .grid{display:grid;gap:16px}
+    @media (min-width:900px){ .grid{grid-template-columns:1.1fr 1fr} }
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
+    .card h2{margin:0 0 10px 0;font-size:18px}
+    .row{display:grid;grid-template-columns:240px 1fr;gap:12px;align-items:center;margin:8px 0}
+    .row > label{color:var(--muted)}
+    input[type="text"],select{
+      width:100%;background:#0b1020;color:var(--text);border:1px solid var(--border);
+      border-radius:10px;padding:10px 12px;font-size:14px;outline:none;
+    }
+    input[type="text"]:focus,select:focus{border-color:#2b3b52}
+    .help{font-size:12px;color:var(--muted);margin-top:6px}
+    .pill{display:inline-block;background:var(--chip);border:1px solid var(--border);padding:5px 8px;border-radius:999px;font-size:12px}
+    .stack{display:flex;flex-wrap:wrap;gap:8px}
+    .totals{display:grid;gap:8px}
+    .totals .line{display:flex;justify-content:space-between;border-bottom:1px dashed #1f2a44;padding:6px 0}
+    .totals .line strong{color:#fff}
+    .totals .grand{font-weight:700}
+    .badge{padding:4px 8px;border-radius:8px;background:#0d1b2a;border:1px solid var(--border);font-size:12px}
+    .hl{color:var(--accent);font-weight:700}
+    .money-ok{color:var(--ok)} .money-warn{color:var(--warn)} .money-bad{color:var(--bad)}
+    .breakdown{margin-top:8px;border-top:1px solid var(--border);padding-top:8px}
+    .chips{display:flex;gap:6px;flex-wrap:wrap}
+    .section-title{display:flex;align-items:center;gap:8px;margin:0 0 6px 0}
+    .inline{display:flex;align-items:center;gap:8px}
+    .right{display:flex;justify-content:flex-end}
+    .small{font-size:12px;color:var(--muted)}
+  </style>
 </head>
 <body>
-<header>
-  <h1>Factory Planner</h1>
-  <div class="muted">Type values or pass them via URL. Numbers show thousand separators automatically.</div>
-  <div class="actions">
-    <a class="btn" href="fixed-costs.html">Fixed costs</a>
+<div class="wrap">
+  <header>
+    <h1>Factory Planner</h1>
+    <div class="stack">
+      <a class="button" href="fixed-costs.html">Open Fixed Costs</a>
+      <span class="pill">Locale: <strong>is-IS</strong></span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- LEFT: Inputs -->
+    <section class="card">
+      <h2 class="section-title">Inputs</h2>
+
+      <!-- Month + Working days -->
+      <div class="row">
+        <label for="month">Month</label>
+        <select id="month">
+          <option value="">— choose —</option>
+        </select>
+      </div>
+      <div class="row">
+        <label for="workingDays">Working days (Mon–Fri)</label>
+        <input type="text" id="workingDays" class="num num-int" inputmode="decimal" placeholder="auto from month" />
+      </div>
+      <div class="help">Selecting a month fills working days for <span id="yearNow"></span>. Editing here manually overrides auto.</div>
+
+      <hr style="border:none;border-top:1px solid var(--border);margin:14px 0">
+
+      <!-- Yield triad -->
+      <div class="row">
+        <label for="rawKg">Raw used kg</label>
+        <input type="text" id="rawKg" class="num" inputmode="decimal" placeholder="e.g. 1.500" />
+      </div>
+      <div class="row">
+        <label for="yieldPct">Yield %</label>
+        <input type="text" id="yieldPct" class="num" inputmode="decimal" placeholder="e.g. 63,5" />
+      </div>
+      <div class="row">
+        <label for="netKg">Net saleable kg</label>
+        <input type="text" id="netKg" class="num" inputmode="decimal" placeholder="auto if raw/yield set" />
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--border);margin:14px 0">
+
+      <div class="row">
+        <label for="pricePerKg">Sale price (EUR/kg)</label>
+        <input type="text" id="pricePerKg" class="num" inputmode="decimal" placeholder="e.g. 6,90" />
+      </div>
+
+      <div class="row">
+        <label for="iskPerEur">FX: ISK per EUR</label>
+        <input type="text" id="iskPerEur" class="num" inputmode="decimal" placeholder="from Fixed Costs page" />
+      </div>
+    </section>
+
+    <!-- RIGHT: Key Numbers -->
+    <section class="card" id="keyNumbersCard">
+      <h2 class="section-title">Key Numbers</h2>
+      <div class="totals" id="keyNumbers">
+        <div class="line"><span>Net saleable kg</span><strong id="kn_netKg" class="hl">–</strong></div>
+        <div class="line"><span>Revenue (EUR)</span><strong id="kn_revenue">–</strong></div>
+        <div class="line"><span>Total cost (EUR/day)</span><strong id="kn_totalCost">–</strong></div>
+        <div class="line"><span>Profit (EUR/day)</span><strong id="kn_profit">–</strong></div>
+        <div class="line"><span>Gross margin %</span><strong id="kn_margin">–</strong></div>
+        <div class="line"><span>Profit / kg (EUR)</span><strong id="kn_profitPerKg">–</strong></div>
+      </div>
+      <div class="help">Key Numbers assume a single factory day using the breakdown on the left + fixed costs below.</div>
+    </section>
   </div>
-</header>
 
-<main>
-  <!-- Key Numbers -->
-  <section class="card">
-    <h2>Key Numbers</h2>
-    <div class="grid">
-      <label>Produced kg (net)<input id="producedKg" inputmode="numeric" data-decimals="0"></label>
-      <label>Selling price / kg<input id="sellPriceDay" inputmode="decimal" data-decimals="2"></label>
-      <label>Raw used kg<input id="rawUsedKg" inputmode="numeric" data-decimals="0"></label>
-      <label>Yield % (optional)<input id="yieldPct" inputmode="decimal" data-decimals="1"></label>
-      <label>Raw cost / kg<input id="rawCostPerKg" inputmode="decimal" data-decimals="2"></label>
-      <label>Pack cost / kg<input id="packCostPerKg" inputmode="decimal" data-decimals="2"></label>
-      <label>Freight / kg<input id="freightPerKg" inputmode="decimal" data-decimals="2"></label>
+  <section class="card" style="margin-top:16px">
+    <h2 class="section-title">Factory Day (EUR)</h2>
+
+    <!-- Variable / direct daily costs -->
+    <div class="row"><label for="laborOps">Labor — operators</label><input type="text" id="laborOps" class="num" inputmode="decimal" placeholder="EUR/day"></div>
+    <div class="row"><label for="laborSup">Labor — supervisors</label><input type="text" id="laborSup" class="num" inputmode="decimal" placeholder="EUR/day"></div>
+    <div class="row"><label for="materialsDay">Materials</label><input type="text" id="materialsDay" class="num" inputmode="decimal" placeholder="EUR/day"></div>
+    <div class="row"><label for="packDay">Pack</label><input type="text" id="packDay" class="num" inputmode="decimal" placeholder="EUR/day"></div>
+    <div class="row"><label for="freightDay">Freight</label><input type="text" id="freightDay" class="num" inputmode="decimal" placeholder="EUR/day"></div>
+
+    <!-- Fixed costs from monthly buckets -->
+    <div class="row"><label>Fixed costs (from monthly)</label>
+      <div class="inline">
+        <span class="badge">ISK→EUR/day: <span id="fcIskDay">–</span></span>
+        <span class="badge">EUR/day: <span id="fcEurDay">–</span></span>
+        <span class="badge">Total fixed/day: <span id="fcTotalDay">–</span></span>
+      </div>
     </div>
-    <ul class="results">
-      <li><span>Net saleable kg</span><strong id="key-net-kg">–</strong></li>
-      <li><span>Revenue</span><strong id="key-revenue">–</strong></li>
-      <li><span>Total cost</span><strong id="key-total-cost">–</strong></li>
-      <li><span>Profit</span><strong id="key-profit">–</strong></li>
-      <li><span>Gross margin %</span><strong id="key-gm">–</strong></li>
-      <li><span>Profit / kg</span><strong id="key-profit-kg">–</strong></li>
-    </ul>
+
+    <!-- Depreciation -->
+    <div class="row"><label for="deprDay">Depreciation / day</label><input type="text" id="deprDay" class="num" inputmode="decimal" placeholder="EUR/day"></div>
+
+    <div class="breakdown">
+      <h3 class="small">Breakdown</h3>
+      <div class="totals" id="fdTotals">
+        <!-- filled by JS -->
+      </div>
+    </div>
   </section>
 
-  <!-- Factory Day -->
-  <section class="card" id="day">
-    <h2>Factory Day</h2>
+  <div class="right">
+    <div class="chips" id="chipsInfo"></div>
+  </div>
 
-    <h3>Labor</h3>
-    <div class="grid">
-      <label>Operators<input id="staffCount" inputmode="numeric" data-decimals="0"></label>
-      <label>€/operator/hr<input id="staffCostPerPerson" inputmode="decimal" data-decimals="2"></label>
-      <label>Supervisors<input id="supCount" inputmode="numeric" data-decimals="0"></label>
-      <label>€/supervisor/hr<input id="supCostPerPerson" inputmode="decimal" data-decimals="2"></label>
-      <label>Operator hours<input id="staffHoursDay" inputmode="decimal" data-decimals="2" value="8"></label>
-      <label>Supervisor hours<input id="supHoursDay" inputmode="decimal" data-decimals="2" value="8"></label>
-    </div>
-
-    <h3>Materials & Production</h3>
-    <div class="grid">
-      <label>Raw used kg<input id="rawUsedKg_day" inputmode="numeric" data-decimals="0"></label>
-      <label>Raw cost / kg<input id="rawCostPerKg_day" inputmode="decimal" data-decimals="2"></label>
-      <label>Pack cost / kg<input id="packCostPerKg_day" inputmode="decimal" data-decimals="2"></label>
-      <label>Produced kg<input id="producedKg_day" inputmode="numeric" data-decimals="0"></label>
-      <label>Selling price / kg<input id="sellPriceDay_day" inputmode="decimal" data-decimals="2"></label>
-      <label>Freight / kg<input id="freightPerKg_day" inputmode="decimal" data-decimals="2"></label>
-    </div>
-
-    <h3>Fixed (ISK → EUR/day)</h3>
-    <div class="grid">
-      <label>ISK per EUR<input id="iskPerEur" inputmode="decimal" data-decimals="4"></label>
-      <label>Working days<input id="workingDays" inputmode="numeric" data-decimals="0"></label>
-      <label>Housing (ISK/month)<input id="housingCost" inputmode="numeric" data-decimals="0"></label>
-      <label>Equipment (ISK/month)<input id="equipCost" inputmode="numeric" data-decimals="0"></label>
-      <label>Admin (ISK/month)<input id="adminCost" inputmode="numeric" data-decimals="0"></label>
-      <label>Depreciation (€/day)<input id="deprCost" inputmode="decimal" data-decimals="2"></label>
-      <label>Month
-        <select id="month"></select>
-      </label>
-    </div>
-
-    <h3>Breakdown</h3>
-    <ul class="results">
-      <li><span>Labor (operators)</span><strong id="bd-labor-staff">–</strong></li>
-      <li><span>Labor (supervisors)</span><strong id="bd-labor-sup">–</strong></li>
-      <li><span>Material</span><strong id="bd-material">–</strong></li>
-      <li><span>Pack</span><strong id="bd-pack">–</strong></li>
-      <li><span>Freight</span><strong id="bd-freight">–</strong></li>
-      <li><span>Electricity €/day</span><strong id="bd-elec">–</strong></li>
-      <li><span>Water €/day</span><strong id="bd-water">–</strong></li>
-      <li><span>Maintenance €/day</span><strong id="bd-maint">–</strong></li>
-      <li><span>Rentals €/day</span><strong id="bd-rentals">–</strong></li>
-      <li><span>Spare parts €/day</span><strong id="bd-spares">–</strong></li>
-      <li><span>Other €/day</span><strong id="bd-other">–</strong></li>
-      <li><span>Housing €/day</span><strong id="bd-housing">–</strong></li>
-      <li><span>Equipment €/day</span><strong id="bd-equip">–</strong></li>
-      <li><span>Admin €/day</span><strong id="bd-admin">–</strong></li>
-      <li><span>Depreciation €/day</span><strong id="bd-depr">–</strong></li>
-    </ul>
-  </section>
-</main>
+</div>
 
 <script>
-/* ---------- helpers ---------- */
-const locale='is-IS';
-const q=(s,r=document)=>r.querySelector(s);
-const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
-const setText=(sel,val)=>{const el=typeof sel==='string'?q(sel):sel;if(el)el.textContent=val;};
-const fmt=(n,d=2)=>Number.isFinite(n)? new Intl.NumberFormat(locale,{minimumFractionDigits:d,maximumFractionDigits:d}).format(n) : '–';
+/* ============================================================
+   Locale + formatting helpers (is-IS)
+   ------------------------------------------------------------
+   - All numeric inputs show thousand separators on blur.
+   - On focus: switch to "raw" (no grouping) for easy editing.
+   - Robust parsing accepts commas or periods, ignores spaces.
+   ============================================================ */
 
-/* robust number parser: handles 1,000.50 / 1.000,50 / 1000,50 / 1000.50 */
-function toNumber(v){
-  if(v==null) return NaN;
-  let s=String(v).trim().replace(/\u00A0/g,'').replace(/\s/g,'');
-  if(!s) return NaN;
-  const hasC=s.includes(','), hasD=s.includes('.');
-  if(hasC&&hasD){
-    if(s.lastIndexOf(',')>s.lastIndexOf('.')) s=s.replace(/\./g,'').replace(',', '.'); // 1.234.567,89
-    else s=s.replace(/,/g,''); // 1,234,567.89
-  }else if(hasC){
-    const parts=s.split(','), thousands=parts.length>1&&parts.every((p,i)=>(i===0?p.length<=3:p.length===3));
-    s=thousands?s.replace(/,/g,''):s.replace(',', '.');
-  }else if(hasD){
-    const parts=s.split('.'), thousands=parts.length>1&&parts.every((p,i)=>(i===0?p.length<=3:p.length===3));
-    if(thousands) s=s.replace(/\./g,'');
+const LOCALE = 'is-IS';
+const nf0 = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 0 });
+const nf2 = new Intl.NumberFormat(LOCALE, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const nfDyn = (digits=2)=> new Intl.NumberFormat(LOCALE, { minimumFractionDigits: 0, maximumFractionDigits: digits });
+
+/** Robust toNumber: accepts is-IS typing (comma or period), ignores spaces and NBSP, handles thousands. */
+function toNumber(value){
+  if (value == null) return NaN;
+  if (typeof value === 'number') return value;
+  let s = (''+value).replace(/\s|\u00A0/g,'').trim();
+  if (s === '') return NaN;
+
+  const hasComma = s.includes(',');
+  const hasDot   = s.includes('.');
+  if (hasComma && hasDot){
+    // Assume the last separator is the decimal; remove all others as thousands
+    const lastComma = s.lastIndexOf(',');
+    const lastDot   = s.lastIndexOf('.');
+    const decIsComma = lastComma > lastDot;
+    if (decIsComma){
+      s = s.replace(/\./g,'').replace(',', '.');
+    } else {
+      s = s.replace(/,/g,''); // dot is decimal already
+    }
+  } else if (hasComma){
+    // If more than one comma, treat all as thousands except maybe last; simpler: remove all but last as thousands and convert last to dot
+    if ((s.match(/,/g)||[]).length > 1){
+      const last = s.lastIndexOf(',');
+      s = s.slice(0,last).replace(/,/g,'') + '.' + s.slice(last+1);
+    } else {
+      // single comma: treat as decimal
+      s = s.replace(',', '.');
+    }
+  } else if (hasDot){
+    // If more than one dot, same approach
+    if ((s.match(/\./g)||[]).length > 1){
+      const last = s.lastIndexOf('.');
+      s = s.slice(0,last).replace(/\./g,'') + '.' + s.slice(last+1);
+    } // else single dot = decimal already
   }
-  const n=Number(s); return Number.isFinite(n)? n : NaN;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : NaN;
 }
 
-/* ---------- month / working days ---------- */
-function workingDaysInMonth(val){
-  // accepts "MM" or "YYYY-MM"
-  let y,m;
-  if(/^\d{2}$/.test(val)){ y=new Date().getFullYear(); m=Number(val); }
-  else if(/^\d{4}-\d{2}$/.test(val)){ [y,m]=val.split('-').map(Number); }
-  else { y=new Date().getFullYear(); m=new Date().getMonth()+1; }
-  const end=new Date(y,m,0).getDate();
-  let days=0;
-  for(let d=1; d<=end; d++){
-    const dow=new Date(y,m-1,d).getDay();
-    if(dow!==0 && dow!==6) days++;
+/** Format number with is-IS grouping. If decimals unspecified, use up to 2. */
+function fmt(n, decimals){
+  if (!Number.isFinite(n)) return '–';
+  if (typeof decimals === 'number'){
+    return new Intl.NumberFormat(LOCALE, { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(n);
+  }
+  // Adaptive: 0 if integer, else up to 2
+  const opts = Number.isInteger(n) ? { maximumFractionDigits: 0 } : { minimumFractionDigits: 0, maximumFractionDigits: 2 };
+  return new Intl.NumberFormat(LOCALE, opts).format(n);
+}
+
+/** Attach formatting behavior to every .num input */
+function wireFormatting(){
+  document.querySelectorAll('input.num').forEach(inp=>{
+    // On focus: show raw value (no grouping)
+    inp.addEventListener('focus', ()=>{
+      const n = toNumber(inp.value);
+      if (Number.isFinite(n)){
+        // Decide decimals for raw edit: keep as minimal string without grouping
+        const decimalsAttr = inp.classList.contains('num-int') ? 0 : undefined;
+        inp.value = (decimalsAttr === 0) ? String(Math.trunc(n)) : String(n).replace(/(?<=\d)\.0+$/,'');
+      }
+    });
+    // On blur: reformat nicely
+    inp.addEventListener('blur', ()=>{
+      const n = toNumber(inp.value);
+      const isInt = inp.classList.contains('num-int');
+      inp.value = Number.isFinite(n) ? fmt(n, isInt ? 0 : undefined) : '';
+      scheduleURLUpdate();
+      computeAll();
+    });
+    // On direct typing: update URL minimally (no heavy compute every keystroke)
+    inp.addEventListener('input', debounce(scheduleURLUpdate, 300));
+  });
+}
+
+/* ============================================================
+   URL <-> Inputs sync
+   - Only include set values; remove when cleared.
+   - No reloads (history.replaceState).
+   ============================================================ */
+const URL_KEYS = [
+  'month','workingDays','rawKg','yieldPct','netKg',
+  'pricePerKg','iskPerEur',
+  'laborOps','laborSup','materialsDay','packDay','freightDay','deprDay'
+];
+let urlUpdateQueued = false;
+
+function readParams(){
+  const sp = new URLSearchParams(location.search);
+  const get = k => sp.get(k);
+  // Also accept fp_* params coming from fixed-costs.html for monthly totals & globals
+  return Object.fromEntries([...sp.entries()].map(([k,v])=>[k,v]));
+}
+
+function setParams(obj){
+  const sp = new URLSearchParams();
+  for (const k of URL_KEYS){
+    const el = document.getElementById(k);
+    if (!el) continue;
+    const val = (el.value||'').trim();
+    if (val) sp.set(k, val);
+  }
+  // carry-through fp_* params if present and non-zero (so shares links cleanly)
+  for (const [k,v] of Object.entries(obj)){
+    if (k.startsWith('fp_') && v != null && String(v).trim() !== '' && toNumber(v) !== 0){
+      sp.set(k, String(v));
+    }
+  }
+  const qs = sp.toString();
+  history.replaceState(null, '', qs ? ('?'+qs) : location.pathname);
+}
+
+function scheduleURLUpdate(){
+  if (urlUpdateQueued) return;
+  urlUpdateQueued = true;
+  requestAnimationFrame(()=>{
+    setParams(readParams());
+    urlUpdateQueued = false;
+  });
+}
+
+/* ============================================================
+   Working days from month
+   - Auto when month changes.
+   - Manual override if user edits workingDays.
+   ============================================================ */
+const YEAR = new Date().getFullYear(); // current year (tooling says Atlantic/Reykjavík; no DST issues for weekday counting)
+let workingDaysManual = false;
+
+function fillMonthSelect(){
+  const monthSel = document.getElementById('month');
+  const monthNames = [];
+  for (let m=0;m<12;m++){
+    monthNames.push(new Intl.DateTimeFormat(LOCALE, { month:'long' }).format(new Date(2025, m, 1)));
+  }
+  monthNames.forEach((name,idx)=>{
+    const opt = document.createElement('option');
+    opt.value = String(idx+1); // 1..12
+    opt.textContent = name.charAt(0).toUpperCase()+name.slice(1);
+    monthSel.appendChild(opt);
+  });
+  document.getElementById('yearNow').textContent = YEAR;
+}
+
+function calcWorkingDays(year, monthIndex1to12){
+  const m = monthIndex1to12-1;
+  let d = new Date(year, m, 1);
+  let days = 0;
+  while (d.getMonth() === m){
+    const weekday = d.getDay(); // 0 Sun .. 6 Sat
+    if (weekday >= 1 && weekday <= 5) days++;
+    d.setDate(d.getDate()+1);
   }
   return days;
 }
-function populateMonthSelect(){
-  const sel=q('#month'); sel.innerHTML='';
-  for(let i=0;i<12;i++){
-    const label=new Date(2000,i,1).toLocaleString('en',{month:'long'});
-    const m=String(i+1).padStart(2,'0');
-    sel.add(new Option(label,m));
-  }
-  sel.value=String(new Date().getMonth()+1).padStart(2,'0');
-}
 
-/* ---------- pretty typing (thousand separators) ---------- */
-function initNumberFormatting(){
-  const getDec = el => el.dataset.decimals!=null ? Math.max(0,Number(el.dataset.decimals)||0)
-                                                 : (el.getAttribute('inputmode')==='numeric'?0:2);
+function wireWorkingDays(){
+  const monthSel = document.getElementById('month');
+  const wdInput  = document.getElementById('workingDays');
 
-  const nfCache=new Map();
-  const nf=(d)=>{ if(!nfCache.has(d)) nfCache.set(d,new Intl.NumberFormat('is-IS',{minimumFractionDigits:d,maximumFractionDigits:d})); return nfCache.get(d); };
-
-  const pretty=(el)=>{ const d=getDec(el), n=toNumber(el.value); if(!Number.isFinite(n))return; el.value=nf(d).format(d===0?Math.round(n):n); };
-  const raw   =(el)=>{ const d=getDec(el), n=toNumber(el.value); if(!Number.isFinite(n))return; el.value=d===0?String(Math.round(n)):String(n.toFixed(d)); };
-
-  document.addEventListener('focusin',e=>{
-    const el=e.target;
-    if(el.matches('input[inputmode="decimal"],input[inputmode="numeric"]')) raw(el);
+  monthSel.addEventListener('change', ()=>{
+    const mv = toNumber(monthSel.value);
+    if (mv>=1 && mv<=12){
+      const auto = calcWorkingDays(YEAR, mv);
+      if (!workingDaysManual || !wdInput.value.trim()){
+        wdInput.value = fmt(auto,0);
+      }
+      scheduleURLUpdate();
+      computeAll();
+    }
   });
-  document.addEventListener('focusout',e=>{
-    const el=e.target;
-    if(el.matches('input[inputmode="decimal"],input[inputmode="numeric"]')){ pretty(el); calcAll(); }
-  });
-
-  // initial pass
-  qa('input[inputmode="decimal"],input[inputmode="numeric"]').forEach(pretty);
+  wdInput.addEventListener('input', ()=>{ workingDaysManual = true; });
 }
 
-/* ---------- URL sync ---------- */
-const bindings={
-  producedKg:'#producedKg', sellPriceDay:'#sellPriceDay', rawUsedKg:'#rawUsedKg', yieldPct:'#yieldPct',
-  rawCostPerKg:'#rawCostPerKg', packCostPerKg:'#packCostPerKg', freightPerKg:'#freightPerKg',
-  rawUsedKg_day:'#rawUsedKg_day', rawCostPerKg_day:'#rawCostPerKg_day', packCostPerKg_day:'#packCostPerKg_day',
-  producedKg_day:'#producedKg_day', sellPriceDay_day:'#sellPriceDay_day', freightPerKg_day:'#freightPerKg_day',
-  staffCount:'#staffCount', staffCostPerPerson:'#staffCostPerPerson', supCount:'#supCount', supCostPerPerson:'#supCostPerPerson',
-  staffHoursDay:'#staffHoursDay', supHoursDay:'#supHoursDay',
-  iskPerEur:'#iskPerEur', workingDays:'#workingDays', housingCost:'#housingCost', equipCost:'#equipCost',
-  adminCost:'#adminCost', deprCost:'#deprCost', month:'#month'
-};
-function applyQueryParams(){
-  const p=new URLSearchParams(location.search);
-  for(const [k,sel] of Object.entries(bindings)){
-    const el=q(sel); if(!el)continue;
-    let v=p.get(k); if(v==null||v==='')continue;
-    if(k==='month'){ if(/^\d{4}-\d{2}$/.test(v)) v=v.slice(5); v=v.padStart(2,'0'); }
-    el.value=v;
+/* ============================================================
+   Fixed costs interop (localStorage + URL)
+   Keys expected from fixed-costs.html (monthly):
+   ISK/month: fp:housingCost, fp:equipCost, fp:adminCost
+   EUR/month: fp:maintEurMonth, fp:rentalsEurMonth, fp:sparesEurMonth,
+              fp:electricityEurMonth, fp:waterEurMonth, fp:otherEurMonth
+   Globals:   fp:iskPerEur, fp:workingDays
+   Also accept URL params fp_* mirroring these (with underscore).
+   ============================================================ */
+const LS_KEYS = [
+  'fp:housingCost','fp:equipCost','fp:adminCost',
+  'fp:maintEurMonth','fp:rentalsEurMonth','fp:sparesEurMonth','fp:electricityEurMonth','fp:waterEurMonth','fp:otherEurMonth',
+  'fp:iskPerEur','fp:workingDays'
+];
+
+function readFixedCostsFromLS(){
+  const o = {};
+  for (const k of LS_KEYS){
+    const v = localStorage.getItem(k);
+    if (v!=null) o[k] = v;
   }
+  return o;
 }
-function syncUrlFromInputs(){
-  const p=new URLSearchParams();
-  for(const [k,sel] of Object.entries(bindings)){
-    const el=q(sel); if(el && String(el.value).trim()!=='') p.set(k,el.value);
+
+function readFixedCostsFromURL(){
+  const p = readParams();
+  // map fp_xxx -> same semantic; index expects both
+  const map = {
+    'fp_housingCost':'fp:housingCost',
+    'fp_equipCost':'fp:equipCost',
+    'fp_adminCost':'fp:adminCost',
+    'fp_maintEurMonth':'fp:maintEurMonth',
+    'fp_rentalsEurMonth':'fp:rentalsEurMonth',
+    'fp_sparesEurMonth':'fp:sparesEurMonth',
+    'fp_electricityEurMonth':'fp:electricityEurMonth',
+    'fp_waterEurMonth':'fp:waterEurMonth',
+    'fp_otherEurMonth':'fp:otherEurMonth',
+    'fp_iskPerEur':'fp:iskPerEur',
+    'fp_workingDays':'fp:workingDays'
+  };
+  const o = {};
+  for (const [k,v] of Object.entries(map)){
+    if (p[k]!=null) o[v] = p[k];
   }
-  history.replaceState(null,'',`${location.pathname}?${p.toString()}`);
+  return o;
 }
 
-/* ---------- calculations ---------- */
-function calcKeyNumbers(){
-  const producedKg=toNumber(q('#producedKg').value);
-  const sellPrice =toNumber(q('#sellPriceDay').value);
-  const rawUsed   =toNumber(q('#rawUsedKg').value);
-  const yieldPct  =toNumber(q('#yieldPct').value);
-  const rawCostKg =toNumber(q('#rawCostPerKg').value)||0;
-  const packKg    =toNumber(q('#packCostPerKg').value)||0;
-  const freightKg =toNumber(q('#freightPerKg').value)||0;
+function fixedCostsMonthlyTotals(){
+  const fromLS  = readFixedCostsFromLS();
+  const fromURL = readFixedCostsFromURL();
 
-  // derive rawUsed or yield if one is missing
-  let rawUsedEff = Number.isFinite(rawUsed) ? rawUsed : NaN;
-  let yieldEff   = Number.isFinite(yieldPct) ? yieldPct : NaN;
-  if (Number.isFinite(producedKg)) {
-    if (Number.isFinite(yieldPct) && yieldPct>0) rawUsedEff = producedKg / (yieldPct/100);
-    else if (Number.isFinite(rawUsed) && rawUsed>0) yieldEff = (producedKg/rawUsed)*100;
+  const get = (key) => {
+    // URL overrides LS if present
+    if (fromURL[key]!=null) return toNumber(fromURL[key]);
+    const v = fromLS[key]; return v!=null ? toNumber(v) : NaN;
+  };
+
+  const iskMonth = (get('fp:housingCost')||0) + (get('fp:equipCost')||0) + (get('fp:adminCost')||0);
+  const eurMonth = (get('fp:maintEurMonth')||0) + (get('fp:rentalsEurMonth')||0) + (get('fp:sparesEurMonth')||0) + (get('fp:electricityEurMonth')||0) + (get('fp:waterEurMonth')||0) + (get('fp:otherEurMonth')||0);
+
+  // carry globals in chips
+  const chipData = [];
+  if (iskMonth) chipData.push({label:'ISK/month (H+E+A)', value: fmt(iskMonth,0)+' ISK'});
+  if (eurMonth) chipData.push({label:'EUR/month (ops)', value: fmt(eurMonth,2)+' €'});
+
+  // Potential defaults
+  const fxFromLSorURL = get('fp:iskPerEur');
+  const wdFromLSorURL = get('fp:workingDays');
+
+  return { iskMonth, eurMonth, fxFromLSorURL, wdFromLSorURL, chipData };
+}
+
+/* ============================================================
+   Computations
+   - Yield triad inference
+   - Factory Day breakdown
+   - Key Numbers
+   ============================================================ */
+function computeAll(){
+  // 1) Maybe set default FX or working days from LS/URL if empty
+  const { iskMonth, eurMonth, fxFromLSorURL, wdFromLSorURL, chipData } = fixedCostsMonthlyTotals();
+
+  const fxInput = document.getElementById('iskPerEur');
+  if (!fxInput.value.trim() && Number.isFinite(fxFromLSorURL)) {
+    fxInput.value = fmt(fxFromLSorURL,2);
+  }
+  const wdInput = document.getElementById('workingDays');
+  if (!wdInput.value.trim() && Number.isFinite(wdFromLSorURL) && !workingDaysManual){
+    wdInput.value = fmt(wdFromLSorURL,0);
   }
 
-  const revenue    = (Number.isFinite(producedKg)&&Number.isFinite(sellPrice)) ? producedKg*sellPrice : NaN;
-  const rawMatCost = Number.isFinite(rawUsedEff) ? rawUsedEff*rawCostKg : NaN;
-  const packCost   = Number.isFinite(producedKg) ? producedKg*packKg : NaN;
-  const freight    = Number.isFinite(producedKg) ? producedKg*freightKg : NaN;
-
-  const totalCost  = [rawMatCost,packCost,freight].reduce((s,v)=>s+(Number.isFinite(v)?v:0),0);
-  const profit     = Number.isFinite(revenue)? revenue-totalCost : NaN;
-  const marginPct  = (Number.isFinite(revenue)&&revenue!==0)? (profit/revenue)*100 : NaN;
-  const profitKg   = (Number.isFinite(producedKg)&&producedKg>0)? profit/producedKg : NaN;
-
-  setText('#key-net-kg',    fmt(producedKg,0));
-  setText('#key-revenue',   fmt(revenue,2));
-  setText('#key-total-cost',fmt(totalCost,2));
-  setText('#key-profit',    fmt(profit,2));
-  setText('#key-gm',        Number.isFinite(marginPct)? fmt(marginPct,1)+' %':'–');
-  setText('#key-profit-kg', fmt(profitKg,2));
-}
-
-function calcDay(){
-  // labor
-  const staffCount=toNumber(q('#staffCount').value), staffHr=toNumber(q('#staffHoursDay').value), staffRate=toNumber(q('#staffCostPerPerson').value);
-  const supCount  =toNumber(q('#supCount').value),   supHr  =toNumber(q('#supHoursDay').value),   supRate  =toNumber(q('#supCostPerPerson').value);
-  const laborStaff=(Number.isFinite(staffCount)&&Number.isFinite(staffHr)&&Number.isFinite(staffRate))? staffCount*staffHr*staffRate : 0;
-  const laborSup  =(Number.isFinite(supCount)&&Number.isFinite(supHr)&&Number.isFinite(supRate))? supCount*supHr*supRate : 0;
-
-  // materials
-  const rawUsed=toNumber(q('#rawUsedKg_day').value), rawCostKg=toNumber(q('#rawCostPerKg_day').value);
-  const produced=toNumber(q('#producedKg_day').value), packKg=toNumber(q('#packCostPerKg_day').value), freightKg=toNumber(q('#freightPerKg_day').value);
-  const matCost=(Number.isFinite(rawUsed)&&Number.isFinite(rawCostKg))? rawUsed*rawCostKg : 0;
-  const packCost=(Number.isFinite(produced)&&Number.isFinite(packKg))? produced*packKg : 0;
-  const freight =(Number.isFinite(produced)&&Number.isFinite(freightKg))? produced*freightKg : 0;
-
-  // fixed
-  const iskPerEur=toNumber(q('#iskPerEur').value);
-  let workDays=toNumber(q('#workingDays').value);
-  if(!Number.isFinite(workDays)||workDays<=0){ workDays=workingDaysInMonth(q('#month').value) || 22; q('#workingDays').value=String(workDays); }
-  const housingISK=toNumber(q('#housingCost').value), equipISK=toNumber(q('#equipCost').value), adminISK=toNumber(q('#adminCost').value);
-  const deprEURd  =toNumber(q('#deprCost').value)||0;
-
-  // monthly EUR buckets from localStorage/URL (set by fixed-costs.html)
-  const get=key=>{ const p=new URLSearchParams(location.search); const v=p.get(key)??localStorage.getItem('fp:'+key); const n=toNumber(v); return Number.isFinite(n)?n:0; };
-  const maintEURm=get('maintEurMonth'), rentalsEURm=get('rentalsEurMonth'), sparesEURm=get('sparesEurMonth'), elecEURm=get('electricityEurMonth'), waterEURm=get('waterEurMonth'), otherEURm=get('otherEurMonth');
-
-  const maintEURd=maintEURm/workDays, rentalsEURd=rentalsEURm/workDays, sparesEURd=sparesEURm/workDays, elecEURd=elecEURm/workDays, waterEURd=waterEURm/workDays, otherEURd=otherEURm/workDays;
-
-  const canFX=Number.isFinite(iskPerEur)&&iskPerEur>0;
-  const housingDay=(canFX&&Number.isFinite(housingISK))?(housingISK*iskPerEur)/workDays:0;
-  const equipDay  =(canFX&&Number.isFinite(equipISK))  ?(equipISK  *iskPerEur)/workDays:0;
-  const adminDay  =(canFX&&Number.isFinite(adminISK))  ?(adminISK  *iskPerEur)/workDays:0;
-
-  const revenue=(Number.isFinite(produced)&&Number.isFinite(toNumber(q('#sellPriceDay_day').value)))? produced*toNumber(q('#sellPriceDay_day').value) : NaN;
-  const totalCost=laborStaff+laborSup+matCost+packCost+freight+elecEURd+waterEURd+maintEURd+rentalsEURd+sparesEURd+otherEURd+housingDay+equipDay+adminDay+deprEURd;
-  const profit=Number.isFinite(revenue)? revenue-totalCost : NaN;
-  const marginPct=(Number.isFinite(revenue)&&revenue!==0)? (profit/revenue)*100 : NaN;
-  const costPerKg=(Number.isFinite(produced)&&produced>0)? totalCost/produced : NaN;
-
-  setText('#bd-labor-staff',fmt(laborStaff,2));
-  setText('#bd-labor-sup',fmt(laborSup,2));
-  setText('#bd-material',fmt(matCost,2));
-  setText('#bd-pack',fmt(packCost,2));
-  setText('#bd-freight',fmt(freight,2));
-  setText('#bd-elec',fmt(elecEURd,2));
-  setText('#bd-water',fmt(waterEURd,2));
-  setText('#bd-maint',fmt(maintEURd,2));
-  setText('#bd-rentals',fmt(rentalsEURd,2));
-  setText('#bd-spares',fmt(sparesEURd,2));
-  setText('#bd-other',fmt(otherEURd,2));
-  setText('#bd-housing',fmt(housingDay,2));
-  setText('#bd-equip',fmt(equipDay,2));
-  setText('#bd-admin',fmt(adminDay,2));
-  setText('#bd-depr',fmt(deprEURd,2));
-
-  // also show top summary from key section
-  setText('#day-revenue',fmt(revenue,2));
-  setText('#day-total-cost',fmt(totalCost,2));
-  setText('#day-profit',fmt(profit,2));
-  setText('#day-margin',Number.isFinite(marginPct)?fmt(marginPct,1)+' %':'–');
-  setText('#day-cost-kg',fmt(costPerKg,2));
-}
-
-function calcAll(){ syncUrlFromInputs(); calcKeyNumbers(); calcDay(); }
-
-/* ---------- wiring ---------- */
-document.addEventListener('DOMContentLoaded',()=>{
-  populateMonthSelect();
-
-  // defaults for working days based on current month
-  const wd = workingDaysInMonth(q('#month').value);
-  if(q('#workingDays') && (!q('#workingDays').value || !Number.isFinite(toNumber(q('#workingDays').value)))) q('#workingDays').value=String(wd);
-
-  q('#month').addEventListener('change',()=>{
-    q('#workingDays').value=String(workingDaysInMonth(q('#month').value));
-    calcAll();
+  // Chips info line
+  const chips = document.getElementById('chipsInfo');
+  chips.innerHTML = '';
+  chipData.forEach(c=>{
+    const span = document.createElement('span'); span.className='badge'; span.textContent = `${c.label}: ${c.value}`;
+    chips.appendChild(span);
   });
 
-  applyQueryParams();
-  initNumberFormatting();
+  // 2) Yield triad: rawKg, yieldPct, netKg (compute if one missing)
+  const rawEl = document.getElementById('rawKg');
+  const yEl   = document.getElementById('yieldPct');
+  const netEl = document.getElementById('netKg');
 
-  // live updates
-  qa('input,select').forEach(el=>{
-    el.addEventListener('input', calcAll);
-    el.addEventListener('change', calcAll);
+  let raw = toNumber(rawEl.value);
+  let y   = toNumber(yEl.value); // %
+  let net = toNumber(netEl.value);
+
+  // If any of the three is missing, infer when possible (two known -> compute third)
+  if (!Number.isFinite(net) && Number.isFinite(raw) && Number.isFinite(y)){
+    net = raw * (y/100);
+    netEl.value = fmt(net);
+  } else if (!Number.isFinite(raw) && Number.isFinite(net) && Number.isFinite(y) && y!==0){
+    raw = net / (y/100);
+    rawEl.value = fmt(raw);
+  } else if (!Number.isFinite(y) && Number.isFinite(net) && Number.isFinite(raw) && raw!==0){
+    y = (net/raw)*100;
+    yEl.value = fmt(y);
+  }
+
+  // 3) Fixed costs per day
+  const wd   = toNumber(document.getElementById('workingDays').value) || 0;
+  const fx   = toNumber(document.getElementById('iskPerEur').value)   || 0;
+
+  let fcIskDay = 0, fcEurDay = 0, fcTotalDay = 0;
+  if (wd > 0){
+    if (iskMonth > 0 && fx > 0) fcIskDay = (iskMonth / fx) / wd; // convert ISK->EUR then per day
+    if (eurMonth > 0)          fcEurDay = (eurMonth) / wd;
+    fcTotalDay = fcIskDay + fcEurDay;
+  }
+
+  document.getElementById('fcIskDay').textContent   = fmt(fcIskDay);
+  document.getElementById('fcEurDay').textContent   = fmt(fcEurDay);
+  document.getElementById('fcTotalDay').textContent = fmt(fcTotalDay);
+
+  // 4) Factory day variable lines
+  const lines = [
+    { name:'Labor — operators', id:'laborOps' },
+    { name:'Labor — supervisors', id:'laborSup' },
+    { name:'Materials', id:'materialsDay' },
+    { name:'Pack', id:'packDay' },
+    { name:'Freight', id:'freightDay' },
+    { name:'Fixed (ISK→EUR/day)', id:null, value: fcIskDay },
+    { name:'Fixed (EUR/day)', id:null, value: fcEurDay },
+    { name:'Depreciation', id:'deprDay' }
+  ];
+
+  let dayTotal = 0;
+  const fdDiv = document.getElementById('fdTotals');
+  fdDiv.innerHTML = '';
+  for (const line of lines){
+    const amount = (line.id ? toNumber(document.getElementById(line.id).value) : line.value) || 0;
+    dayTotal += amount;
+    const row = document.createElement('div');
+    row.className = 'line';
+    row.innerHTML = `<span>${line.name}</span><strong>${fmt(amount)}</strong>`;
+    fdDiv.appendChild(row);
+  }
+  // Total
+  const totalRow = document.createElement('div');
+  totalRow.className = 'line grand';
+  totalRow.innerHTML = `<span>Total / day</span><strong>${fmt(dayTotal)}</strong>`;
+  fdDiv.appendChild(totalRow);
+
+  // 5) Key Numbers
+  const price = toNumber(document.getElementById('pricePerKg').value);
+  const revenue = (Number.isFinite(net) && Number.isFinite(price)) ? (net * price) : NaN;
+  const profit  = (Number.isFinite(revenue)) ? (revenue - dayTotal) : NaN;
+  const margin  = (Number.isFinite(revenue) && revenue!==0) ? (profit / revenue * 100) : NaN;
+  const pPerKg  = (Number.isFinite(profit) && Number.isFinite(net) && net!==0) ? (profit / net) : NaN;
+
+  setText('kn_netKg', fmt(net));
+  setText('kn_revenue', fmt(revenue));
+  setText('kn_totalCost', fmt(dayTotal));
+  setText('kn_profit', fmt(profit), (profit>0?'money-ok': (profit<0?'money-bad':'')));
+  setText('kn_margin', Number.isFinite(margin) ? fmt(margin) + ' %' : '–');
+  setText('kn_profitPerKg', fmt(pPerKg));
+}
+
+function setText(id, text, extraClass){
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.classList.remove('money-ok','money-bad','money-warn');
+  if (extraClass) el.classList.add(extraClass);
+}
+
+/* ============================================================
+   Bootstrap: initial load from URL or LS and wire events
+   ============================================================ */
+function loadInitialValues(){
+  // Months
+  fillMonthSelect();
+
+  const params = readParams();
+
+  // If month param present, set it
+  if (params.month){
+    document.getElementById('month').value = params.month;
+  }
+  // Set any known inputs from URL
+  for (const key of URL_KEYS){
+    const el = document.getElementById(key);
+    if (!el) continue;
+    if (params[key]!=null){
+      // Format nicely on load
+      const n = toNumber(params[key]);
+      el.value = Number.isFinite(n) ? (el.classList.contains('num-int')? fmt(n,0): fmt(n)) : params[key];
+    }
+  }
+
+  // If working days provided via fp_workingDays, prefer it if empty and not overridden yet
+  const fromURL = readFixedCostsFromURL();
+  if (!document.getElementById('workingDays').value && fromURL['fp:workingDays']){
+    const n = toNumber(fromURL['fp:workingDays']);
+    if (Number.isFinite(n)) document.getElementById('workingDays').value = fmt(n,0);
+  }
+}
+
+function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; }
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  wireFormatting();
+  fillMonthSelect();
+  wireWorkingDays();
+  loadInitialValues();
+  computeAll();
+
+  // Recompute on changes
+  document.querySelectorAll('input,select').forEach(el=>{
+    el.addEventListener('change', computeAll);
+    el.addEventListener('input', debounce(computeAll, 250));
   });
-
-  calcAll();
 });
 </script>
 </body>
