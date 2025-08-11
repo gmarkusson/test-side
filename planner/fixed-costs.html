@@ -2,433 +2,421 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Fixed Costs — 2 Buildings</title>
+  <title>Factory Planner — Fixed Costs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root{
-      --gap:14px;--pad:16px;
-      --bg:#f6f8fc;--card:#fff;--ink:#0b1320;--muted:#4a5874;--accent:#0b5fff;--border:#e4e9f2;--field:#d6dbe6
+      --bg:#0f172a; --card:#111827; --muted:#94a3b8; --text:#e5e7eb;
+      --accent:#22d3ee; --border:#1f2937; --chip:#0b1222; --ok:#10b981;
     }
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    header{padding:24px var(--pad);border-bottom:1px solid var(--border)}
-    h1{margin:0 0 6px;font-size:22px}
-    h2{margin:0 0 10px;font-size:18px;color:var(--accent)}
-    main{padding:20px var(--pad) 60px;display:grid;gap:14px}
-    section.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
-    label{display:flex;flex-direction:column;gap:6px;color:var(--muted);font-weight:600}
-    input,select{background:#fff;color:var(--ink);border:1px solid var(--field);border-radius:8px;padding:9px 11px;outline:none}
-    input:focus,select:focus{border-color:#2c6fff;box-shadow:0 0 0 2px rgba(44,111,255,.14)}
-    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-    .btn{display:inline-block;background:var(--accent);color:#fff;border:1px solid var(--accent);padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:600;cursor:pointer}
-    .btn.secondary{background:#fff;color:var(--accent)}
-    .muted{color:var(--muted)}
-
-    .buildings{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:14px}
-    .building{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px}
-    .building h3{margin:0 0 8px;font-size:16px;color:#1b2746}
-    .section-sub{margin:12px 0 6px;color:#4a5874;font-weight:700}
-
-    .rows{display:grid;gap:8px}
-    .row{
-      display:grid;
-      grid-template-columns: minmax(160px,1fr) 160px minmax(200px,1.2fr) 160px 36px;
-      gap:8px; align-items:center;
+    html,body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;margin:0}
+    .wrap{max-width:1100px;margin:40px auto;padding:0 20px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    h1{font-size:clamp(20px,3vw,28px);margin:0}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px}
+    .grid{display:grid;gap:16px}
+    @media(min-width:980px){ .grid{grid-template-columns:1fr 1fr} }
+    table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    th,td{padding:8px 10px;text-align:left}
+    th{color:var(--muted);font-weight:600;font-size:13px}
+    td .row{display:flex;gap:8px;align-items:center}
+    input[type="text"]{
+      width:100%;background:#0b1020;color:var(--text);border:1px solid var(--border);
+      border-radius:10px;padding:9px 10px;font-size:14px;outline:none;
     }
-    .row input{padding:8px 10px}
-    .row .cat{width:160px}
-    .row .amt{text-align:right}
-    .row .del{height:36px;width:36px;border-radius:8px;border:1px solid var(--border);background:#fff;cursor:pointer}
-
-    ul.results{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0 0;padding:0;list-style:none}
-    .results li{background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px;display:flex;justify-content:space-between;align-items:center}
-    .results li span{color:var(--muted)} .results li strong{font-size:15px}
-    .mini{margin-top:10px}
-
-    @media (max-width:680px){
-      .row{grid-template-columns: 1fr 1fr; grid-auto-rows:auto}
-      .row .cat{grid-column:1/3}
-      .row .desc{grid-column:1/3}
-      .row .amt{grid-column:1/2}
-      .row .del{grid-column:2/3; justify-self:end}
+    input[type="text"]:focus{border-color:#2b3b52}
+    .btn,button{
+      background:var(--accent);color:#062028;border:none;border-radius:10px;
+      padding:8px 12px;font-weight:600;cursor:pointer;transition:filter .15s;
     }
+    .btn:hover,button:hover{filter:brightness(1.05)}
+    .muted{color:var(--muted);font-size:12px}
+    .subtotal{font-weight:700}
+    .pill{display:inline-block;background:var(--chip);border:1px solid var(--border);padding:5px 8px;border-radius:999px;font-size:12px;margin-left:8px}
+    .inline{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .danger{background:#ef4444;color:#fff}
+    .ok{color:var(--ok);font-weight:700}
   </style>
 </head>
 <body>
+<div class="wrap">
   <header>
-    <h1>Fixed Costs (2 buildings)</h1>
-    <div class="muted">Add monthly ISK costs and monthly € costs per building. Totals are saved for the planner.</div>
-    <div class="actions">
-      <a class="btn secondary" href="./">← Back to planner</a>
-      <button id="copyBtn" class="btn">Copy to planner now</button>
-      <button id="saveBtn" class="btn secondary">Save defaults</button>
-      <button id="resetBtn" class="btn secondary">Reset saved</button>
+    <h1>Fixed Costs — Monthly</h1>
+    <div class="inline">
+      <button id="copyToPlanner" class="btn">Copy to Planner URL</button>
+      <a class="btn" href="index.html">Open Planner</a>
     </div>
   </header>
 
-  <main>
-    <!-- GLOBALS -->
-    <section class="card">
-      <h2>Globals</h2>
-      <div class="grid">
-        <label>ISK per EUR
-          <input id="iskPerEur" inputmode="decimal" placeholder="e.g. 0.0068" />
-        </label>
-        <label>Working days (per month)
-          <input id="workingDays" inputmode="numeric" placeholder="e.g. 21" />
-          <span class="muted" style="font-size:12px">Optional. Planner can auto-calc from month if left blank.</span>
-        </label>
-      </div>
-    </section>
-
-    <!-- BUILDINGS -->
-    <section class="card">
-      <h2>Buildings</h2>
-
-      <div class="buildings">
-        <!-- Building A -->
-        <div id="bA" class="building">
-          <h3>Whitefish &amp; Salmon factories</h3>
-
-          <div class="section-sub">Monthly costs — ISK/month</div>
-          <div class="rows monthly-isk"></div>
-          <div class="actions"><button class="btn add-monthly-isk" type="button">+ Add ISK cost</button></div>
-
-          <div class="section-sub">Monthly costs — €/month</div>
-          <div class="rows monthly-eur"></div>
-          <div class="actions"><button class="btn add-monthly-eur" type="button">+ Add € cost</button></div>
-
-          <ul class="results mini">
-            <li><span>Housing (ISK/mo)</span><strong id="b0-housing">–</strong></li>
-            <li><span>Equipment (ISK/mo)</span><strong id="b0-equipment">–</strong></li>
-            <li><span>Admin (ISK/mo)</span><strong id="b0-admin">–</strong></li>
-            <li><span>Maintenance (€/mo)</span><strong id="b0-maint">–</strong></li>
-            <li><span>Rentals (€/mo)</span><strong id="b0-rentals">–</strong></li>
-            <li><span>Spare parts (€/mo)</span><strong id="b0-spares">–</strong></li>
-            <li><span>Electricity (€/mo)</span><strong id="b0-elec">–</strong></li>
-            <li><span>Water (€/mo)</span><strong id="b0-water">–</strong></li>
-            <li><span>Other (€/mo)</span><strong id="b0-othereur">–</strong></li>
-          </ul>
-        </div>
-
-        <!-- Building B -->
-        <div id="bB" class="building">
-          <h3>Smokehouse</h3>
-
-          <div class="section-sub">Monthly costs — ISK/month</div>
-          <div class="rows monthly-isk"></div>
-          <div class="actions"><button class="btn add-monthly-isk" type="button">+ Add ISK cost</button></div>
-
-          <div class="section-sub">Monthly costs — €/month</div>
-          <div class="rows monthly-eur"></div>
-          <div class="actions"><button class="btn add-monthly-eur" type="button">+ Add € cost</button></div>
-
-          <ul class="results mini">
-            <li><span>Housing (ISK/mo)</span><strong id="b1-housing">–</strong></li>
-            <li><span>Equipment (ISK/mo)</span><strong id="b1-equipment">–</strong></li>
-            <li><span>Admin (ISK/mo)</span><strong id="b1-admin">–</strong></li>
-            <li><span>Maintenance (€/mo)</span><strong id="b1-maint">–</strong></li>
-            <li><span>Rentals (€/mo)</span><strong id="b1-rentals">–</strong></li>
-            <li><span>Spare parts (€/mo)</span><strong id="b1-spares">–</strong></li>
-            <li><span>Electricity (€/mo)</span><strong id="b1-elec">–</strong></li>
-            <li><span>Water (€/mo)</span><strong id="b1-water">–</strong></li>
-            <li><span>Other (€/mo)</span><strong id="b1-othereur">–</strong></li>
-          </ul>
+  <section class="card">
+    <div class="inline">
+      <div>
+        <div class="muted">Globals</div>
+        <div class="inline" style="margin-top:6px">
+          <label class="muted" for="iskPerEur">ISK per EUR</label>
+          <input type="text" id="iskPerEur" class="num" inputmode="decimal" placeholder="e.g. 153,50" style="width:140px">
+          <label class="muted" for="workingDays">Working days (optional)</label>
+          <input type="text" id="workingDays" class="num num-int" inputmode="decimal" placeholder="e.g. 21" style="width:120px">
         </div>
       </div>
-    </section>
+      <span class="pill">Locale: is-IS</span>
+    </div>
+  </section>
 
-    <!-- TOTALS SENT TO PLANNER -->
-    <section class="card">
-      <h2>Totals saved to planner</h2>
-      <ul class="results" id="totals">
-        <li><span>Housing (ISK/month)</span><strong id="t-housing">–</strong></li>
-        <li><span>Equipment (ISK/month)</span><strong id="t-equipment">–</strong></li>
-        <li><span>Admin (ISK/month)</span><strong id="t-admin">–</strong></li>
+  <section class="grid">
+    <!-- ISK categories per building -->
+    <div class="card" id="iskA">
+      <h2 style="margin:0 0 8px 0">Building A — ISK/month</h2>
+      <table data-building="A" data-currency="ISK">
+        <thead><tr><th>Category</th><th>Amount (ISK)</th><th></th></tr></thead>
+        <tbody></tbody>
+        <tfoot>
+          <tr><td class="subtotal">Subtotal (A)</td><td class="subtotal" data-subtotal="A-ISK">–</td><td></td></tr>
+        </tfoot>
+      </table>
+      <div class="inline" style="margin-top:6px">
+        <button class="btn" data-add="A-ISK">Add row</button>
+      </div>
+      <div class="muted">Categories counted in ISK totals: <strong>housing</strong>, <strong>equipment</strong>, <strong>admin</strong>.</div>
+    </div>
 
-        <li><span>Maintenance (€/month)</span><strong id="t-maint">–</strong></li>
-        <li><span>Rentals (€/month)</span><strong id="t-rentals">–</strong></li>
-        <li><span>Spare parts (€/month)</span><strong id="t-spares">–</strong></li>
-        <li><span>Electricity (€/month)</span><strong id="t-elec">–</strong></li>
-        <li><span>Water (€/month)</span><strong id="t-water">–</strong></li>
-        <li><span>Other (€/month)</span><strong id="t-other">–</strong></li>
-      </ul>
-    </section>
-  </main>
+    <div class="card" id="iskB">
+      <h2 style="margin:0 0 8px 0">Building B — ISK/month</h2>
+      <table data-building="B" data-currency="ISK">
+        <thead><tr><th>Category</th><th>Amount (ISK)</th><th></th></tr></thead>
+        <tbody></tbody>
+        <tfoot>
+          <tr><td class="subtotal">Subtotal (B)</td><td class="subtotal" data-subtotal="B-ISK">–</td><td></td></tr>
+        </tfoot>
+      </table>
+      <div class="inline" style="margin-top:6px">
+        <button class="btn" data-add="B-ISK">Add row</button>
+      </div>
+      <div class="muted">Use category names “housing / equipment / admin” (case-insensitive). Extra ISK rows are allowed and will be ignored for totals if not matching.</div>
+    </div>
+  </section>
 
-  <script>
-    /* ---------- tiny helpers ---------- */
-    const locale='is-IS';
-    const q=(s,r=document)=>r.querySelector(s);
-    const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
-    const setText=(sel,val)=>{const el=typeof sel==='string'?q(sel):sel;if(el)el.textContent=val;};
-    const fmt=(n,d=2)=>Number.isFinite(n)? new Intl.NumberFormat(locale,{minimumFractionDigits:d,maximumFractionDigits:d}).format(n) : '–';
-    function toNumber(v){
-      if(v==null) return NaN;
-      let s=String(v).trim().replace(/\u00A0/g,'').replace(/\s/g,'');
-      if(!s) return NaN;
-      const hasC=s.includes(','), hasD=s.includes('.');
-      if(hasC&&hasD){ if(s.lastIndexOf(',')>s.lastIndexOf('.')) s=s.replace(/\./g,'').replace(',', '.'); else s=s.replace(/,/g,''); }
-      else if(hasC){ const parts=s.split(','), thousands=parts.length>1&&parts.every((p,i)=>(i===0?p.length<=3:p.length===3)); s=thousands?s.replace(/,/g,''):s.replace(',', '.'); }
-      else if(hasD){ const parts=s.split('.'), thousands=parts.length>1&&parts.every((p,i)=>(i===0?p.length<=3:p.length===3)); if(thousands) s=s.replace(/\./g,''); }
-      const n=Number(s); return Number.isFinite(n)? n : NaN;
+  <section class="grid">
+    <!-- EUR operational categories per building -->
+    <div class="card" id="eurA">
+      <h2 style="margin:0 0 8px 0">Building A — EUR/month</h2>
+      <table data-building="A" data-currency="EUR">
+        <thead><tr><th>Category</th><th>Amount (EUR)</th><th></th></tr></thead>
+        <tbody></tbody>
+        <tfoot><tr><td class="subtotal">Subtotal (A)</td><td class="subtotal" data-subtotal="A-EUR">–</td><td></td></tr></tfoot>
+      </table>
+      <div class="inline" style="margin-top:6px">
+        <button class="btn" data-add="A-EUR">Add row</button>
+      </div>
+      <div class="muted">EUR categories counted toward totals: <strong>maintenance</strong>, <strong>rentals</strong>, <strong>spares</strong>, <strong>electricity</strong>, <strong>water</strong>, <strong>other</strong>.</div>
+    </div>
+
+    <div class="card" id="eurB">
+      <h2 style="margin:0 0 8px 0">Building B — EUR/month</h2>
+      <table data-building="B" data-currency="EUR">
+        <thead><tr><th>Category</th><th>Amount (EUR)</th><th></th></tr></thead>
+        <tbody></tbody>
+        <tfoot><tr><td class="subtotal">Subtotal (B)</td><td class="subtotal" data-subtotal="B-EUR">–</td><td></td></tr></tfoot>
+      </table>
+      <div class="inline" style="margin-top:6px">
+        <button class="btn" data-add="B-EUR">Add row</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 style="margin:0 0 8px 0">Aggregated totals (saved)</h2>
+    <div class="inline" style="gap:18px">
+      <div>ISK/month →
+        <span class="pill">housing: <strong id="t_housing">–</strong></span>
+        <span class="pill">equipment: <strong id="t_equip">–</strong></span>
+        <span class="pill">admin: <strong id="t_admin">–</strong></span>
+      </div>
+    </div>
+    <div class="inline" style="gap:12px;margin-top:10px">
+      <div>EUR/month →
+        <span class="pill">maintenance: <strong id="t_maint">–</strong></span>
+        <span class="pill">rentals: <strong id="t_rentals">–</strong></span>
+        <span class="pill">spares: <strong id="t_spares">–</strong></span>
+        <span class="pill">electricity: <strong id="t_elec">–</strong></span>
+        <span class="pill">water: <strong id="t_water">–</strong></span>
+        <span class="pill">other: <strong id="t_other">–</strong></span>
+      </div>
+    </div>
+    <div class="muted" style="margin-top:8px">Saved keys:
+      <code>fp:housingCost</code>, <code>fp:equipCost</code>, <code>fp:adminCost</code>,
+      <code>fp:maintEurMonth</code>, <code>fp:rentalsEurMonth</code>, <code>fp:sparesEurMonth</code>, <code>fp:electricityEurMonth</code>, <code>fp:waterEurMonth</code>, <code>fp:otherEurMonth</code>, plus <code>fp:iskPerEur</code> and (optional) <code>fp:workingDays</code>.
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ========================= Locale helpers (shared) ========================= */
+const LOCALE='is-IS';
+const nf0 = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 0 });
+const nf2 = new Intl.NumberFormat(LOCALE, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+function toNumber(value){
+  if (value == null) return NaN;
+  if (typeof value === 'number') return value;
+  let s = (''+value).replace(/\s|\u00A0/g,'').trim();
+  if (s === '') return NaN;
+
+  const hasComma = s.includes(',');
+  const hasDot   = s.includes('.');
+  if (hasComma && hasDot){
+    const lastComma = s.lastIndexOf(',');
+    const lastDot   = s.lastIndexOf('.');
+    const decIsComma = lastComma > lastDot;
+    if (decIsComma){
+      s = s.replace(/\./g,'').replace(',', '.');
+    } else {
+      s = s.replace(/,/g,''); // dot decimal
     }
-
-    // debounced recalc+save
-    const debounce=(fn,ms=120)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}};
-    const debouncedRecalcSave = debounce(()=>{ updateTotals(); saveBuildings(); }, 120);
-
-    /* ---------- categories ---------- */
-    const CATS_MONTH_ISK = [
-      {value:'housing',   label:'Housing (ISK/mo)'},
-      {value:'equipment', label:'Equipment (ISK/mo)'},
-      {value:'admin',     label:'Admin (ISK/mo)'}
-    ];
-    const CATS_MONTH_EUR = [
-      {value:'maintenance', label:'Maintenance (€/mo)'},
-      {value:'rentals',     label:'Rentals (€/mo)'},
-      {value:'spares',      label:'Spare parts (€/mo)'},
-      {value:'electricity', label:'Electricity (€/mo)'},
-      {value:'water',       label:'Water (€/mo)'},
-      {value:'otherEur',    label:'Other (€/mo)'}
-    ];
-    const fillCat=(el,list)=>{ el.innerHTML=list.map(c=>`<option value="${c.value}">${c.label}</option>`).join(''); };
-
-    // amount formatters
-    const nfISK = new Intl.NumberFormat('is-IS',{maximumFractionDigits:0});
-    const nfEUR = new Intl.NumberFormat('is-IS',{minimumFractionDigits:2,maximumFractionDigits:2});
-    function attachAmtFormatting(input, decimals){
-      if(!input) return;
-      input.addEventListener('focus', ()=>{
-        const n = toNumber(input.value);
-        if(Number.isFinite(n)) input.value = String(n);
-      });
-      input.addEventListener('blur', ()=>{
-        const n = toNumber(input.value);
-        if(!Number.isFinite(n)) return;
-        input.value = decimals===0 ? nfISK.format(Math.round(n)) : nfEUR.format(n);
-      });
+  } else if (hasComma){
+    if ((s.match(/,/g)||[]).length > 1){
+      const last = s.lastIndexOf(',');
+      s = s.slice(0,last).replace(/,/g,'') + '.' + s.slice(last+1);
+    } else {
+      s = s.replace(',', '.');
     }
-
-    /* ---------- row builder ---------- */
-    function addCostRow(rowsEl, preset={}){
-      const row = document.createElement('div');
-      row.className = 'row';
-      row.innerHTML = `
-        <input class="name" placeholder="Name (e.g. Rent, Waste pickup)" />
-        <select class="cat"></select>
-        <input class="desc" placeholder="Description (optional)" />
-        <input class="amt" inputmode="decimal" placeholder="${rowsEl.classList.contains('monthly-isk') ? 'ISK/month' : '€/month'}" />
-        <button class="del" type="button">×</button>
-      `;
-
-      if (rowsEl.classList.contains('monthly-isk')) fillCat(row.querySelector('.cat'), CATS_MONTH_ISK);
-      else fillCat(row.querySelector('.cat'), CATS_MONTH_EUR);
-
-      if (preset.name) row.querySelector('.name').value = preset.name;
-      if (preset.desc) row.querySelector('.desc').value = preset.desc;
-      if (preset.amt)  row.querySelector('.amt').value  = preset.amt;
-      if (preset.cat)  row.querySelector('.cat').value  = preset.cat;
-
-      rowsEl.appendChild(row);
-
-      const isISK = rowsEl.classList.contains('monthly-isk');
-      const amtEl = row.querySelector('.amt');
-      attachAmtFormatting(amtEl, isISK ? 0 : 2);
-      if (preset.amt) amtEl.dispatchEvent(new Event('blur')); // format immediately
-
-      row.addEventListener('input', debouncedRecalcSave);
-      row.querySelector('.del').addEventListener('click', ()=>{
-        row.remove();
-        debouncedRecalcSave();
-      });
+  } else if (hasDot){
+    if ((s.match(/\./g)||[]).length > 1){
+      const last = s.lastIndexOf('.');
+      s = s.slice(0,last).replace(/\./g,'') + '.' + s.slice(last+1);
     }
+  }
+  const n = Number(s);
+  return Number.isFinite(n) ? n : NaN;
+}
+function fmt(n,dec){
+  if (!Number.isFinite(n)) return '–';
+  if (typeof dec==='number'){
+    return new Intl.NumberFormat(LOCALE, { minimumFractionDigits: dec, maximumFractionDigits: dec }).format(n);
+  }
+  const opts = Number.isInteger(n) ? { maximumFractionDigits: 0 } : { maximumFractionDigits: 2 };
+  return new Intl.NumberFormat(LOCALE, opts).format(n);
+}
 
-    /* ---------- serialize / restore ---------- */
-    const STORE_KEY='fp:fixed:v5';
-    function serializeBuilding(bEl){
-      const pack = (sel)=> qa(`${sel} .row`, bEl).map(r=>({
-        name: r.querySelector('.name')?.value?.trim() || '',
-        cat:  r.querySelector('.cat') ?.value || '',
-        desc: r.querySelector('.desc')?.value?.trim() || '',
-        amt:  r.querySelector('.amt') ?.value?.trim() || ''
-      }));
-      return { title:q('h3',bEl)?.textContent||'', monthlyISK:pack('.monthly-isk'), monthlyEUR:pack('.monthly-eur') };
-    }
-    function restoreBuilding(bEl, data={}){
-      (data.monthlyISK||[]).forEach(x=> addCostRow(q('.monthly-isk', bEl), x));
-      (data.monthlyEUR||[]).forEach(x=> addCostRow(q('.monthly-eur', bEl), x));
-    }
-    function saveBuildings(){ const data=qa('.building').map(serializeBuilding); localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
-    function loadBuildings(){
-      try{
-        let data = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
-        if (!Array.isArray(data)) data=[];
-        [q('#bA'), q('#bB')].forEach((bEl,i)=> restoreBuilding(bEl, data[i]||{}));
-      }catch(e){}
-    }
+/* ========================= Row model & UI ========================= */
+const CAT_ISK = ['housing','equipment','admin'];
+const CAT_EUR = ['maintenance','rentals','spares','electricity','water','other'];
 
-    /* ---------- totals & persistence ---------- */
-    const LS_PREFIX='fp:';
-    function updateTotals(){
-      const buildings=[q('#bA'), q('#bB')];
-      const per = buildings.map(()=>({housing:0,equipment:0,admin:0,maint:0,rentals:0,spares:0,elec:0,water:0,othereur:0}));
+function makeRow(building, currency, cat='', amount=''){
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input type="text" class="cat" placeholder="category" value="${cat}"></td>
+    <td><input type="text" class="num amt" inputmode="decimal" placeholder="${currency}/month" value="${amount}"></td>
+    <td><button class="danger" title="remove">×</button></td>
+  `;
+  tr.querySelector('button').addEventListener('click', ()=>{ tr.remove(); recalcAll(); saveAll(); });
+  wireNum(tr.querySelector('input.amt'));
+  tr.querySelector('input.cat').addEventListener('blur', ()=>{ saveAll(); recalcAll(); });
+  tr.querySelector('input.cat').addEventListener('input', debounce(()=>{ saveAll(); recalcAll(); },250));
+  return tr;
+}
 
-      buildings.forEach((bEl,idx)=>{
-        qa('.monthly-isk .row', bEl).forEach(r=>{
-          const cat=r.querySelector('.cat')?.value||'';
-          const amt=toNumber(r.querySelector('.amt')?.value)||0;
-          if (cat==='housing') per[idx].housing+=amt;
-          else if(cat==='equipment') per[idx].equipment+=amt;
-          else if(cat==='admin') per[idx].admin+=amt;
+function wireNum(inp){
+  inp.addEventListener('focus', ()=>{
+    const n = toNumber(inp.value);
+    if (Number.isFinite(n)) inp.value = String(n).replace(/(?<=\d)\.0+$/,'');
+  });
+  inp.addEventListener('blur', ()=>{
+    const n = toNumber(inp.value);
+    inp.value = Number.isFinite(n) ? fmt(n) : '';
+    saveAll(); recalcAll();
+  });
+  inp.addEventListener('input', debounce(()=>{ saveAll(); recalcAll(); },250));
+}
+
+function addRow(building, currency, cat='', amount=''){
+  const table = document.querySelector(`table[data-building="${building}"][data-currency="${currency}"] tbody`);
+  table.appendChild(makeRow(building, currency, cat, amount));
+}
+
+/* ========================= Persistence ========================= */
+function storageKey(building,currency){
+  return `fp:rows:${building}:${currency}`; // stores JSON of rows [{cat,amount},...]
+}
+function saveAll(){
+  // Save tables
+  for (const building of ['A','B']){
+    for (const currency of ['ISK','EUR']){
+      const rows = [...document.querySelectorAll(`table[data-building="${building}"][data-currency="${currency}"] tbody tr`)]
+        .map(tr=>{
+          return {
+            cat: tr.querySelector('input.cat').value.trim(),
+            amount: tr.querySelector('input.amt').value.trim()
+          };
         });
-        qa('.monthly-eur .row', bEl).forEach(r=>{
-          const cat=r.querySelector('.cat')?.value||'';
-          const amt=toNumber(r.querySelector('.amt')?.value)||0;
-          if (cat==='maintenance') per[idx].maint+=amt;
-          else if (cat==='rentals') per[idx].rentals+=amt;
-          else if (cat==='spares') per[idx].spares+=amt;
-          else if (cat==='electricity') per[idx].elec+=amt;
-          else if (cat==='water') per[idx].water+=amt;
-          else if (cat==='otherEur') per[idx].othereur+=amt;
-        });
-      });
-
-      // per-building mini
-      per.forEach((b,i)=>{
-        setText(`#b${i}-housing`,   fmt(b.housing,0));
-        setText(`#b${i}-equipment`, fmt(b.equipment,0));
-        setText(`#b${i}-admin`,     fmt(b.admin,0));
-        setText(`#b${i}-maint`,     fmt(b.maint,2));
-        setText(`#b${i}-rentals`,   fmt(b.rentals,2));
-        setText(`#b${i}-spares`,    fmt(b.spares,2));
-        setText(`#b${i}-elec`,      fmt(b.elec,2));
-        setText(`#b${i}-water`,     fmt(b.water,2));
-        setText(`#b${i}-othereur`,  fmt(b.othereur,2));
-      });
-
-      // aggregate
-      const agg = per.reduce((a,b)=>({
-        housing:a.housing+b.housing,
-        equipment:a.equipment+b.equipment,
-        admin:a.admin+b.admin,
-        maint:a.maint+b.maint,
-        rentals:a.rentals+b.rentals,
-        spares:a.spares+b.spares,
-        elec:a.elec+b.elec,
-        water:a.water+b.water,
-        othereur:a.othereur+b.othereur
-      }),{housing:0,equipment:0,admin:0,maint:0,rentals:0,spares:0,elec:0,water:0,othereur:0});
-
-      // totals UI
-      setText('#t-housing',   fmt(agg.housing,0));
-      setText('#t-equipment', fmt(agg.equipment,0));
-      setText('#t-admin',     fmt(agg.admin,0));
-      setText('#t-maint',     fmt(agg.maint,2));
-      setText('#t-rentals',   fmt(agg.rentals,2));
-      setText('#t-spares',    fmt(agg.spares,2));
-      setText('#t-elec',      fmt(agg.elec,2));
-      setText('#t-water',     fmt(agg.water,2));
-      setText('#t-other',     fmt(agg.othereur,2));
-
-      return {
-        t_housing:agg.housing, t_equipment:agg.equipment, t_admin:agg.admin,
-        eur:{maint:agg.maint,rentals:agg.rentals,spares:agg.spares,electricity:agg.elec,water:agg.water,other:agg.othereur}
-      };
+      localStorage.setItem(storageKey(building,currency), JSON.stringify(rows));
     }
+  }
+  // Save globals
+  const iskPerEur = document.getElementById('iskPerEur').value.trim();
+  const workingDays = document.getElementById('workingDays').value.trim();
+  if (iskPerEur) localStorage.setItem('fp:iskPerEur', String(toNumber(iskPerEur)));
+  else           localStorage.removeItem('fp:iskPerEur');
+  if (workingDays) localStorage.setItem('fp:workingDays', String(toNumber(workingDays)));
+  else             localStorage.removeItem('fp:workingDays');
+}
 
-    function saveDefaults(){
-      // save rows + totals
-      saveBuildings();
-      const t=updateTotals();
-
-      // globals
-      localStorage.setItem(LS_PREFIX+'iskPerEur', q('#iskPerEur').value||'');
-      if(q('#workingDays').value!=='') localStorage.setItem(LS_PREFIX+'workingDays', q('#workingDays').value);
-
-      // ISK/month
-      localStorage.setItem(LS_PREFIX+'housingCost', String(t.t_housing));
-      localStorage.setItem(LS_PREFIX+'equipCost',   String(t.t_equipment));
-      localStorage.setItem(LS_PREFIX+'adminCost',   String(t.t_admin));
-
-      // EUR/month buckets
-      localStorage.setItem(LS_PREFIX+'maintEurMonth',       String(t.eur.maint.toFixed(2)));
-      localStorage.setItem(LS_PREFIX+'rentalsEurMonth',     String(t.eur.rentals.toFixed(2)));
-      localStorage.setItem(LS_PREFIX+'sparesEurMonth',      String(t.eur.spares.toFixed(2)));
-      localStorage.setItem(LS_PREFIX+'electricityEurMonth', String(t.eur.electricity.toFixed(2)));
-      localStorage.setItem(LS_PREFIX+'waterEurMonth',       String(t.eur.water.toFixed(2)));
-      localStorage.setItem(LS_PREFIX+'otherEurMonth',       String(t.eur.other.toFixed(2)));
-
-      const btn=q('#saveBtn'); if(btn){const old=btn.textContent; btn.textContent='Saved ✓'; setTimeout(()=>btn.textContent=old,900);}
-      return t;
+function loadAll(){
+  for (const building of ['A','B']){
+    for (const currency of ['ISK','EUR']){
+      const key = storageKey(building,currency);
+      const tbody = document.querySelector(`table[data-building="${building}"][data-currency="${currency}"] tbody`);
+      tbody.innerHTML = '';
+      let rows = [];
+      try { rows = JSON.parse(localStorage.getItem(key)||'[]') } catch(e){}
+      if (!rows || !rows.length){
+        // Seed default rows per spec categories
+        const cats = currency==='ISK' ? CAT_ISK : CAT_EUR;
+        for (const c of cats) addRow(building, currency, c, '');
+      } else {
+        for (const r of rows) addRow(building, currency, r.cat||'', r.amount||'');
+      }
     }
+  }
+  // Load globals
+  const fx = localStorage.getItem('fp:iskPerEur'); if (fx) document.getElementById('iskPerEur').value = fmt(toNumber(fx),2);
+  const wd = localStorage.getItem('fp:workingDays'); if (wd) document.getElementById('workingDays').value = fmt(toNumber(wd),0);
+}
 
-    function copyToPlanner(){
-      const t=saveDefaults();
-      const qs=new URLSearchParams();
-      const addStr=(k,v)=>{ if(v!=null && String(v).trim()!=='') qs.set(k,String(v)); };
-      const addNum=(k,v)=>{ const n=toNumber(v); if(Number.isFinite(n)) qs.set(k,String(n)); };
-
-      addStr('iskPerEur', q('#iskPerEur').value);
-      if(q('#workingDays').value!=='') addStr('workingDays', q('#workingDays').value);
-
-      addNum('housingCost', t.t_housing);
-      addNum('equipCost',   t.t_equipment);
-      addNum('adminCost',   t.t_admin);
-
-      addNum('maintEurMonth',       t.eur.maint.toFixed(2));
-      addNum('rentalsEurMonth',     t.eur.rentals.toFixed(2));
-      addNum('sparesEurMonth',      t.eur.spares.toFixed(2));
-      addNum('electricityEurMonth', t.eur.electricity.toFixed(2));
-      addNum('waterEurMonth',       t.eur.water.toFixed(2));
-      addNum('otherEurMonth',       t.eur.other.toFixed(2));
-
-      location.href = './?' + qs.toString() + '#day';
+/* ========================= Totals & Saving required keys ========================= */
+function recalcAll(){
+  // Subtotals per table
+  for (const building of ['A','B']){
+    for (const currency of ['ISK','EUR']){
+      const rows = [...document.querySelectorAll(`table[data-building="${building}"][data-currency="${currency}"] tbody tr`)];
+      let subtotal = 0;
+      for (const tr of rows){
+        const n = toNumber(tr.querySelector('input.amt').value);
+        if (Number.isFinite(n)) subtotal += n;
+      }
+      const subCell = document.querySelector(`[data-subtotal="${building}-${currency}"]`);
+      if (subCell) subCell.textContent = fmt(subtotal, currency==='ISK'?0:2);
     }
+  }
 
-    function resetAll(){
-      if(!confirm('Clear all fixed-cost defaults saved for the planner?')) return;
-      [
-        'iskPerEur','workingDays',
-        'housingCost','equipCost','adminCost',
-        'maintEurMonth','rentalsEurMonth','sparesEurMonth','electricityEurMonth','waterEurMonth','otherEurMonth'
-      ].forEach(k=> localStorage.removeItem(LS_PREFIX+k));
-      localStorage.removeItem(STORE_KEY);
-      location.reload();
+  // Aggregate to the exact saved keys
+  const aggISK = { housing:0, equipment:0, admin:0 };
+  const aggEUR = { maintenance:0, rentals:0, spares:0, electricity:0, water:0, other:0 };
+
+  for (const building of ['A','B']){
+    const rowsISK = [...document.querySelectorAll(`table[data-building="${building}"][data-currency="ISK"] tbody tr`)];
+    for (const tr of rowsISK){
+      const cat = (tr.querySelector('input.cat').value||'').trim().toLowerCase();
+      const val = toNumber(tr.querySelector('input.amt').value)||0;
+      if (cat in aggISK) aggISK[cat] += val;
     }
-
-    /* ---------- wiring ---------- */
-    function wireUI(){
-      qa('.building').forEach(b=>{
-        b.querySelector('.add-monthly-isk').addEventListener('click', ()=>{
-          addCostRow(q('.monthly-isk', b));
-          debouncedRecalcSave();
-        });
-        b.querySelector('.add-monthly-eur').addEventListener('click', ()=>{
-          addCostRow(q('.monthly-eur', b));
-          debouncedRecalcSave();
-        });
-      });
-
-      q('#saveBtn').addEventListener('click', saveDefaults);
-      q('#copyBtn').addEventListener('click', copyToPlanner);
-      q('#resetBtn').addEventListener('click', resetAll);
+    const rowsEUR = [...document.querySelectorAll(`table[data-building="${building}"][data-currency="EUR"] tbody tr`)];
+    for (const tr of rowsEUR){
+      const cat = (tr.querySelector('input.cat').value||'').trim().toLowerCase();
+      const val = toNumber(tr.querySelector('input.amt').value)||0;
+      if (cat in aggEUR) aggEUR[cat] += val;
+      else if (cat && !CAT_EUR.includes(cat)) aggEUR.other += val; // non-listed EUR cats count as "other"
     }
+  }
 
-    document.addEventListener('DOMContentLoaded', ()=>{
-      // Load globals if previously saved
-      q('#iskPerEur').value   = localStorage.getItem(LS_PREFIX+'iskPerEur')   || '';
-      q('#workingDays').value = localStorage.getItem(LS_PREFIX+'workingDays') || '';
+  // Save required keys (remove if zero)
+  saveKeyNum('fp:housingCost', aggISK.housing);
+  saveKeyNum('fp:equipCost',   aggISK.equipment);
+  saveKeyNum('fp:adminCost',   aggISK.admin);
 
-      wireUI();
-      loadBuildings();
+  saveKeyNum('fp:maintEurMonth',      aggEUR.maintenance);
+  saveKeyNum('fp:rentalsEurMonth',    aggEUR.rentals);
+  saveKeyNum('fp:sparesEurMonth',     aggEUR.spares);
+  saveKeyNum('fp:electricityEurMonth',aggEUR.electricity);
+  saveKeyNum('fp:waterEurMonth',      aggEUR.water);
+  saveKeyNum('fp:otherEurMonth',      aggEUR.other);
 
-      // Ensure any restored amounts are formatted & keep formatting behaviour
-      qa('.monthly-isk .row .amt').forEach(el=>{ attachAmtFormatting(el,0); el.dispatchEvent(new Event('blur')); });
-      qa('.monthly-eur .row .amt').forEach(el=>{ attachAmtFormatting(el,2); el.dispatchEvent(new Event('blur')); });
+  // Update badges
+  document.getElementById('t_housing').textContent = fmt(aggISK.housing,0);
+  document.getElementById('t_equip').textContent   = fmt(aggISK.equipment,0);
+  document.getElementById('t_admin').textContent   = fmt(aggISK.admin,0);
 
-      updateTotals();
+  document.getElementById('t_maint').textContent   = fmt(aggEUR.maintenance,2);
+  document.getElementById('t_rentals').textContent = fmt(aggEUR.rentals,2);
+  document.getElementById('t_spares').textContent  = fmt(aggEUR.spares,2);
+  document.getElementById('t_elec').textContent    = fmt(aggEUR.electricity,2);
+  document.getElementById('t_water').textContent   = fmt(aggEUR.water,2);
+  document.getElementById('t_other').textContent   = fmt(aggEUR.other,2);
+}
+
+function saveKeyNum(key, num){
+  if (num && Number.isFinite(num) && Math.abs(num) > 0){
+    localStorage.setItem(key, String(num));
+  } else {
+    localStorage.removeItem(key);
+  }
+}
+
+/* ========================= Copy to Planner URL ========================= */
+function copyToPlannerURL(){
+  // Start with base index.html
+  const sp = new URLSearchParams();
+
+  // Include non-zero totals & globals
+  const pairs = [
+    ['fp_housingCost',       localStorage.getItem('fp:housingCost')],
+    ['fp_equipCost',         localStorage.getItem('fp:equipCost')],
+    ['fp_adminCost',         localStorage.getItem('fp:adminCost')],
+    ['fp_maintEurMonth',     localStorage.getItem('fp:maintEurMonth')],
+    ['fp_rentalsEurMonth',   localStorage.getItem('fp:rentalsEurMonth')],
+    ['fp_sparesEurMonth',    localStorage.getItem('fp:sparesEurMonth')],
+    ['fp_electricityEurMonth',localStorage.getItem('fp:electricityEurMonth')],
+    ['fp_waterEurMonth',     localStorage.getItem('fp:waterEurMonth')],
+    ['fp_otherEurMonth',     localStorage.getItem('fp:otherEurMonth')],
+    ['fp_iskPerEur',         localStorage.getItem('fp:iskPerEur')],
+    ['fp_workingDays',       localStorage.getItem('fp:workingDays')]
+  ];
+  for (const [k,v] of pairs){
+    const n = toNumber(v);
+    if (v!=null && Number.isFinite(n) && Math.abs(n)>0) sp.set(k, String(n));
+  }
+
+  const url = 'index.html' + (sp.toString() ? ('?'+sp.toString()) : '');
+  // Copy to clipboard & also navigate (pleasant flow)
+  try { navigator.clipboard.writeText(new URL(url, location.href).href); } catch(e){}
+  location.href = url;
+}
+
+/* ========================= Events & bootstrap ========================= */
+function wireButtons(){
+  document.querySelectorAll('button[data-add]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const [building,currency] = btn.getAttribute('data-add').split('-');
+      addRow(building, currency, '', '');
+      saveAll(); recalcAll();
     });
-  </script>
+  });
+  document.getElementById('copyToPlanner').addEventListener('click', copyToPlannerURL);
+
+  // Globals behavior
+  ['iskPerEur','workingDays'].forEach(id=>{
+    const el = document.getElementById(id);
+    // formatters
+    el.addEventListener('focus', ()=>{
+      const n = toNumber(el.value); if (Number.isFinite(n)) el.value = String(n);
+    });
+    el.addEventListener('blur', ()=>{
+      const n = toNumber(el.value);
+      el.value = Number.isFinite(n) ? (id==='workingDays' ? fmt(n,0) : fmt(n,2)) : '';
+      saveAll();
+    });
+    el.addEventListener('input', debounce(saveAll,300));
+  });
+}
+
+function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; }
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  loadAll();
+  recalcAll();
+  wireButtons();
+});
+</script>
 </body>
 </html>
