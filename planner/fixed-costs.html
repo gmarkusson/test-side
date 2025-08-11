@@ -376,17 +376,21 @@ function saveDefaults(){
 
 function copyToPlanner(){
   const t = saveDefaults();
+
   const qs = new URLSearchParams();
   const addStr=(k,v)=>{ if(v!=null && String(v).trim()!=='') qs.set(k,String(v)); };
   const addNum=(k,v)=>{ const n=toNumber(v); if(Number.isFinite(n)) qs.set(k,String(n)); };
 
+  // Globals
   addStr('iskPerEur', q('#iskPerEur').value);
   if(q('#workingDays').value!=='') addStr('workingDays', q('#workingDays').value);
 
+  // ISK/month
   addNum('housingCost', t.t_housing);
   addNum('equipCost',   t.t_equipment);
   addNum('adminCost',   t.t_admin);
 
+  // EUR/month buckets
   addNum('maintEurMonth',       t.eur.maint.toFixed(2));
   addNum('rentalsEurMonth',     t.eur.rentals.toFixed(2));
   addNum('sparesEurMonth',      t.eur.spares.toFixed(2));
@@ -394,7 +398,10 @@ function copyToPlanner(){
   addNum('waterEurMonth',       t.eur.water.toFixed(2));
   addNum('otherEurMonth',       t.eur.other.toFixed(2));
 
-  location.href = './?' + qs.toString() + '#day';
+  // Build a clean path to index.html in the same directory
+  const baseDir = location.pathname.replace(/[^/]+$/, ''); // e.g. /planner/
+  const target  = baseDir + 'index.html?' + qs.toString() + '#day';
+  location.href = target;
 }
 
 function resetAll(){
