@@ -200,10 +200,6 @@ function syncUrlFromInputs(){
 let lastEdited=null;
 
 
-  attachSync();
-  calcKeyNumbers();
-  calcDay();
-});
   
 function attachSync(){
   // 'input' listeners
@@ -492,10 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
   calcDay();
 });
 
-  attachSync();               // wire up listeners
-  calcKeyNumbers();           // initial calc
-  calcDay();                  // also fills Working days if still empty
-});
+
 
 </script>
 
