@@ -272,8 +272,12 @@ const CATS_MONTH_ISK = [
       if (preset.cat)  row.querySelector('.cat').value  = preset.cat;
 
       rowsEl.appendChild(row);
-      row.addEventListener('input', ()=>{ updateTotals(); saveBuildings(); });
-      row.querySelector('.del').addEventListener('click', ()=>{ row.remove(); updateTotals(); saveBuildings(); });
+      row.addEventListener('input', debouncedSaveTotals);
+row.querySelector('.del').addEventListener('click', ()=>{
+  row.remove();
+  debouncedSaveTotals();   // still debounced
+});
+
     }
 
    /* ---------- serialize / restore ---------- */
