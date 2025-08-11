@@ -384,37 +384,66 @@ function fixedMonthlyTotals(){
 /* ===== Factory controller ===== */
 class FactoryPane{
   constructor(root){
-    this.root=root; this.id=root.dataset.factory; this.year=new Date().getFullYear(); this.manualWD=false;
-    this.bindRefs(); this.fillMonthSelect(); this.wireFormatting(); this.wireLogic(); this.loadFromURL(); this.applyDefaultsFromFixed(); this.compute();
-  }
-  bindRefs(){
-    const q=sel=>this.root.querySelector(sel);
-    this.refs = {
-  month:q('.month'), workingDays:q('.workingDays'),
-  iskPerEur:q('.iskPerEur'), pricePerKg:q('.pricePerKg'),
-  rawKg:q('.rawKg'), yieldPct:q('.yieldPct'), netKg:q('.netKg'),
-  laborOps:q('.laborOps'), laborSup:q('.laborSup'), materialsDay:q('.materialsDay'),
-  packDay:q('.packDay'), freightDay:q('.freightDay'), deprDay:q('.deprDay'),
-  yr:q('.yr'), fcIskDay:q('.fcIskDay'), fcEurDay:q('.fcEurDay'), fcTotalDay:q('.fcTotalDay'),
-  kn_revenue:q('.kn_revenue'), kn_totalCost:q('.kn_totalCost'), kn_profit:q('.kn_profit'),
-  kn_margin:q('.kn_margin'), kn_profitPerKg:q('.kn_profitPerKg'),
-  badge:this.root.querySelector(`[data-badge="${this.id}"]`),
-  selectedMonth:q('.selected-month')   // <-- ADD THIS
-};
+    this.root = root;
+    this.id = root.dataset.factory;
+    this.year = new Date().getFullYear();
+    this.manualWD = false;
 
-    if (!this.refs.yr){ const l=this.root.querySelector('.small'); if(l){ const s=document.createElement('span'); s.className='yr'; l.prepend(s); this.refs.yr=s; } }
-    this.refs.yr.textContent=this.year;
+    this.bindRefs();
+    this.fillMonthSelect();
+    this.wireFormatting();
+    this.wireLogic();
+    this.loadFromURL();              // restore values from URL (if any)
+    this.applyDefaultsFromFixed();   // bring in fixed-cost defaults if blanks
+    this.refs.month.dispatchEvent(new Event('change')); // render “Selected: …” + auto WD
+    this.compute();
   }
+
+  bindRefs(){
+    const q = sel => this.root.querySelector(sel);
+    this.refs = {
+      month:q('.month'), workingDays:q('.workingDays'),
+      iskPerEur:q('.iskPerEur'), pricePerKg:q('.pricePerKg'),
+      rawKg:q('.rawKg'), yieldPct:q('.yieldPct'), netKg:q('.netKg'),
+      laborOps:q('.laborOps'), laborSup:q('.laborSup'), materialsDay:q('.materialsDay'),
+      packDay:q('.packDay'), freightDay:q('.freightDay'), deprDay:q('.deprDay'),
+      yr:q('.yr'), fcIskDay:q('.fcIskDay'), fcEurDay:q('.fcEurDay'), fcTotalDay:q('.fcTotalDay'),
+      kn_revenue:q('.kn_revenue'), kn_totalCost:q('.kn_totalCost'), kn_profit:q('.kn_profit'),
+      kn_margin:q('.kn_margin'), kn_profitPerKg:q('.kn_profitPerKg'),
+      badge:this.root.querySelector(`[data-badge="${this.id}"]`),
+      selectedMonth:q('.selected-month')
+    };
+
+    // ensure year text exists
+    if (!this.refs.yr){
+      const l=this.root.querySelector('.small');
+      if(l){
+        const s=document.createElement('span');
+        s.className='yr';
+        l.prepend(s);
+        this.refs.yr=s;
+      }
+    }
+    this.refs.yr.textContent = this.year;
+  }
+
   fillMonthSelect(){
-    const names=[]; for(let m=0;m<12;m++) names.push(new Intl.DateTimeFormat(LOCALE,{month:'long'}).format(new Date(this.year,m,1)));
-    this.refs.month.innerHTML=`<option value="">— choose —</option>`+names.map((n,i)=>`<option value="${i+1}">${n.charAt(0).toUpperCase()+n.slice(1)}</option>`).join('');
+    const names=[];
+    for(let m=0;m<12;m++){
+      names.push(new Intl.DateTimeFormat(LOCALE,{month:'long'}).format(new Date(this.year,m,1)));
+    }
+    this.refs.month.innerHTML =
+      `<option value="">— choose —</option>` +
+      names.map((n,i)=>`<option value="${i+1}">${n.charAt(0).toUpperCase()+n.slice(1)}</option>`).join('');
   }
+
   calcWorkingDays(month1to12){
     const m=(month1to12|0)-1; if(m<0) return NaN;
     let d=new Date(this.year,m,1), days=0;
     while(d.getMonth()===m){ const wd=d.getDay(); if(wd>=1&&wd<=5) days++; d.setDate(d.getDate()+1); }
     return days;
   }
+
   wireFormatting(){
     this.root.querySelectorAll('input.num').forEach(inp=>{
       inp.addEventListener('focus', ()=>{
@@ -433,56 +462,65 @@ class FactoryPane{
       inp.addEventListener('input', debounce(()=>{ scheduleURLUpdate(); this.compute(); },250));
     });
   }
- wireLogic(){
-  const updateSelectedMonth = () => {
-    const sel = this.refs.month;
-    const txt = sel.options[sel.selectedIndex]?.text || '';
-    const display = this.root.querySelector('.selected-month');
-    if (display) display.textContent = txt ? `Selected: ${txt}` : '';
-  };
 
-  // Month changed
-  this.refs.month.addEventListener('change', () => {
-    const mv = toNumber(this.refs.month.value);
-    updateSelectedMonth();
-
-    if (mv >= 1 && mv <= 12) {
-      const auto = this.calcWorkingDays(mv);
-      if (!this.manualWD || !this.refs.workingDays.value.trim()) {
-        this.refs.workingDays.value = fmt(auto, 0);
+  wireLogic(){
+    const updateSelectedMonth = () => {
+      const sel = this.refs.month;
+      const txt = sel.options[sel.selectedIndex]?.text || '';
+      if (this.refs.selectedMonth) {
+        this.refs.selectedMonth.textContent = txt ? `Selected: ${txt}` : '';
       }
-      scheduleURLUpdate();
-      this.compute();
-    }
-  });
+    };
 
-  // Manual override of working days
-  this.refs.workingDays.addEventListener('input', () => { this.manualWD = true; });
+    this.refs.month.addEventListener('change', ()=>{
+      const mv = toNumber(this.refs.month.value);
+      updateSelectedMonth();
 
-  // Recompute for any input/select changes
-  this.root.querySelectorAll('input,select').forEach(el => {
-    el.addEventListener('change', () => this.compute());
-    el.addEventListener('input', debounce(() => this.compute(), 200));
-  });
+      if(mv>=1 && mv<=12){
+        const auto = this.calcWorkingDays(mv);
+        if(!this.manualWD || !this.refs.workingDays.value.trim()){
+          this.refs.workingDays.value = fmt(auto,0);
+        }
+        scheduleURLUpdate();
+        this.compute();
+      }
+    });
 
-  // Render the selected-month text on first paint
-  updateSelectedMonth();
-}
+    this.refs.workingDays.addEventListener('input', ()=>{ this.manualWD=true; });
 
+    this.root.querySelectorAll('input,select').forEach(el=>{
+      el.addEventListener('change', ()=>this.compute());
+      el.addEventListener('input', debounce(()=>this.compute(),200));
+    });
+
+    // initial render of “Selected: …”
+    updateSelectedMonth();
+  }
+
+  loadFromURL(){
+    const sp = readParams();
+    for(const key of FIELD_KEYS){
+      const val = sp.get(`${this.id}_${key}`);
       if(val!=null){
-        const el=this.refs[key];
+        const el = this.refs[key];
         if(el){
-          const n=toNumber(val);
-          el.value=Number.isFinite(n)?fmt(n, el.classList.contains('num-int')?0:undefined):val;
+          const n = toNumber(val);
+          el.value = Number.isFinite(n)
+            ? fmt(n, el.classList.contains('num-int')?0:undefined)
+            : val;
         }
       }
     }
+    // If month came from URL, keep the select in sync
+    // (constructor will dispatch 'change' after this runs)
   }
+
   applyDefaultsFromFixed(){
     const { fxDefault, wdDefault }=fixedMonthlyTotals();
     if(!this.refs.iskPerEur.value && Number.isFinite(fxDefault)) this.refs.iskPerEur.value=fmt(fxDefault,2);
     if(!this.refs.workingDays.value && Number.isFinite(wdDefault) && !this.manualWD) this.refs.workingDays.value=fmt(wdDefault,0);
   }
+
   fixedPerDay(){
     const { iskMonth, eurMonth }=fixedMonthlyTotals();
     const wd=toNumber(this.refs.workingDays.value)||0;
@@ -498,11 +536,13 @@ class FactoryPane{
     this.refs.fcTotalDay.textContent=fmt(total);
     return { iskDay, eurDay, total };
   }
+
   compute(){
     const raw=toNumber(this.refs.rawKg.value);
     const y=toNumber(this.refs.yieldPct.value);
     const net=toNumber(this.refs.netKg.value);
     let r=raw, yy=y, n=net;
+
     if(!Number.isFinite(n) && Number.isFinite(r) && Number.isFinite(yy)){ n=r*(yy/100); this.refs.netKg.value=fmt(n); }
     else if(!Number.isFinite(r) && Number.isFinite(n) && Number.isFinite(yy) && yy!==0){ r=n/(yy/100); this.refs.rawKg.value=fmt(r); }
     else if(!Number.isFinite(yy) && Number.isFinite(n) && Number.isFinite(r) && r!==0){ yy=(n/r)*100; this.refs.yieldPct.value=fmt(yy); }
@@ -533,8 +573,14 @@ class FactoryPane{
     this.refs.badge.textContent=(Number.isFinite(revenue) && Number.isFinite(dayCost))?'Calculated':'Ready';
     updateCompare(this.id,{ netKg:n, revenue, totalCost:dayCost, profit, margin, pPerKg });
   }
-  setText(el,text,extra){ el.textContent=text; el.classList.remove('money-ok','money-bad','money-warn'); if(extra) el.classList.add(extra); }
+
+  setText(el,text,extra){
+    el.textContent=text;
+    el.classList.remove('money-ok','money-bad','money-warn');
+    if(extra) el.classList.add(extra);
+  }
 }
+
 
 /* ===== Compare table ===== */
 const compareState={ A:{}, B:{}, C:{} };
