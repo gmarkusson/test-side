@@ -82,4 +82,491 @@
         <div>
           <div class="row"><label>Raw used kg</label><input type="text" class="num rawKg" placeholder="e.g. 1.500"></div>
           <div class="row"><label>Yield %</label><input type="text" class="num yieldPct" placeholder="e.g. 63,5"></div>
-          <div class="row"><label>Net saleable kg</label><input type="text" class="num n
+          <div class="row"><label>Net saleable kg</label><input type="text" class="num netKg" placeholder="auto if set"></div>
+        </div>
+        <div>
+          <div class="row"><label>Labor — operators</label><input type="text" class="num laborOps" placeholder="EUR/day"></div>
+          <div class="row"><label>Labor — supervisors</label><input type="text" class="num laborSup" placeholder="EUR/day"></div>
+          <div class="row"><label>Materials</label><input type="text" class="num materialsDay" placeholder="EUR/day"></div>
+          <div class="row"><label>Pack</label><input type="text" class="num packDay" placeholder="EUR/day"></div>
+          <div class="row"><label>Freight</label><input type="text" class="num freightDay" placeholder="EUR/day"></div>
+          <div class="row"><label>Depreciation</label><input type="text" class="num deprDay" placeholder="EUR/day"></div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:4px">
+        <label>Fixed costs (per day)</label>
+        <div class="stack">
+          <span class="badge">ISK→EUR/day: <span class="fcIskDay">–</span></span>
+          <span class="badge">EUR/day: <span class="fcEurDay">–</span></span>
+          <span class="badge">Total fixed/day: <span class="fcTotalDay">–</span></span>
+        </div>
+      </div>
+
+      <div class="card" style="padding:10px">
+        <div class="totals">
+          <div class="line"><span>Revenue (EUR)</span><strong class="kn_revenue">–</strong></div>
+          <div class="line"><span>Total cost (EUR/day)</span><strong class="kn_totalCost">–</strong></div>
+          <div class="line"><span>Profit (EUR/day)</span><strong class="kn_profit">–</strong></div>
+          <div class="line"><span>Gross margin %</span><strong class="kn_margin">–</strong></div>
+          <div class="line"><span>Profit / kg (EUR)</span><strong class="kn_profitPerKg">–</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Factory B -->
+    <div class="card factory" id="fxB" data-factory="B">
+      <h2>Factory B <span class="badge" data-badge="B">Ready</span></h2>
+      <!-- identical structure; inputs are namespaced by class selectors -->
+      <div class="split">
+        <div>
+          <div class="row"><label>Month</label><select class="month"></select></div>
+          <div class="row"><label>Working days</label><input type="text" class="num num-int workingDays" placeholder="auto from month"></div>
+          <div class="small">Auto weekdays (Mon–Fri) for <span class="yr"></span>. Manual edit overrides auto.</div>
+        </div>
+        <div>
+          <div class="row"><label>ISK per EUR</label><input type="text" class="num iskPerEur" placeholder="from fixed-costs"></div>
+          <div class="row"><label>Price (EUR/kg)</label><input type="text" class="num pricePerKg" placeholder="e.g. 6,90"></div>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="split">
+        <div>
+          <div class="row"><label>Raw used kg</label><input type="text" class="num rawKg" placeholder="e.g. 1.500"></div>
+          <div class="row"><label>Yield %</label><input type="text" class="num yieldPct" placeholder="e.g. 63,5"></div>
+          <div class="row"><label>Net saleable kg</label><input type="text" class="num netKg" placeholder="auto if set"></div>
+        </div>
+        <div>
+          <div class="row"><label>Labor — operators</label><input type="text" class="num laborOps" placeholder="EUR/day"></div>
+          <div class="row"><label>Labor — supervisors</label><input type="text" class="num laborSup" placeholder="EUR/day"></div>
+          <div class="row"><label>Materials</label><input type="text" class="num materialsDay" placeholder="EUR/day"></div>
+          <div class="row"><label>Pack</label><input type="text" class="num packDay" placeholder="EUR/day"></div>
+          <div class="row"><label>Freight</label><input type="text" class="num freightDay" placeholder="EUR/day"></div>
+          <div class="row"><label>Depreciation</label><input type="text" class="num deprDay" placeholder="EUR/day"></div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:4px">
+        <label>Fixed costs (per day)</label>
+        <div class="stack">
+          <span class="badge">ISK→EUR/day: <span class="fcIskDay">–</span></span>
+          <span class="badge">EUR/day: <span class="fcEurDay">–</span></span>
+          <span class="badge">Total fixed/day: <span class="fcTotalDay">–</span></span>
+        </div>
+      </div>
+
+      <div class="card" style="padding:10px">
+        <div class="totals">
+          <div class="line"><span>Revenue (EUR)</span><strong class="kn_revenue">–</strong></div>
+          <div class="line"><span>Total cost (EUR/day)</span><strong class="kn_totalCost">–</strong></div>
+          <div class="line"><span>Profit (EUR/day)</span><strong class="kn_profit">–</strong></div>
+          <div class="line"><span>Gross margin %</span><strong class="kn_margin">–</strong></div>
+          <div class="line"><span>Profit / kg (EUR)</span><strong class="kn_profitPerKg">–</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Factory C -->
+    <div class="card factory" id="fxC" data-factory="C">
+      <h2>Factory C <span class="badge" data-badge="C">Ready</span></h2>
+      <div class="split">
+        <div>
+          <div class="row"><label>Month</label><select class="month"></select></div>
+          <div class="row"><label>Working days</label><input type="text" class="num num-int workingDays" placeholder="auto from month"></div>
+          <div class="small">Auto weekdays (Mon–Fri) for <span class="yr"></span>. Manual edit overrides auto.</div>
+        </div>
+        <div>
+          <div class="row"><label>ISK per EUR</label><input type="text" class="num iskPerEur" placeholder="from fixed-costs"></div>
+          <div class="row"><label>Price (EUR/kg)</label><input type="text" class="num pricePerKg" placeholder="e.g. 6,90"></div>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="split">
+        <div>
+          <div class="row"><label>Raw used kg</label><input type="text" class="num rawKg" placeholder="e.g. 1.500"></div>
+          <div class="row"><label>Yield %</label><input type="text" class="num yieldPct" placeholder="e.g. 63,5"></div>
+          <div class="row"><label>Net saleable kg</label><input type="text" class="num netKg" placeholder="auto if set"></div>
+        </div>
+        <div>
+          <div class="row"><label>Labor — operators</label><input type="text" class="num laborOps" placeholder="EUR/day"></div>
+          <div class="row"><label>Labor — supervisors</label><input type="text" class="num laborSup" placeholder="EUR/day"></div>
+          <div class="row"><label>Materials</label><input type="text" class="num materialsDay" placeholder="EUR/day"></div>
+          <div class="row"><label>Pack</label><input type="text" class="num packDay" placeholder="EUR/day"></div>
+          <div class="row"><label>Freight</label><input type="text" class="num freightDay" placeholder="EUR/day"></div>
+          <div class="row"><label>Depreciation</label><input type="text" class="num deprDay" placeholder="EUR/day"></div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:4px">
+        <label>Fixed costs (per day)</label>
+        <div class="stack">
+          <span class="badge">ISK→EUR/day: <span class="fcIskDay">–</span></span>
+          <span class="badge">EUR/day: <span class="fcEurDay">–</span></span>
+          <span class="badge">Total fixed/day: <span class="fcTotalDay">–</span></span>
+        </div>
+      </div>
+
+      <div class="card" style="padding:10px">
+        <div class="totals">
+          <div class="line"><span>Revenue (EUR)</span><strong class="kn_revenue">–</strong></div>
+          <div class="line"><span>Total cost (EUR/day)</span><strong class="kn_totalCost">–</strong></div>
+          <div class="line"><span>Profit (EUR/day)</span><strong class="kn_profit">–</strong></div>
+          <div class="line"><span>Gross margin %</span><strong class="kn_margin">–</strong></div>
+          <div class="line"><span>Profit / kg (EUR)</span><strong class="kn_profitPerKg">–</strong></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card compare">
+    <h2 style="margin:0 0 6px 0">Quick comparison</h2>
+    <div class="small" style="margin-bottom:6px">Updates live as you type.</div>
+    <div class="stack" id="chips"></div>
+    <div style="overflow:auto;margin-top:8px">
+      <table>
+        <thead>
+          <tr><th>Factory</th><th>Net kg</th><th>Revenue (€/day)</th><th>Total cost (€/day)</th><th>Profit (€/day)</th><th>Margin %</th><th>€/kg</th></tr>
+        </thead>
+        <tbody id="cmpBody"></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ============================================================
+   Shared helpers (is-IS locale) — defined before use
+   ============================================================ */
+const LOCALE='is-IS';
+function toNumber(value){
+  if (value == null) return NaN;
+  if (typeof value === 'number') return value;
+  let s = (''+value).replace(/\s|\u00A0/g,'').trim();
+  if (s === '') return NaN;
+  const hasComma = s.includes(',');
+  const hasDot   = s.includes('.');
+  if (hasComma && hasDot){
+    const lastComma = s.lastIndexOf(',');
+    const lastDot   = s.lastIndexOf('.');
+    const decIsComma = lastComma > lastDot;
+    if (decIsComma){ s = s.replace(/\./g,'').replace(',', '.'); }
+    else { s = s.replace(/,/g,''); }
+  } else if (hasComma){
+    if ((s.match(/,/g)||[]).length > 1){
+      const last = s.lastIndexOf(',');
+      s = s.slice(0,last).replace(/,/g,'') + '.' + s.slice(last+1);
+    } else { s = s.replace(',', '.'); }
+  } else if (hasDot){
+    if ((s.match(/\./g)||[]).length > 1){
+      const last = s.lastIndexOf('.');
+      s = s.slice(0,last).replace(/\./g,'') + '.' + s.slice(last+1);
+    }
+  }
+  const n = Number(s);
+  return Number.isFinite(n) ? n : NaN;
+}
+function fmt(n,dec){
+  if (!Number.isFinite(n)) return '–';
+  return new Intl.NumberFormat(LOCALE, typeof dec==='number'
+    ? { minimumFractionDigits: dec, maximumFractionDigits: dec }
+    : (Number.isInteger(n) ? { maximumFractionDigits: 0 } : { maximumFractionDigits: 2 })
+  ).format(n);
+}
+function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; }
+
+/* ============================================================
+   URL sync — per factory namespace
+   - Inputs kept in sync with replaceState
+   - Prefix params: A_rawKg, B_pricePerKg, etc.
+   ============================================================ */
+const FACTORIES=['A','B','C'];
+const FIELD_KEYS=['month','workingDays','iskPerEur','pricePerKg','rawKg','yieldPct','netKg','laborOps','laborSup','materialsDay','packDay','freightDay','deprDay'];
+let urlUpdateQueued=false;
+
+function readParams(){ return new URLSearchParams(location.search); }
+function setParamsFromDOM(){
+  const sp=new URLSearchParams();
+  const carry = ['fp_housingCost','fp_equipCost','fp_adminCost','fp_maintEurMonth','fp_rentalsEurMonth','fp_sparesEurMonth','fp_electricityEurMonth','fp_waterEurMonth','fp_otherEurMonth','fp_iskPerEur','fp_workingDays'];
+  // carry through existing fp_* if present
+  const current=readParams();
+  carry.forEach(k=>{ if(current.get(k)!=null) sp.set(k, current.get(k)); });
+  // per factory values
+  for (const f of FACTORIES){
+    const root = document.getElementById('fx'+f);
+    for (const key of FIELD_KEYS){
+      const el = root.querySelector('.'+key);
+      if (!el) continue;
+      const val = (el.value||'').trim();
+      if (val) sp.set(`${f}_${key}`, val);
+    }
+  }
+  const qs = sp.toString();
+  history.replaceState(null,'', qs ? ('?'+qs) : location.pathname);
+}
+function scheduleURLUpdate(){ if(urlUpdateQueued) return; urlUpdateQueued=true; requestAnimationFrame(()=>{ setParamsFromDOM(); urlUpdateQueued=false; }); }
+
+/* ============================================================
+   Fixed-costs interop (reads from LS and/or URL)
+   ============================================================ */
+const LS_KEYS = [
+  'fp:housingCost','fp:equipCost','fp:adminCost',
+  'fp:maintEurMonth','fp:rentalsEurMonth','fp:sparesEurMonth','fp:electricityEurMonth','fp:waterEurMonth','fp:otherEurMonth',
+  'fp:iskPerEur','fp:workingDays'
+];
+function readFixedFromLS(){
+  const o={}; for(const k of LS_KEYS){ const v=localStorage.getItem(k); if(v!=null) o[k]=v; } return o;
+}
+function readFixedFromURL(){
+  const p=readParams(); const map={
+    'fp_housingCost':'fp:housingCost','fp_equipCost':'fp:equipCost','fp_adminCost':'fp:adminCost',
+    'fp_maintEurMonth':'fp:maintEurMonth','fp_rentalsEurMonth':'fp:rentalsEurMonth','fp_sparesEurMonth':'fp:sparesEurMonth',
+    'fp_electricityEurMonth':'fp:electricityEurMonth','fp_waterEurMonth':'fp:waterEurMonth','fp_otherEurMonth':'fp:otherEurMonth',
+    'fp_iskPerEur':'fp:iskPerEur','fp_workingDays':'fp:workingDays'
+  };
+  const o={}; for(const [k,v] of Object.entries(map)){ if(p.get(k)!=null) o[v]=p.get(k); } return o;
+}
+function fixedMonthlyTotals(){
+  const fromLS=readFixedFromLS(), fromURL=readFixedFromURL();
+  const get=(key)=> (fromURL[key]!=null ? toNumber(fromURL[key]) : (fromLS[key]!=null ? toNumber(fromLS[key]) : NaN));
+  const iskMonth=(get('fp:housingCost')||0)+(get('fp:equipCost')||0)+(get('fp:adminCost')||0);
+  const eurMonth=(get('fp:maintEurMonth')||0)+(get('fp:rentalsEurMonth')||0)+(get('fp:sparesEurMonth')||0)+(get('fp:electricityEurMonth')||0)+(get('fp:waterEurMonth')||0)+(get('fp:otherEurMonth')||0);
+  return { iskMonth, eurMonth, fxDefault:get('fp:iskPerEur'), wdDefault:get('fp:workingDays') };
+}
+
+/* ============================================================
+   Factory controller
+   ============================================================ */
+class FactoryPane{
+  constructor(root){
+    this.root = root;
+    this.id   = root.dataset.factory; // 'A' | 'B' | 'C'
+    this.year = new Date().getFullYear();
+    this.manualWD = false;
+    this.bindRefs();
+    this.fillMonthSelect();
+    this.wireFormatting();
+    this.wireLogic();
+    this.loadFromURL();
+    this.applyDefaultsFromFixed();
+    this.compute();
+  }
+
+  bindRefs(){
+    const q = sel => this.root.querySelector(sel);
+    this.refs = {
+      month: q('.month'),
+      workingDays: q('.workingDays'),
+      iskPerEur: q('.iskPerEur'),
+      pricePerKg: q('.pricePerKg'),
+      rawKg: q('.rawKg'),
+      yieldPct: q('.yieldPct'),
+      netKg: q('.netKg'),
+      laborOps: q('.laborOps'),
+      laborSup: q('.laborSup'),
+      materialsDay: q('.materialsDay'),
+      packDay: q('.packDay'),
+      freightDay: q('.freightDay'),
+      deprDay: q('.deprDay'),
+      yr: q('.yr'),
+      fcIskDay: q('.fcIskDay'),
+      fcEurDay: q('.fcEurDay'),
+      fcTotalDay: q('.fcTotalDay'),
+      kn_revenue: q('.kn_revenue'),
+      kn_totalCost: q('.kn_totalCost'),
+      kn_profit: q('.kn_profit'),
+      kn_margin: q('.kn_margin'),
+      kn_profitPerKg: q('.kn_profitPerKg'),
+      badge: this.root.querySelector(`[data-badge="${this.id}"]`)
+    };
+    this.refs.yr.textContent = this.year;
+  }
+
+  fillMonthSelect(){
+    const names=[]; for(let m=0;m<12;m++) names.push(new Intl.DateTimeFormat(LOCALE,{month:'long'}).format(new Date(this.year,m,1)));
+    this.refs.month.innerHTML = `<option value="">— choose —</option>` + names.map((n,i)=>`<option value="${i+1}">${n.charAt(0).toUpperCase()+n.slice(1)}</option>`).join('');
+  }
+
+  calcWorkingDays(month1to12){
+    const m = (month1to12|0)-1; if(m<0) return NaN;
+    let d = new Date(this.year, m, 1), days=0;
+    while (d.getMonth()===m){ const wd=d.getDay(); if(wd>=1&&wd<=5) days++; d.setDate(d.getDate()+1); }
+    return days;
+  }
+
+  // Attach number formatting behavior to every .num in this pane
+  wireFormatting(){
+    this.root.querySelectorAll('input.num').forEach(inp=>{
+      inp.addEventListener('focus', ()=>{
+        const n = toNumber(inp.value);
+        if (Number.isFinite(n)){
+          if (inp.classList.contains('num-int')) inp.value = String(Math.trunc(n));
+          else inp.value = String(n).replace(/(?<=\d)\.0+$/,'');
+        }
+      });
+      inp.addEventListener('blur', ()=>{
+        const n = toNumber(inp.value);
+        const isInt = inp.classList.contains('num-int');
+        inp.value = Number.isFinite(n) ? fmt(n, isInt?0:undefined) : '';
+        scheduleURLUpdate(); this.compute();
+      });
+      inp.addEventListener('input', debounce(()=>{ scheduleURLUpdate(); this.compute(); }, 250));
+    });
+  }
+
+  wireLogic(){
+    // Month change → auto working days (unless manually edited)
+    this.refs.month.addEventListener('change', ()=>{
+      const mv = toNumber(this.refs.month.value);
+      if (mv>=1 && mv<=12){
+        const auto = this.calcWorkingDays(mv);
+        if (!this.manualWD || !this.refs.workingDays.value.trim()){
+          this.refs.workingDays.value = fmt(auto,0);
+        }
+        scheduleURLUpdate();
+        this.compute();
+      }
+    });
+    this.refs.workingDays.addEventListener('input', ()=>{ this.manualWD = true; });
+
+    // Recompute on any change
+    this.root.querySelectorAll('input,select').forEach(el=>{
+      el.addEventListener('change', ()=>this.compute());
+      el.addEventListener('input', debounce(()=>this.compute(), 200));
+    });
+  }
+
+  loadFromURL(){
+    const sp = readParams();
+    for (const key of FIELD_KEYS){
+      const val = sp.get(`${this.id}_${key}`);
+      if (val!=null){
+        const el = this.refs[key];
+        if (el){
+          const n = toNumber(val);
+          el.value = Number.isFinite(n) ? fmt(n, el.classList.contains('num-int')?0:undefined) : val;
+        }
+      }
+    }
+  }
+
+  applyDefaultsFromFixed(){
+    const { fxDefault, wdDefault } = fixedMonthlyTotals();
+    if (!this.refs.iskPerEur.value && Number.isFinite(fxDefault)) this.refs.iskPerEur.value = fmt(fxDefault,2);
+    if (!this.refs.workingDays.value && Number.isFinite(wdDefault) && !this.manualWD) this.refs.workingDays.value = fmt(wdDefault,0);
+  }
+
+  fixedPerDay(){
+    const { iskMonth, eurMonth } = fixedMonthlyTotals();
+    const wd = toNumber(this.refs.workingDays.value) || 0;
+    const fx = toNumber(this.refs.iskPerEur.value) || 0;
+    let iskDay=0, eurDay=0, total=0;
+    if (wd>0){
+      if (iskMonth>0 && fx>0) iskDay = (iskMonth / fx) / wd;
+      if (eurMonth>0) eurDay = eurMonth / wd;
+      total = iskDay + eurDay;
+    }
+    this.refs.fcIskDay.textContent = fmt(iskDay);
+    this.refs.fcEurDay.textContent = fmt(eurDay);
+    this.refs.fcTotalDay.textContent = fmt(total);
+    return { iskDay, eurDay, total };
+  }
+
+  compute(){
+    // Yield triad inference
+    const raw = toNumber(this.refs.rawKg.value);
+    const y   = toNumber(this.refs.yieldPct.value);
+    const net = toNumber(this.refs.netKg.value);
+    let r=raw, yy=y, n=net;
+
+    if (!Number.isFinite(n) && Number.isFinite(r) && Number.isFinite(yy)){ n = r*(yy/100); this.refs.netKg.value = fmt(n); }
+    else if (!Number.isFinite(r) && Number.isFinite(n) && Number.isFinite(yy) && yy!==0){ r = n/(yy/100); this.refs.rawKg.value = fmt(r); }
+    else if (!Number.isFinite(yy) && Number.isFinite(n) && Number.isFinite(r) && r!==0){ yy = (n/r)*100; this.refs.yieldPct.value = fmt(yy); }
+
+    const price = toNumber(this.refs.pricePerKg.value);
+    const { total: fixedDay } = this.fixedPerDay();
+
+    const parts = [
+      toNumber(this.refs.laborOps.value)||0,
+      toNumber(this.refs.laborSup.value)||0,
+      toNumber(this.refs.materialsDay.value)||0,
+      toNumber(this.refs.packDay.value)||0,
+      toNumber(this.refs.freightDay.value)||0,
+      toNumber(this.refs.deprDay.value)||0,
+      fixedDay||0
+    ];
+    const dayCost = parts.reduce((a,b)=>a+b,0);
+
+    const revenue = (Number.isFinite(n) && Number.isFinite(price)) ? (n * price) : NaN;
+    const profit  = (Number.isFinite(revenue) ? (revenue - dayCost) : NaN);
+    const margin  = (Number.isFinite(revenue) && revenue!==0) ? (profit/revenue*100) : NaN;
+    const pPerKg  = (Number.isFinite(profit) && Number.isFinite(n) && n!==0) ? (profit/n) : NaN;
+
+    this.setText(this.refs.kn_revenue, fmt(revenue));
+    this.setText(this.refs.kn_totalCost, fmt(dayCost));
+    this.setText(this.refs.kn_profit, fmt(profit), profit>0?'money-ok':(profit<0?'money-bad':''));
+    this.setText(this.refs.kn_margin, Number.isFinite(margin) ? fmt(margin)+' %' : '–');
+    this.setText(this.refs.kn_profitPerKg, fmt(pPerKg));
+
+    // badge hint
+    this.refs.badge.textContent = (Number.isFinite(revenue) && Number.isFinite(dayCost)) ? 'Calculated' : 'Ready';
+
+    // update compare row
+    updateCompare(this.id, {
+      netKg:n, revenue, totalCost:dayCost, profit, margin, pPerKg
+    });
+  }
+
+  setText(el, text, extraClass){
+    el.textContent = text;
+    el.classList.remove('money-ok','money-bad','money-warn');
+    if (extraClass) el.classList.add(extraClass);
+  }
+}
+
+/* ============================================================
+   Compare table logic
+   ============================================================ */
+const compareState = { A:{}, B:{}, C:{} };
+function updateCompare(id, vals){
+  compareState[id]=vals;
+  const tbody = document.getElementById('cmpBody');
+  tbody.innerHTML = '';
+  for (const f of FACTORIES){
+    const v = compareState[f]||{};
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>${f}</strong></td>
+      <td>${fmt(v.netKg)}</td>
+      <td>${fmt(v.revenue)}</td>
+      <td>${fmt(v.totalCost)}</td>
+      <td class="${(v.profit>0)?'money-ok':(v.profit<0?'money-bad':'')}">${fmt(v.profit)}</td>
+      <td>${Number.isFinite(v.margin)? fmt(v.margin)+' %' : '–'}</td>
+      <td>${fmt(v.pPerKg)}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+  // chip summary (fixed-costs monthly totals snapshot)
+  const { iskMonth, eurMonth } = fixedMonthlyTotals();
+  const chips = document.getElementById('chips');
+  chips.innerHTML='';
+  if (iskMonth) chips.appendChild(chip(`ISK/month (H+E+A): ${fmt(iskMonth,0)} ISK`));
+  if (eurMonth) chips.appendChild(chip(`EUR/month (ops): ${fmt(eurMonth,2)} €`));
+}
+function chip(text){ const s=document.createElement('span'); s.className='chip'; s.textContent=text; return s; }
+
+/* ============================================================
+   Bootstrap
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', ()=>{
+  // instantiate three panes
+  for (const f of FACTORIES){ new FactoryPane(document.getElementById('fx'+f)); }
+  // re-run compare once to draw empty rows
+  updateCompare('A', compareState.A);
+});
+</script>
+</body>
+</html>
