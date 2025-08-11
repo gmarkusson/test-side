@@ -131,95 +131,10 @@
 </main>
 
 <script>
-/* -------------------- helpers -------------------- */
-const locale='is-IS';
-const LS_PREFIX='fp:';
-const q=(s,r=document)=>r.querySelector(s);
-const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
-const setText=(sel,val)=>{const el=typeof sel==='string'?q(sel):sel;if(el)el.textContent=val;};
-const fmt=(n,d=2)=>Number.isFinite(n)? new Intl.NumberFormat(locale,{minimumFractionDigits:d,maximumFractionDigits:d}).format(n):'–';
-
-// robust number parser that accepts any thousands/decimal combo
-function toNumber(v){
-  if(v==null) return NaN;
-  let s=String(v).trim().replace(/\u00A0/g,'').replace(/\s/g,'');
-  if(!s) return NaN;
-  const lastC=s.lastIndexOf(','), lastD=s.lastIndexOf('.');
-  if(lastC>=0 || lastD>=0){
-    if(lastC>lastD){ s=s.replace(/\./g,'').replace(',', '.'); }
-    else{ s=s.replace(/,/g,''); }
-  }
-  const n=Number(s);
-  return Number.isFinite(n)? n : NaN;
-}
-
-/* -------------------- month / working days -------------------- */
-function workingDaysInMonth(val){
-  // accepts "MM" or "YYYY-MM"
-  let y,m;
-  if(/^\d{2}$/.test(val)){ y=new Date().getFullYear(); m=Number(val); }
-  else if(/^\d{4}-\d{2}$/.test(val)){ [y,m]=val.split('-').map(Number); }
-  else{ y=new Date().getFullYear(); m=Number(val)|| (new Date().getMonth()+1); }
-  const end=new Date(y,m,0).getDate();
-  let days=0;
-  for(let d=1; d<=end; d++){ const dow=new Date(y,m-1,d).getDay(); if(dow!==0 && dow!==6) days++; }
-  return days;
-}
-function populateMonthSelect(){
-  const sel=q('#month'); if(!sel) return;
-  sel.innerHTML='';
-  for(let i=0;i<12;i++){
-    const label=new Date(2000,i,1).toLocaleString('en',{month:'long'});
-    const m=String(i+1).padStart(2,'0');
-    sel.add(new Option(label,m));
-  }
-  if(!sel.value) sel.value=String(new Date().getMonth()+1).padStart(2,'0');
-  const wdBox=q('#workingDays');
-  if(wdBox && !wdBox.value){
-    const wd=workingDaysInMonth(sel.value);
-    if(Number.isFinite(wd)) wdBox.value=String(wd);
-  }
-}
-
-/* -------------------- URL <-> inputs -------------------- */
-const bindings={
-  // key numbers
-  producedKg:'#producedKg', sellPriceDay:'#sellPriceDay', rawUsedKg:'#rawUsedKg', yieldPct:'#yieldPct',
-  rawCostPerKg:'#rawCostPerKg', packCostPerKg:'#packCostPerKg', freightPerKg:'#freightPerKg',
-  // day
-  rawUsedKg_day:'#rawUsedKg_day', rawCostPerKg_day:'#rawCostPerKg_day', packCostPerKg_day:'#packCostPerKg_day',
-  producedKg_day:'#producedKg_day', sellPriceDay_day:'#sellPriceDay_day', freightPerKg_day:'#freightPerKg_day',
-  // fixed
-  iskPerEur:'#iskPerEur', workingDays:'#workingDays',
-  housingCost:'#housingCost', equipCost:'#equipCost', adminCost:'#adminCost', deprCost:'#deprCost',
-  month:'#month'
-};
-
-function applyQueryParams(){
-  const p=new URLSearchParams(location.search);
-  for(const [k,sel] of Object.entries(bindings)){
-    const el=q(sel); if(!el) continue;
-    let v=p.get(k);
-    if(v==null || v==='') continue;
-    if(k==='month'){
-      if(/^\d{4}-\d{2}$/.test(v)) v=v.slice(5);
-      if(/^\d{1,2}$/.test(v)) v=v.padStart(2,'0');
-    }
-    el.value=v;
-  }
-}
-function syncUrlFromInputs(){
-  const p=new URLSearchParams(location.search);
-  for(const [k,sel] of Object.entries(bindings)){
-    const el=q(sel);
-    if(el && el.value!=='') p.set(k,el.value); else p.delete(k);
-  }
-  history.replaceState(null,'',`${location.pathname}?${p.toString()}`);
-}
+/* ... keep all helpers above ... */
 
 /* -------------------- number formatting for inputs -------------------- */
 function initNumberFormatting(){
-  // decimals: numeric -> 0, decimal -> 2, override via data-decimals
   const decimalsFor=(el)=>{
     if(el.dataset.decimals!=null) return Math.max(0, Number(el.dataset.decimals)||0);
     return el.getAttribute('inputmode')==='numeric'? 0 : 2;
@@ -239,6 +154,8 @@ function initNumberFormatting(){
     if(!Number.isFinite(n)) return;
     el.value= d===0? String(Math.round(n)) : String(n.toFixed(d));
   };
+
+  // Apply formatting on focus/blur
   document.addEventListener('focusin',e=>{
     const el=e.target;
     if(el.matches('input[inputmode="decimal"], input[inputmode="numeric"]')) raw(el);
@@ -247,174 +164,45 @@ function initNumberFormatting(){
     const el=e.target;
     if(el.matches('input[inputmode="decimal"], input[inputmode="numeric"]')) pretty(el);
   });
-  // initial pretty pass
+
+  // Initial pretty pass (force after load)
   qa('input[inputmode="decimal"], input[inputmode="numeric"]').forEach(pretty);
 }
 
-/* -------------------- storage helpers -------------------- */
-function getParamOrStoreNum(param, storeKey=param){
+/* -------------------- URL <-> inputs -------------------- */
+function applyQueryParams(){
   const p=new URLSearchParams(location.search);
-  const v=p.get(param);
-  if(v!=null && v!==''){ const n=toNumber(v); if(Number.isFinite(n)) return n; }
-  const s=localStorage.getItem(LS_PREFIX+storeKey);
-  const n=toNumber(s);
-  return Number.isFinite(n)? n:0;
+  for(const [k,sel] of Object.entries(bindings)){
+    const el=q(sel); if(!el) continue;
+    let v=p.get(k);
+    if(v==null || v==='') continue;
+    if(k==='month'){
+      if(/^\d{4}-\d{2}$/.test(v)) v=v.slice(5);
+      if(/^\d{1,2}$/.test(v)) v=v.padStart(2,'0');
+    }
+    el.value=v;
+  }
+  // Format immediately after setting from URL
+  qa('input[inputmode="decimal"], input[inputmode="numeric"]').forEach(el=>{
+    const n=toNumber(el.value);
+    if(Number.isFinite(n)) {
+      const d = el.getAttribute('inputmode')==='numeric'? 0 : 2;
+      el.value=new Intl.NumberFormat('is-IS',{minimumFractionDigits:d,maximumFractionDigits:d}).format(d===0?Math.round(n):n);
+    }
+  });
 }
+
 function loadSimpleDefaults(){
   ['iskPerEur','workingDays','housingCost','equipCost','adminCost','deprCost'].forEach(id=>{
     const el=q('#'+id); if(!el || el.value) return;
     const v=localStorage.getItem(LS_PREFIX+id);
-    if(v!=null && v!=='') el.value=v;
-  });
-}
-
-/* -------------------- calculations -------------------- */
-function calcKeyNumbers(){
-  const producedKg=toNumber(q('#producedKg').value);
-  const sellPrice=toNumber(q('#sellPriceDay').value);
-  const rawCost=toNumber(q('#rawCostPerKg').value)||0;
-  const packCost=toNumber(q('#packCostPerKg').value)||0;
-  const freight=toNumber(q('#freightPerKg').value)||0;
-
-  const rawUsedEl=q('#rawUsedKg');
-  const yieldEl=q('#yieldPct');
-  const rawUsedIn=toNumber(rawUsedEl.value);
-  const yieldIn=toNumber(yieldEl.value);
-
-  let rawUsedEff=Number.isFinite(rawUsedIn)? rawUsedIn:NaN;
-  let yieldEff=Number.isFinite(yieldIn)? yieldIn:NaN;
-
-  if(Number.isFinite(producedKg)){
-    if(Number.isFinite(yieldIn) && yieldIn>0){
-      rawUsedEff=producedKg/(yieldIn/100);
-      if(!Number.isFinite(rawUsedIn)) rawUsedEl.value=new Intl.NumberFormat('is-IS',{maximumFractionDigits:0}).format(Math.round(rawUsedEff));
-    }else if(Number.isFinite(rawUsedIn) && rawUsedIn>0){
-      yieldEff=(producedKg/rawUsedIn)*100;
-      if(!Number.isFinite(yieldIn)) yieldEl.value=yieldEff.toFixed(1);
+    if(v!=null && v!=='') {
+      el.value=v;
+      // Format immediately after setting from storage
+      const d = el.getAttribute('inputmode')==='numeric'? 0 : 2;
+      const n=toNumber(v);
+      if(Number.isFinite(n)) el.value=new Intl.NumberFormat('is-IS',{minimumFractionDigits:d,maximumFractionDigits:d}).format(d===0?Math.round(n):n);
     }
-  }
-
-  const revenue=(Number.isFinite(producedKg)&&Number.isFinite(sellPrice))? producedKg*sellPrice:NaN;
-  const rawMatCost=Number.isFinite(rawUsedEff)? rawUsedEff*rawCost:NaN;
-  const packC=Number.isFinite(producedKg)? producedKg*packCost:NaN;
-  const freightC=Number.isFinite(producedKg)? producedKg*freight:NaN;
-
-  const totalCost=[rawMatCost,packC,freightC].reduce((s,v)=>s+(Number.isFinite(v)?v:0),0);
-  const profit=Number.isFinite(revenue)? revenue-totalCost:NaN;
-  const marginPct=(Number.isFinite(revenue)&&revenue!==0)? (profit/revenue)*100:NaN;
-  const profitKg=(Number.isFinite(producedKg)&&producedKg>0)? profit/producedKg:NaN;
-
-  setText('#key-net-kg',fmt(producedKg,0));
-  setText('#key-revenue',fmt(revenue));
-  setText('#key-total-cost',fmt(totalCost));
-  setText('#key-profit',fmt(profit));
-  setText('#key-gm',Number.isFinite(marginPct)? fmt(marginPct,1)+' %':'–');
-  setText('#key-profit-kg',fmt(profitKg));
-}
-
-function calcDay(){
-  // labor
-  const staffCount=toNumber(q('#staffCount').value);
-  const staffHr=toNumber(q('#staffHoursDay').value);
-  const staffRate=toNumber(q('#staffCostPerPerson').value);
-  const supCount=toNumber(q('#supCount').value);
-  const supHr=toNumber(q('#supHoursDay').value);
-  const supRate=toNumber(q('#supCostPerPerson').value);
-  const laborStaff=(Number.isFinite(staffCount)&&Number.isFinite(staffHr)&&Number.isFinite(staffRate))? staffCount*staffHr*staffRate:0;
-  const laborSup=(Number.isFinite(supCount)&&Number.isFinite(supHr)&&Number.isFinite(supRate))? supCount*supHr*supRate:0;
-
-  // materials & production
-  const rawUsedKg_day=toNumber(q('#rawUsedKg_day').value);
-  const rawCostPerKg_day=toNumber(q('#rawCostPerKg_day').value);
-  const packCostPerKg_day=toNumber(q('#packCostPerKg_day').value);
-  const producedKg_day=toNumber(q('#producedKg_day').value);
-  const sellPriceDay_day=toNumber(q('#sellPriceDay_day').value);
-  const freightPerKg_day=toNumber(q('#freightPerKg_day').value);
-
-  const matCost=(Number.isFinite(rawUsedKg_day)&&Number.isFinite(rawCostPerKg_day))? rawUsedKg_day*rawCostPerKg_day:0;
-  const packCost=(Number.isFinite(producedKg_day)&&Number.isFinite(packCostPerKg_day))? producedKg_day*packCostPerKg_day:0;
-  const freight=(Number.isFinite(producedKg_day)&&Number.isFinite(freightPerKg_day))? producedKg_day*freightPerKg_day:0;
-
-  // fixed inputs (ISK→€/day)
-  const iskPerEur=toNumber(q('#iskPerEur').value);
-  let workDays=toNumber(q('#workingDays').value);
-  const mSel=q('#month')?.value?.trim();
-  if(!Number.isFinite(workDays) || workDays<=0){
-    const wd=workingDaysInMonth(mSel||String(new Date().getMonth()+1).padStart(2,'0'));
-    if(Number.isFinite(wd)) workDays=wd;
-  }
-  if(!Number.isFinite(workDays) || workDays<=0) workDays=22;
-
-  const housingISK=toNumber(q('#housingCost').value);
-  const equipISK=toNumber(q('#equipCost').value);
-  const adminISK=toNumber(q('#adminCost').value);
-  const deprEURd=toNumber(q('#deprCost').value)||0;
-
-  const canFX=Number.isFinite(iskPerEur)&&iskPerEur>0;
-  const housingDay=(canFX&&Number.isFinite(housingISK))? (housingISK*iskPerEur)/workDays:0;
-  const equipDay=(canFX&&Number.isFinite(equipISK))? (equipISK*iskPerEur)/workDays:0;
-  const adminDay=(canFX&&Number.isFinite(adminISK))? (adminISK*iskPerEur)/workDays:0;
-
-  // monthly EUR buckets from fixed-costs (localStorage / URL)
-  const maintEURm=getParamOrStoreNum('maintEurMonth');
-  const rentalsEURm=getParamOrStoreNum('rentalsEurMonth');
-  const sparesEURm=getParamOrStoreNum('sparesEurMonth');
-  const elecEURm=getParamOrStoreNum('electricityEurMonth');
-  const waterEURm=getParamOrStoreNum('waterEurMonth');
-  const otherEURm=getParamOrStoreNum('otherEurMonth');
-
-  const maintEURd=maintEURm/workDays, rentalsEURd=rentalsEURm/workDays, sparesEURd=sparesEURm/workDays,
-        elecEURd=elecEURm/workDays, waterEURd=waterEURm/workDays, otherEURd=otherEURm/workDays;
-
-  // totals
-  const revenue=(Number.isFinite(producedKg_day)&&Number.isFinite(sellPriceDay_day))? producedKg_day*sellPriceDay_day:NaN;
-  const totalCost=laborStaff+laborSup+matCost+packCost+freight
-                +elecEURd+waterEURd+maintEURd+rentalsEURd+sparesEURd+otherEURd
-                +housingDay+equipDay+adminDay+deprEURd;
-  const profit=Number.isFinite(revenue)? revenue-totalCost:NaN;
-  const marginPct=(Number.isFinite(revenue)&&revenue!==0)? (profit/revenue)*100:NaN;
-  const costPerKg=(Number.isFinite(producedKg_day)&&producedKg_day>0)? totalCost/producedKg_day:NaN;
-  const yieldDay=(Number.isFinite(producedKg_day)&&Number.isFinite(rawUsedKg_day)&&rawUsedKg_day>0)? (producedKg_day/rawUsedKg_day)*100:NaN;
-
-  // outputs
-  setText('#day-yield',Number.isFinite(yieldDay)? fmt(yieldDay,1)+' %':'–');
-  setText('#day-revenue',fmt(revenue));
-  setText('#day-total-cost',fmt(totalCost));
-  setText('#day-profit',fmt(profit));
-  setText('#day-margin',Number.isFinite(marginPct)? fmt(marginPct,1)+' %':'–');
-  setText('#day-cost-kg',fmt(costPerKg));
-
-  setText('#bd-labor-staff',fmt(laborStaff));
-  setText('#bd-labor-sup',fmt(laborSup));
-  setText('#bd-material',fmt(matCost));
-  setText('#bd-pack',fmt(packCost));
-  setText('#bd-freight',fmt(freight));
-  setText('#bd-elec',fmt(elecEURd));
-  setText('#bd-water',fmt(waterEURd));
-  setText('#bd-maint',fmt(maintEURd));
-  setText('#bd-rentals',fmt(rentalsEURd));
-  setText('#bd-spares',fmt(sparesEURd));
-  setText('#bd-other',fmt(otherEURd));
-  setText('#bd-housing',fmt(housingDay));
-  setText('#bd-equip',fmt(equipDay));
-  setText('#bd-admin',fmt(adminDay));
-  setText('#bd-depr',fmt(deprEURd));
-}
-
-/* -------------------- sync + wiring -------------------- */
-function attachSync(){
-  const onChange=()=>{ syncUrlFromInputs(); calcKeyNumbers(); calcDay(); };
-  qa('input,select').forEach(el=>{
-    el.addEventListener('input', onChange);
-    el.addEventListener('change', onChange);
-  });
-  q('#month')?.addEventListener('change', ()=>{
-    const wdBox=q('#workingDays');
-    if(wdBox && !wdBox.value){
-      const wd=workingDaysInMonth(q('#month').value);
-      if(Number.isFinite(wd)) wdBox.value=String(wd);
-    }
-    onChange();
   });
 }
 
@@ -423,11 +211,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
   populateMonthSelect();
   applyQueryParams();
   loadSimpleDefaults();
-  initNumberFormatting();    // pretty-print existing values (URL/LS) without breaking parsing
+  initNumberFormatting();    // now runs after setting values
   attachSync();
   calcKeyNumbers();
   calcDay();
 });
 </script>
+
 </body>
 </html>
