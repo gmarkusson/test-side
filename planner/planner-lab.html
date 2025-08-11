@@ -82,10 +82,13 @@
           <div id="fxA-help-isk" class="small">1 € = this many ISK (used to convert ISK monthly costs to EUR/day).</div>
           <div class="row"><label>Price (EUR/kg)</label><input type="text" class="num pricePerKg short" placeholder="e.g. 6,90"></div>
 
-          <!-- New: labor hours inputs -->
+          <!-- New: labor hours & rates -->
           <div class="row"><label>DV hours (daytime)</label><input type="text" class="num dvHours short" placeholder="e.g. 120"></div>
+          <div class="row"><label>DV rate (ISK/hour)</label><input type="text" class="num dvRateISK short" placeholder="e.g. 4.200"></div>
+
           <div class="row"><label>YV hours (overtime)</label><input type="text" class="num yvHours short" placeholder="e.g. 20"></div>
-          <div class="row"><label>Hourly rate (ISK/hour)</label><input type="text" class="num hourlyRateISK short" placeholder="e.g. 4.200"></div>
+          <div class="row"><label>YV rate (ISK/hour)</label><input type="text" class="num yvRateISK short" placeholder="e.g. 5.800"></div>
+
           <div class="row"><label>Labor from hours (€/day)</label><input type="text" class="num laborFromHoursDay readonly short" readonly></div>
         </div>
       </div>
@@ -152,8 +155,11 @@
           <div class="row"><label>Price (EUR/kg)</label><input type="text" class="num pricePerKg short" placeholder="e.g. 6,90"></div>
 
           <div class="row"><label>DV hours (daytime)</label><input type="text" class="num dvHours short" placeholder="e.g. 120"></div>
+          <div class="row"><label>DV rate (ISK/hour)</label><input type="text" class="num dvRateISK short" placeholder="e.g. 4.200"></div>
+
           <div class="row"><label>YV hours (overtime)</label><input type="text" class="num yvHours short" placeholder="e.g. 20"></div>
-          <div class="row"><label>Hourly rate (ISK/hour)</label><input type="text" class="num hourlyRateISK short" placeholder="e.g. 4.200"></div>
+          <div class="row"><label>YV rate (ISK/hour)</label><input type="text" class="num yvRateISK short" placeholder="e.g. 5.800"></div>
+
           <div class="row"><label>Labor from hours (€/day)</label><input type="text" class="num laborFromHoursDay readonly short" readonly></div>
         </div>
       </div>
@@ -220,8 +226,11 @@
           <div class="row"><label>Price (EUR/kg)</label><input type="text" class="num pricePerKg short" placeholder="e.g. 6,90"></div>
 
           <div class="row"><label>DV hours (daytime)</label><input type="text" class="num dvHours short" placeholder="e.g. 120"></div>
+          <div class="row"><label>DV rate (ISK/hour)</label><input type="text" class="num dvRateISK short" placeholder="e.g. 4.200"></div>
+
           <div class="row"><label>YV hours (overtime)</label><input type="text" class="num yvHours short" placeholder="e.g. 20"></div>
-          <div class="row"><label>Hourly rate (ISK/hour)</label><input type="text" class="num hourlyRateISK short" placeholder="e.g. 4.200"></div>
+          <div class="row"><label>YV rate (ISK/hour)</label><input type="text" class="num yvRateISK short" placeholder="e.g. 5.800"></div>
+
           <div class="row"><label>Labor from hours (€/day)</label><input type="text" class="num laborFromHoursDay readonly short" readonly></div>
         </div>
       </div>
@@ -328,7 +337,7 @@ function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(
 const FACTORIES=['A','B','C'];
 const FIELD_KEYS=[
   'month','workingDays','iskPerEur','pricePerKg',
-  'dvHours','yvHours','hourlyRateISK',           // NEW
+  'dvHours','dvRateISK','yvHours','yvRateISK',   // rates split
   'rawKg','yieldPct','netKg','laborOps','laborSup',
   'materialsDay','packDay','freightDay','deprDay'
 ];
@@ -394,7 +403,8 @@ class FactoryPane{
     this.refs = {
       month:q('.month'), workingDays:q('.workingDays'),
       iskPerEur:q('.iskPerEur'), pricePerKg:q('.pricePerKg'),
-      dvHours:q('.dvHours'), yvHours:q('.yvHours'), hourlyRateISK:q('.hourlyRateISK'),
+      dvHours:q('.dvHours'), dvRateISK:q('.dvRateISK'),
+      yvHours:q('.yvHours'), yvRateISK:q('.yvRateISK'),
       laborFromHoursDay:q('.laborFromHoursDay'),
       rawKg:q('.rawKg'), yieldPct:q('.yieldPct'), netKg:q('.netKg'),
       laborOps:q('.laborOps'), laborSup:q('.laborSup'),
@@ -517,14 +527,17 @@ class FactoryPane{
   }
 
   laborFromHoursEURDay(){
-    const dv=toNumber(this.refs.dvHours.value)||0;
-    const yv=toNumber(this.refs.yvHours.value)||0;
-    const rateISK=toNumber(this.refs.hourlyRateISK.value)||0;
-    const fx=toNumber(this.refs.iskPerEur.value)||0;
-    const totalHours = dv + yv; // no OT multiplier yet
-    const eur = (fx>0) ? (totalHours*rateISK)/fx : NaN;
-    this.refs.laborFromHoursDay.value = Number.isFinite(eur)? fmt(eur) : '';
-    return Number.isFinite(eur)? eur : 0;
+    const dv = toNumber(this.refs.dvHours.value) || 0;
+    const yv = toNumber(this.refs.yvHours.value) || 0;
+    const dvRate = toNumber(this.refs.dvRateISK.value) || 0;   // ISK/hour
+    const yvRate = toNumber(this.refs.yvRateISK.value) || 0;   // ISK/hour
+    const fx = toNumber(this.refs.iskPerEur.value) || 0;       // ISK per EUR
+
+    const isk = (dv * dvRate) + (yv * yvRate);                 // ISK/day
+    const eur = fx > 0 ? (isk / fx) : NaN;                     // EUR/day
+
+    this.refs.laborFromHoursDay.value = Number.isFinite(eur) ? fmt(eur) : '';
+    return Number.isFinite(eur) ? eur : 0;
   }
 
   compute(){
