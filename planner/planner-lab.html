@@ -63,6 +63,13 @@
     @media (max-width:640px){
       input.short { width: 100%; min-width: 0; }                /* full width on small screens */
     }
+    /* Prevent Grid from stretching the two compact fields */
+.row input.short {
+  width: 160px;
+  min-width: 160px;
+  justify-self: start;   /* stops grid from forcing full width */
+  box-sizing: border-box;
+}
   </style>
 </head>
 <body>
