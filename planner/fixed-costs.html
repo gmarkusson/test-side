@@ -249,42 +249,51 @@
       row.querySelector('.del').addEventListener('click', ()=>{ row.remove(); updateTotals(); saveBuildings(); });
     }
 
-    /* ---------- serialize / restore ---------- */
-    const STORE_KEY = 'fp:fixed:v3';
-    function serializeBuilding(bEl){
-      const pack = (sel)=> qa(`${sel} .row`, bEl).map(r=>({
-        name: r.querySelector('.name')?.value?.trim() || '',
-        cat:  r.querySelector('.cat') ?.value || '',
-        desc: r.querySelector('.desc')?.value?.trim() || '',
-        amt:  r.querySelector('.amt') ?.value?.trim() || ''
-      }));
-      return {
-        title: q('h3', bEl)?.textContent || '',
-        elec:  q('.elec',  bEl)?.value || '',
-        water: q('.water', bEl)?.value || '',
-        monthlyISK: pack('.monthly-isk'),
-        monthlyEUR: pack('.monthly-eur'),
-        dailyEUR:   pack('.daily-eur')
-      };
+   /* ---------- serialize / restore ---------- */
+const STORE_KEY = 'fp:fixed:v2';
+
+function serializeBuilding(bEl){
+  const pack = (sel)=> qa(`${sel} .row`, bEl).map(r=>({
+    name: r.querySelector('.name')?.value?.trim() || '',
+    cat:  r.querySelector('.cat') ?.value || '',
+    desc: r.querySelector('.desc')?.value?.trim() || '',
+    amt:  r.querySelector('.amt') ?.value?.trim() || ''
+  }));
+  return {
+    title: q('h3', bEl)?.textContent || '',
+    elec:  q('.elec',  bEl)?.value || '',
+    water: q('.water', bEl)?.value || '',
+    monthlyISK: pack('.monthly-isk'),
+    monthlyEUR: pack('.monthly-eur'),
+    dailyEUR:   pack('.daily-eur')
+  };
+}
+
+function restoreBuilding(bEl, data={}){
+  if (data.elec)  q('.elec',  bEl).value = data.elec;
+  if (data.water) q('.water', bEl).value = data.water;
+  (data.monthlyISK||[]).forEach(x=> addCostRow(q('.monthly-isk', bEl), x));
+  (data.monthlyEUR||[]).forEach(x=> addCostRow(q('.monthly-eur', bEl), x));
+  (data.dailyEUR||[]).forEach(x=>   addCostRow(q('.daily-eur',   bEl), x));
+}
+
+function saveBuildings(){
+  const data = qa('.building').map(serializeBuilding);
+  localStorage.setItem(STORE_KEY, JSON.stringify(data));
+}
+
+function loadBuildings(){
+  try{
+    let data = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+    if (!Array.isArray(data)) {
+      // Fallback for older v3 saves
+      data = JSON.parse(localStorage.getItem('fp:fixed:v3') || '[]');
     }
-    function restoreBuilding(bEl, data={}){
-      if (data.elec)  q('.elec',  bEl).value = data.elec;
-      if (data.water) q('.water', bEl).value = data.water;
-      (data.monthlyISK||[]).forEach(x=> addCostRow(q('.monthly-isk', bEl), x));
-      (data.monthlyEUR||[]).forEach(x=> addCostRow(q('.monthly-eur', bEl), x));
-      (data.dailyEUR||[]).forEach(x=>   addCostRow(q('.daily-eur',   bEl), x));
-    }
-    function saveBuildings(){
-      const data = qa('.building').map(serializeBuilding);
-      localStorage.setItem(STORE_KEY, JSON.stringify(data));
-    }
-    function loadBuildings(){
-      try{
-        const data = JSON.parse(localStorage.getItem(STORE_KEY)||'[]');
-        const buildings = [q('#bA'), q('#bB')];
-        buildings.forEach((bEl,i)=> restoreBuilding(bEl, data[i]||{}));
-      }catch(e){}
-    }
+    const buildings = [q('#bA'), q('#bB')];
+    buildings.forEach((bEl,i)=> restoreBuilding(bEl, data[i]||{}));
+  }catch(e){}
+}
+
 
     /* ---------- totals & persistence to planner ---------- */
     const LS_PREFIX='fp:';
