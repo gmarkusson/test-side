@@ -2,20 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Factory Planner — Lab (3 Factories, Light Theme)</title>
+  <title>Factory Planner — Lab (3 Factories, Light)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-   :root{
-  --bg:#ffffff;       /* white page background */
-  --card:#f9fafb;     /* light grey cards */
-  --muted:#6b7280;    /* medium grey text for labels */
-  --text:#111827;     /* dark text */
-  --accent:#0ea5e9;   /* blue buttons/accents */
-  --border:#d1d5db;   /* light border */
-  --chip:#e5e7eb;     /* chip background */
-  --ok:#10b981;       /* green for positive numbers */
-}
-
+    /* ===== Light theme ===== */
+    :root{
+      --bg:#ffffff;
+      --card:#f9fafb;
+      --muted:#6b7280;
+      --text:#111827;
+      --accent:#0ea5e9;
+      --ok:#10b981;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --border:#d1d5db;
+      --chip:#e5e7eb;
+    }
     html,body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;margin:0}
     .wrap{max-width:1400px;margin:40px auto;padding:0 20px}
     header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
@@ -54,19 +56,16 @@
     .compare th,.compare td{padding:8px 10px;text-align:left}
     .compare th{color:var(--muted);font-weight:600;font-size:13px}
     .chip{display:inline-block;background:var(--chip);border:1px solid var(--border);padding:4px 8px;border-radius:999px;font-size:12px}
-    /* --- Narrow path fix: ISK per EUR & Price sizing --- */
-.factory .split .row { grid-template-columns: 140px auto; } /* labels get room, inputs don’t squish */
-input.short { width: 140px; min-width: 140px; }            /* keep placeholders readable */
-@media (max-width: 640px){
-  input.short { width: 100%; min-width: 0; }               /* full width on small screens */
-}
+
+    /* ===== FIX: make ISK per EUR & Price inputs wide enough ===== */
+    .factory .split .row { grid-template-columns: 150px auto; } /* give labels room */
+    input.short { width: 160px; min-width: 160px; }             /* keep placeholder visible */
+    @media (max-width:640px){
+      input.short { width: 100%; min-width: 0; }                /* full width on small screens */
+    }
   </style>
 </head>
 <body>
-<!-- KEEP REST OF HTML & SCRIPT FROM YOUR CURRENT planner-lab.html -->
-</body>
-</html>
-
 <div class="wrap">
   <header>
     <h1>Factory Planner — Lab (A/B/C)</h1>
@@ -78,7 +77,7 @@ input.short { width: 140px; min-width: 140px; }            /* keep placeholders 
   </header>
 
   <section class="grid3">
-    <!-- Three factories -->
+    <!-- ========================= FACTORY A ========================= -->
     <div class="card factory" id="fxA" data-factory="A">
       <h2>Factory A <span class="badge" data-badge="A">Ready</span></h2>
       <div class="split">
@@ -88,8 +87,16 @@ input.short { width: 140px; min-width: 140px; }            /* keep placeholders 
           <div class="small">Auto weekdays (Mon–Fri) for <span class="yr"></span>. Manual edit overrides auto.</div>
         </div>
         <div>
-          <div class="row"><label>ISK per EUR</label><input type="text" class="num iskPerEur" placeholder="from fixed-costs"></div>
-          <div class="row"><label>Price (EUR/kg)</label><input type="text" class="num pricePerKg" placeholder="e.g. 6,90"></div>
+          <!-- FIX: clearer placeholder + width + help text -->
+          <div class="row">
+            <label title="1 € costs this many ISK">ISK per EUR</label>
+            <input type="text" class="num iskPerEur short" placeholder="e.g. 153,50" aria-describedby="fxA-help-isk">
+          </div>
+          <div class="row">
+            <label>Price (EUR/kg)</label>
+            <input type="text" class="num pricePerKg short" placeholder="e.g. 6,90">
+          </div>
+          <div id="fxA-help-isk" class="small">1 € = this many ISK (used to convert ISK monthly costs to EUR/day).</div>
         </div>
       </div>
 
@@ -131,10 +138,9 @@ input.short { width: 140px; min-width: 140px; }            /* keep placeholders 
       </div>
     </div>
 
-    <!-- Factory B -->
+    <!-- ========================= FACTORY B ========================= -->
     <div class="card factory" id="fxB" data-factory="B">
       <h2>Factory B <span class="badge" data-badge="B">Ready</span></h2>
-      <!-- identical structure; inputs are namespaced by class selectors -->
       <div class="split">
         <div>
           <div class="row"><label>Month</label><select class="month"></select></div>
@@ -142,8 +148,16 @@ input.short { width: 140px; min-width: 140px; }            /* keep placeholders 
           <div class="small">Auto weekdays (Mon–Fri) for <span class="yr"></span>. Manual edit overrides auto.</div>
         </div>
         <div>
-          <div class="row"><label>ISK per EUR</label><input type="text" class="num iskPerEur" placeholder="from fixed-costs"></div>
-          <div class="row"><label>Price (EUR/kg)</label><input type="text" class="num pricePerKg" placeholder="e.g. 6,90"></div>
+          <!-- FIX: same as A -->
+          <div class="row">
+            <label title="1 € costs this many ISK">ISK per EUR</label>
+            <input type="text" class="num iskPerEur short" placeholder="e.g. 153,50" aria-describedby="fxB-help-isk">
+          </div>
+          <div class="row">
+            <label>Price (EUR/kg)</label>
+            <input type="text" class="num pricePerKg short" placeholder="e.g. 6,90">
+          </div>
+          <div id="fxB-help-isk" class="small">1 € = this many ISK (used to convert ISK monthly costs to EUR/day).</div>
         </div>
       </div>
 
@@ -185,7 +199,7 @@ input.short { width: 140px; min-width: 140px; }            /* keep placeholders 
       </div>
     </div>
 
-    <!-- Factory C -->
+    <!-- ========================= FACTORY C ========================= -->
     <div class="card factory" id="fxC" data-factory="C">
       <h2>Factory C <span class="badge" data-badge="C">Ready</span></h2>
       <div class="split">
@@ -195,8 +209,16 @@ input.short { width: 140px; min-width: 140px; }            /* keep placeholders 
           <div class="small">Auto weekdays (Mon–Fri) for <span class="yr"></span>. Manual edit overrides auto.</div>
         </div>
         <div>
-          <div class="row"><label>ISK per EUR</label><input type="text" class="num iskPerEur" placeholder="from fixed-costs"></div>
-          <div class="row"><label>Price (EUR/kg)</label><input type="text" class="num pricePerKg" placeholder="e.g. 6,90"></div>
+          <!-- FIX: same as A -->
+          <div class="row">
+            <label title="1 € costs this many ISK">ISK per EUR</label>
+            <input type="text" class="num iskPerEur short" placeholder="e.g. 153,50" aria-describedby="fxC-help-isk">
+          </div>
+          <div class="row">
+            <label>Price (EUR/kg)</label>
+            <input type="text" class="num pricePerKg short" placeholder="e.g. 6,90">
+          </div>
+          <div id="fxC-help-isk" class="small">1 € = this many ISK (used to convert ISK monthly costs to EUR/day).</div>
         </div>
       </div>
 
@@ -255,36 +277,24 @@ input.short { width: 140px; min-width: 140px; }            /* keep placeholders 
 </div>
 
 <script>
-/* ============================================================
-   Shared helpers (is-IS locale) — defined before use
-   ============================================================ */
+/* ===== Shared helpers (is-IS locale) ===== */
 const LOCALE='is-IS';
 function toNumber(value){
   if (value == null) return NaN;
   if (typeof value === 'number') return value;
   let s = (''+value).replace(/\s|\u00A0/g,'').trim();
   if (s === '') return NaN;
-  const hasComma = s.includes(',');
-  const hasDot   = s.includes('.');
+  const hasComma = s.includes(','), hasDot = s.includes('.');
   if (hasComma && hasDot){
-    const lastComma = s.lastIndexOf(',');
-    const lastDot   = s.lastIndexOf('.');
-    const decIsComma = lastComma > lastDot;
-    if (decIsComma){ s = s.replace(/\./g,'').replace(',', '.'); }
-    else { s = s.replace(/,/g,''); }
+    const lastComma=s.lastIndexOf(','), lastDot=s.lastIndexOf('.');
+    if (lastComma>lastDot){ s=s.replace(/\./g,'').replace(',', '.'); } else { s=s.replace(/,/g,''); }
   } else if (hasComma){
-    if ((s.match(/,/g)||[]).length > 1){
-      const last = s.lastIndexOf(',');
-      s = s.slice(0,last).replace(/,/g,'') + '.' + s.slice(last+1);
-    } else { s = s.replace(',', '.'); }
+    if ((s.match(/,/g)||[]).length>1){ const last=s.lastIndexOf(','); s=s.slice(0,last).replace(/,/g,'')+'.'+s.slice(last+1); }
+    else { s=s.replace(',', '.'); }
   } else if (hasDot){
-    if ((s.match(/\./g)||[]).length > 1){
-      const last = s.lastIndexOf('.');
-      s = s.slice(0,last).replace(/\./g,'') + '.' + s.slice(last+1);
-    }
+    if ((s.match(/\./g)||[]).length>1){ const last=s.lastIndexOf('.'); s=s.slice(0,last).replace(/\./g,'')+'.'+s.slice(last+1); }
   }
-  const n = Number(s);
-  return Number.isFinite(n) ? n : NaN;
+  const n=Number(s); return Number.isFinite(n)?n:NaN;
 }
 function fmt(n,dec){
   if (!Number.isFinite(n)) return '–';
@@ -295,48 +305,31 @@ function fmt(n,dec){
 }
 function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; }
 
-/* ============================================================
-   URL sync — per factory namespace
-   - Inputs kept in sync with replaceState
-   - Prefix params: A_rawKg, B_pricePerKg, etc.
-   ============================================================ */
+/* ===== URL sync (A_, B_, C_) ===== */
 const FACTORIES=['A','B','C'];
 const FIELD_KEYS=['month','workingDays','iskPerEur','pricePerKg','rawKg','yieldPct','netKg','laborOps','laborSup','materialsDay','packDay','freightDay','deprDay'];
 let urlUpdateQueued=false;
-
 function readParams(){ return new URLSearchParams(location.search); }
 function setParamsFromDOM(){
-  const sp=new URLSearchParams();
-  const carry = ['fp_housingCost','fp_equipCost','fp_adminCost','fp_maintEurMonth','fp_rentalsEurMonth','fp_sparesEurMonth','fp_electricityEurMonth','fp_waterEurMonth','fp_otherEurMonth','fp_iskPerEur','fp_workingDays'];
-  // carry through existing fp_* if present
-  const current=readParams();
+  const sp=new URLSearchParams(), current=readParams();
+  const carry=['fp_housingCost','fp_equipCost','fp_adminCost','fp_maintEurMonth','fp_rentalsEurMonth','fp_sparesEurMonth','fp_electricityEurMonth','fp_waterEurMonth','fp_otherEurMonth','fp_iskPerEur','fp_workingDays'];
   carry.forEach(k=>{ if(current.get(k)!=null) sp.set(k, current.get(k)); });
-  // per factory values
   for (const f of FACTORIES){
-    const root = document.getElementById('fx'+f);
+    const root=document.getElementById('fx'+f);
     for (const key of FIELD_KEYS){
-      const el = root.querySelector('.'+key);
+      const el=root.querySelector('.'+key);
       if (!el) continue;
-      const val = (el.value||'').trim();
+      const val=(el.value||'').trim();
       if (val) sp.set(`${f}_${key}`, val);
     }
   }
-  const qs = sp.toString();
-  history.replaceState(null,'', qs ? ('?'+qs) : location.pathname);
+  const qs=sp.toString(); history.replaceState(null,'', qs?('?'+qs):location.pathname);
 }
 function scheduleURLUpdate(){ if(urlUpdateQueued) return; urlUpdateQueued=true; requestAnimationFrame(()=>{ setParamsFromDOM(); urlUpdateQueued=false; }); }
 
-/* ============================================================
-   Fixed-costs interop (reads from LS and/or URL)
-   ============================================================ */
-const LS_KEYS = [
-  'fp:housingCost','fp:equipCost','fp:adminCost',
-  'fp:maintEurMonth','fp:rentalsEurMonth','fp:sparesEurMonth','fp:electricityEurMonth','fp:waterEurMonth','fp:otherEurMonth',
-  'fp:iskPerEur','fp:workingDays'
-];
-function readFixedFromLS(){
-  const o={}; for(const k of LS_KEYS){ const v=localStorage.getItem(k); if(v!=null) o[k]=v; } return o;
-}
+/* ===== Fixed-costs interop ===== */
+const LS_KEYS=['fp:housingCost','fp:equipCost','fp:adminCost','fp:maintEurMonth','fp:rentalsEurMonth','fp:sparesEurMonth','fp:electricityEurMonth','fp:waterEurMonth','fp:otherEurMonth','fp:iskPerEur','fp:workingDays'];
+function readFixedFromLS(){ const o={}; for(const k of LS_KEYS){ const v=localStorage.getItem(k); if(v!=null) o[k]=v; } return o; }
 function readFixedFromURL(){
   const p=readParams(); const map={
     'fp_housingCost':'fp:housingCost','fp_equipCost':'fp:equipCost','fp_adminCost':'fp:adminCost',
@@ -354,159 +347,114 @@ function fixedMonthlyTotals(){
   return { iskMonth, eurMonth, fxDefault:get('fp:iskPerEur'), wdDefault:get('fp:workingDays') };
 }
 
-/* ============================================================
-   Factory controller
-   ============================================================ */
+/* ===== Factory controller ===== */
 class FactoryPane{
   constructor(root){
-    this.root = root;
-    this.id   = root.dataset.factory; // 'A' | 'B' | 'C'
-    this.year = new Date().getFullYear();
-    this.manualWD = false;
-    this.bindRefs();
-    this.fillMonthSelect();
-    this.wireFormatting();
-    this.wireLogic();
-    this.loadFromURL();
-    this.applyDefaultsFromFixed();
-    this.compute();
+    this.root=root; this.id=root.dataset.factory; this.year=new Date().getFullYear(); this.manualWD=false;
+    this.bindRefs(); this.fillMonthSelect(); this.wireFormatting(); this.wireLogic(); this.loadFromURL(); this.applyDefaultsFromFixed(); this.compute();
   }
-
   bindRefs(){
-    const q = sel => this.root.querySelector(sel);
-    this.refs = {
-      month: q('.month'),
-      workingDays: q('.workingDays'),
-      iskPerEur: q('.iskPerEur'),
-      pricePerKg: q('.pricePerKg'),
-      rawKg: q('.rawKg'),
-      yieldPct: q('.yieldPct'),
-      netKg: q('.netKg'),
-      laborOps: q('.laborOps'),
-      laborSup: q('.laborSup'),
-      materialsDay: q('.materialsDay'),
-      packDay: q('.packDay'),
-      freightDay: q('.freightDay'),
-      deprDay: q('.deprDay'),
-      yr: q('.yr'),
-      fcIskDay: q('.fcIskDay'),
-      fcEurDay: q('.fcEurDay'),
-      fcTotalDay: q('.fcTotalDay'),
-      kn_revenue: q('.kn_revenue'),
-      kn_totalCost: q('.kn_totalCost'),
-      kn_profit: q('.kn_profit'),
-      kn_margin: q('.kn_margin'),
-      kn_profitPerKg: q('.kn_profitPerKg'),
-      badge: this.root.querySelector(`[data-badge="${this.id}"]`)
+    const q=sel=>this.root.querySelector(sel);
+    this.refs={
+      month:q('.month'), workingDays:q('.workingDays'),
+      iskPerEur:q('.iskPerEur'), pricePerKg:q('.pricePerKg'),
+      rawKg:q('.rawKg'), yieldPct:q('.yieldPct'), netKg:q('.netKg'),
+      laborOps:q('.laborOps'), laborSup:q('.laborSup'), materialsDay:q('.materialsDay'),
+      packDay:q('.packDay'), freightDay:q('.freightDay'), deprDay:q('.deprDay'),
+      yr:q('.yr'), fcIskDay:q('.fcIskDay'), fcEurDay:q('.fcEurDay'), fcTotalDay:q('.fcTotalDay'),
+      kn_revenue:q('.kn_revenue'), kn_totalCost:q('.kn_totalCost'), kn_profit:q('.kn_profit'), kn_margin:q('.kn_margin'), kn_profitPerKg:q('.kn_profitPerKg'),
+      badge:this.root.querySelector(`[data-badge="${this.id}"]`)
     };
-    this.refs.yr.textContent = this.year;
+    // Add missing year label if not present
+    if (!this.refs.yr){ const l=this.root.querySelector('.small'); if(l){ const s=document.createElement('span'); s.className='yr'; l.prepend(s); this.refs.yr=s; } }
+    this.refs.yr.textContent=this.year;
   }
-
   fillMonthSelect(){
     const names=[]; for(let m=0;m<12;m++) names.push(new Intl.DateTimeFormat(LOCALE,{month:'long'}).format(new Date(this.year,m,1)));
-    this.refs.month.innerHTML = `<option value="">— choose —</option>` + names.map((n,i)=>`<option value="${i+1}">${n.charAt(0).toUpperCase()+n.slice(1)}</option>`).join('');
+    this.refs.month.innerHTML=`<option value="">— choose —</option>`+names.map((n,i)=>`<option value="${i+1}">${n.charAt(0).toUpperCase()+n.slice(1)}</option>`).join('');
   }
-
   calcWorkingDays(month1to12){
-    const m = (month1to12|0)-1; if(m<0) return NaN;
-    let d = new Date(this.year, m, 1), days=0;
-    while (d.getMonth()===m){ const wd=d.getDay(); if(wd>=1&&wd<=5) days++; d.setDate(d.getDate()+1); }
+    const m=(month1to12|0)-1; if(m<0) return NaN;
+    let d=new Date(this.year,m,1), days=0;
+    while(d.getMonth()===m){ const wd=d.getDay(); if(wd>=1&&wd<=5) days++; d.setDate(d.getDate()+1); }
     return days;
   }
-
-  // Attach number formatting behavior to every .num in this pane
   wireFormatting(){
     this.root.querySelectorAll('input.num').forEach(inp=>{
       inp.addEventListener('focus', ()=>{
-        const n = toNumber(inp.value);
-        if (Number.isFinite(n)){
-          if (inp.classList.contains('num-int')) inp.value = String(Math.trunc(n));
-          else inp.value = String(n).replace(/(?<=\d)\.0+$/,'');
-        }
+        const n=toNumber(inp.value);
+        if(Number.isFinite(n)){ if(inp.classList.contains('num-int')) inp.value=String(Math.trunc(n)); else inp.value=String(n).replace(/(?<=\d)\.0+$/,''); }
       });
       inp.addEventListener('blur', ()=>{
-        const n = toNumber(inp.value);
-        const isInt = inp.classList.contains('num-int');
-        inp.value = Number.isFinite(n) ? fmt(n, isInt?0:undefined) : '';
+        const n=toNumber(inp.value);
+        const isInt=inp.classList.contains('num-int');
+        inp.value=Number.isFinite(n)?fmt(n,isInt?0:undefined):'';
         scheduleURLUpdate(); this.compute();
       });
-      inp.addEventListener('input', debounce(()=>{ scheduleURLUpdate(); this.compute(); }, 250));
+      inp.addEventListener('input', debounce(()=>{ scheduleURLUpdate(); this.compute(); },250));
     });
   }
-
   wireLogic(){
-    // Month change → auto working days (unless manually edited)
     this.refs.month.addEventListener('change', ()=>{
-      const mv = toNumber(this.refs.month.value);
-      if (mv>=1 && mv<=12){
-        const auto = this.calcWorkingDays(mv);
-        if (!this.manualWD || !this.refs.workingDays.value.trim()){
-          this.refs.workingDays.value = fmt(auto,0);
-        }
-        scheduleURLUpdate();
-        this.compute();
+      const mv=toNumber(this.refs.month.value);
+      if(mv>=1&&mv<=12){
+        const auto=this.calcWorkingDays(mv);
+        if(!this.manualWD || !this.refs.workingDays.value.trim()){ this.refs.workingDays.value=fmt(auto,0); }
+        scheduleURLUpdate(); this.compute();
       }
     });
-    this.refs.workingDays.addEventListener('input', ()=>{ this.manualWD = true; });
-
-    // Recompute on any change
+    this.refs.workingDays.addEventListener('input', ()=>{ this.manualWD=true; });
     this.root.querySelectorAll('input,select').forEach(el=>{
       el.addEventListener('change', ()=>this.compute());
-      el.addEventListener('input', debounce(()=>this.compute(), 200));
+      el.addEventListener('input', debounce(()=>this.compute(),200));
     });
   }
-
   loadFromURL(){
-    const sp = readParams();
-    for (const key of FIELD_KEYS){
-      const val = sp.get(`${this.id}_${key}`);
-      if (val!=null){
-        const el = this.refs[key];
-        if (el){
-          const n = toNumber(val);
-          el.value = Number.isFinite(n) ? fmt(n, el.classList.contains('num-int')?0:undefined) : val;
+    const sp=readParams();
+    for(const key of FIELD_KEYS){
+      const val=sp.get(`${this.id}_${key}`);
+      if(val!=null){
+        const el=this.refs[key];
+        if(el){
+          const n=toNumber(val);
+          el.value=Number.isFinite(n)?fmt(n, el.classList.contains('num-int')?0:undefined):val;
         }
       }
     }
   }
-
   applyDefaultsFromFixed(){
-    const { fxDefault, wdDefault } = fixedMonthlyTotals();
-    if (!this.refs.iskPerEur.value && Number.isFinite(fxDefault)) this.refs.iskPerEur.value = fmt(fxDefault,2);
-    if (!this.refs.workingDays.value && Number.isFinite(wdDefault) && !this.manualWD) this.refs.workingDays.value = fmt(wdDefault,0);
+    const { fxDefault, wdDefault }=fixedMonthlyTotals();
+    if(!this.refs.iskPerEur.value && Number.isFinite(fxDefault)) this.refs.iskPerEur.value=fmt(fxDefault,2);
+    if(!this.refs.workingDays.value && Number.isFinite(wdDefault) && !this.manualWD) this.refs.workingDays.value=fmt(wdDefault,0);
   }
-
   fixedPerDay(){
-    const { iskMonth, eurMonth } = fixedMonthlyTotals();
-    const wd = toNumber(this.refs.workingDays.value) || 0;
-    const fx = toNumber(this.refs.iskPerEur.value) || 0;
+    const { iskMonth, eurMonth }=fixedMonthlyTotals();
+    const wd=toNumber(this.refs.workingDays.value)||0;
+    const fx=toNumber(this.refs.iskPerEur.value)||0;
     let iskDay=0, eurDay=0, total=0;
-    if (wd>0){
-      if (iskMonth>0 && fx>0) iskDay = (iskMonth / fx) / wd;
-      if (eurMonth>0) eurDay = eurMonth / wd;
-      total = iskDay + eurDay;
+    if(wd>0){
+      if(iskMonth>0 && fx>0) iskDay=(iskMonth/fx)/wd;
+      if(eurMonth>0) eurDay=eurMonth/wd;
+      total=iskDay+eurDay;
     }
-    this.refs.fcIskDay.textContent = fmt(iskDay);
-    this.refs.fcEurDay.textContent = fmt(eurDay);
-    this.refs.fcTotalDay.textContent = fmt(total);
+    this.refs.fcIskDay.textContent=fmt(iskDay);
+    this.refs.fcEurDay.textContent=fmt(eurDay);
+    this.refs.fcTotalDay.textContent=fmt(total);
     return { iskDay, eurDay, total };
   }
-
   compute(){
-    // Yield triad inference
-    const raw = toNumber(this.refs.rawKg.value);
-    const y   = toNumber(this.refs.yieldPct.value);
-    const net = toNumber(this.refs.netKg.value);
+    // yield triad
+    const raw=toNumber(this.refs.rawKg.value);
+    const y=toNumber(this.refs.yieldPct.value);
+    const net=toNumber(this.refs.netKg.value);
     let r=raw, yy=y, n=net;
+    if(!Number.isFinite(n) && Number.isFinite(r) && Number.isFinite(yy)){ n=r*(yy/100); this.refs.netKg.value=fmt(n); }
+    else if(!Number.isFinite(r) && Number.isFinite(n) && Number.isFinite(yy) && yy!==0){ r=n/(yy/100); this.refs.rawKg.value=fmt(r); }
+    else if(!Number.isFinite(yy) && Number.isFinite(n) && Number.isFinite(r) && r!==0){ yy=(n/r)*100; this.refs.yieldPct.value=fmt(yy); }
 
-    if (!Number.isFinite(n) && Number.isFinite(r) && Number.isFinite(yy)){ n = r*(yy/100); this.refs.netKg.value = fmt(n); }
-    else if (!Number.isFinite(r) && Number.isFinite(n) && Number.isFinite(yy) && yy!==0){ r = n/(yy/100); this.refs.rawKg.value = fmt(r); }
-    else if (!Number.isFinite(yy) && Number.isFinite(n) && Number.isFinite(r) && r!==0){ yy = (n/r)*100; this.refs.yieldPct.value = fmt(yy); }
-
-    const price = toNumber(this.refs.pricePerKg.value);
-    const { total: fixedDay } = this.fixedPerDay();
-
-    const parts = [
+    const price=toNumber(this.refs.pricePerKg.value);
+    const { total: fixedDay }=this.fixedPerDay();
+    const parts=[
       toNumber(this.refs.laborOps.value)||0,
       toNumber(this.refs.laborSup.value)||0,
       toNumber(this.refs.materialsDay.value)||0,
@@ -515,47 +463,33 @@ class FactoryPane{
       toNumber(this.refs.deprDay.value)||0,
       fixedDay||0
     ];
-    const dayCost = parts.reduce((a,b)=>a+b,0);
-
-    const revenue = (Number.isFinite(n) && Number.isFinite(price)) ? (n * price) : NaN;
-    const profit  = (Number.isFinite(revenue) ? (revenue - dayCost) : NaN);
-    const margin  = (Number.isFinite(revenue) && revenue!==0) ? (profit/revenue*100) : NaN;
-    const pPerKg  = (Number.isFinite(profit) && Number.isFinite(n) && n!==0) ? (profit/n) : NaN;
+    const dayCost=parts.reduce((a,b)=>a+b,0);
+    const revenue=(Number.isFinite(n) && Number.isFinite(price)) ? (n*price) : NaN;
+    const profit=(Number.isFinite(revenue) ? (revenue-dayCost) : NaN);
+    const margin=(Number.isFinite(revenue) && revenue!==0) ? (profit/revenue*100) : NaN;
+    const pPerKg=(Number.isFinite(profit) && Number.isFinite(n) && n!==0) ? (profit/n) : NaN;
 
     this.setText(this.refs.kn_revenue, fmt(revenue));
     this.setText(this.refs.kn_totalCost, fmt(dayCost));
     this.setText(this.refs.kn_profit, fmt(profit), profit>0?'money-ok':(profit<0?'money-bad':''));
-    this.setText(this.refs.kn_margin, Number.isFinite(margin) ? fmt(margin)+' %' : '–');
+    this.setText(this.refs.kn_margin, Number.isFinite(margin)?fmt(margin)+' %':'–');
     this.setText(this.refs.kn_profitPerKg, fmt(pPerKg));
 
-    // badge hint
-    this.refs.badge.textContent = (Number.isFinite(revenue) && Number.isFinite(dayCost)) ? 'Calculated' : 'Ready';
-
-    // update compare row
-    updateCompare(this.id, {
-      netKg:n, revenue, totalCost:dayCost, profit, margin, pPerKg
-    });
+    this.refs.badge.textContent=(Number.isFinite(revenue) && Number.isFinite(dayCost))?'Calculated':'Ready';
+    updateCompare(this.id,{ netKg:n, revenue, totalCost:dayCost, profit, margin, pPerKg });
   }
-
-  setText(el, text, extraClass){
-    el.textContent = text;
-    el.classList.remove('money-ok','money-bad','money-warn');
-    if (extraClass) el.classList.add(extraClass);
-  }
+  setText(el,text,extra){ el.textContent=text; el.classList.remove('money-ok','money-bad','money-warn'); if(extra) el.classList.add(extra); }
 }
 
-/* ============================================================
-   Compare table logic
-   ============================================================ */
-const compareState = { A:{}, B:{}, C:{} };
-function updateCompare(id, vals){
+/* ===== Compare table ===== */
+const compareState={ A:{}, B:{}, C:{} };
+function updateCompare(id,vals){
   compareState[id]=vals;
-  const tbody = document.getElementById('cmpBody');
-  tbody.innerHTML = '';
-  for (const f of FACTORIES){
-    const v = compareState[f]||{};
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
+  const tbody=document.getElementById('cmpBody'); tbody.innerHTML='';
+  for(const f of FACTORIES){
+    const v=compareState[f]||{};
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
       <td><strong>${f}</strong></td>
       <td>${fmt(v.netKg)}</td>
       <td>${fmt(v.revenue)}</td>
@@ -566,22 +500,16 @@ function updateCompare(id, vals){
     `;
     tbody.appendChild(tr);
   }
-  // chip summary (fixed-costs monthly totals snapshot)
-  const { iskMonth, eurMonth } = fixedMonthlyTotals();
-  const chips = document.getElementById('chips');
-  chips.innerHTML='';
-  if (iskMonth) chips.appendChild(chip(`ISK/month (H+E+A): ${fmt(iskMonth,0)} ISK`));
-  if (eurMonth) chips.appendChild(chip(`EUR/month (ops): ${fmt(eurMonth,2)} €`));
+  const { iskMonth, eurMonth }=fixedMonthlyTotals();
+  const chips=document.getElementById('chips'); chips.innerHTML='';
+  if(iskMonth) chips.appendChild(chip(`ISK/month (H+E+A): ${fmt(iskMonth,0)} ISK`));
+  if(eurMonth) chips.appendChild(chip(`EUR/month (ops): ${fmt(eurMonth,2)} €`));
 }
 function chip(text){ const s=document.createElement('span'); s.className='chip'; s.textContent=text; return s; }
 
-/* ============================================================
-   Bootstrap
-   ============================================================ */
+/* ===== Bootstrap ===== */
 document.addEventListener('DOMContentLoaded', ()=>{
-  // instantiate three panes
   for (const f of FACTORIES){ new FactoryPane(document.getElementById('fx'+f)); }
-  // re-run compare once to draw empty rows
   updateCompare('A', compareState.A);
 });
 </script>
