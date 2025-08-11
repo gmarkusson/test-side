@@ -197,31 +197,66 @@
     function fillCat(selectEl, list){
       selectEl.innerHTML = list.map(c=>`<option value="${c.value}">${c.label}</option>`).join('');
     }
+// --- amount formatting helpers (IS locale) ---
+const nfISK = new Intl.NumberFormat('is-IS', { maximumFractionDigits: 0 });
+const nfEUR = new Intl.NumberFormat('is-IS', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+function formatAmtInput(input, decimals){
+  const n = toNumber(input.value);
+  if(!Number.isFinite(n)) return;
+  input.value = decimals === 0 ? nfISK.format(Math.round(n)) : nfEUR.format(n);
+}
+
+function attachAmtFormatting(input, decimals){
+  // On focus: strip separators so typing is easy
+  input.addEventListener('focus', () => {
+    const n = toNumber(input.value);
+    if(Number.isFinite(n)) input.value = String(n);
+  });
+  // On blur: format nicely
+  input.addEventListener('blur', () => formatAmtInput(input, decimals));
+}
+
+    
     /* ---------- row builder ---------- */
     function addCostRow(rowsEl, preset={}){
-      const row = document.createElement('div');
-      row.className = 'row';
-      row.innerHTML = `
-        <input class="name" placeholder="Name (e.g. Rent, Waste pickup)" />
-        <select class="cat"></select>
-        <input class="desc" placeholder="Description (optional)" />
-        <input class="amt" inputmode="decimal" placeholder="${rowsEl.classList.contains('monthly-isk') ? 'ISK/month' : '€/month'}" />
-        <button class="del" type="button">×</button>
-      `;
+  const row = document.createElement('div');
+  row.className = 'row';
+  row.innerHTML = `
+    <input class="name" placeholder="Name (e.g. Rent, Waste pickup)" />
+    <select class="cat"></select>
+    <input class="desc" placeholder="Description (optional)" />
+    <input class="amt" inputmode="decimal" placeholder="${rowsEl.classList.contains('monthly-isk') ? 'ISK/month' : '€/month'}" />
+    <button class="del" type="button">×</button>
+  `;
 
-      if (rowsEl.classList.contains('monthly-isk')) fillCat(row.querySelector('.cat'), CATS_MONTH_ISK);
-      else fillCat(row.querySelector('.cat'), CATS_MONTH_EUR);
+  // Category choices based on container
+  if (rowsEl.classList.contains('monthly-isk')) fillCat(row.querySelector('.cat'), CATS_MONTH_ISK);
+  else fillCat(row.querySelector('.cat'), CATS_MONTH_EUR);
 
-      if (preset.name) row.querySelector('.name').value = preset.name;
-      if (preset.desc) row.querySelector('.desc').value = preset.desc;
-      if (preset.amt)  row.querySelector('.amt').value  = preset.amt;
-      if (preset.cat)  row.querySelector('.cat').value  = preset.cat;
+  // Presets
+  if (preset.name) row.querySelector('.name').value = preset.name;
+  if (preset.desc) row.querySelector('.desc').value = preset.desc;
+  if (preset.amt)  row.querySelector('.amt').value  = preset.amt;
+  if (preset.cat)  row.querySelector('.cat').value  = preset.cat;
 
-      rowsEl.appendChild(row);
-      row.addEventListener('input', debouncedSave);
-      row.querySelector('.del').addEventListener('click', ()=>{ row.remove(); debouncedSave(); });
-    }
+  rowsEl.appendChild(row);
+
+  // NEW: hook up thousand-separator formatting for the amount field
+  const isISK = rowsEl.classList.contains('monthly-isk');
+  const amtEl = row.querySelector('.amt');
+  attachAmtFormatting(amtEl, isISK ? 0 : 2);
+  // If preset value existed, format it right away
+  if (preset.amt) formatAmtInput(amtEl, isISK ? 0 : 2);
+
+  // Existing listeners
+  row.addEventListener('input', debouncedSaveTotals);
+  row.querySelector('.del').addEventListener('click', ()=>{
+    row.remove();
+    debouncedSaveTotals();
+  });
+}
+
 
     /* ---------- serialize / restore ---------- */
     const STORE_KEY = 'fp:fixed:v4';
