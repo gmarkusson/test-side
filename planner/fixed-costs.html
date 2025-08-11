@@ -201,6 +201,33 @@
       else if(hasD){ const parts=s.split('.'), thousands=parts.length>1&&parts.every((p,i)=>(i===0?p.length<=3:p.length===3)); if(thousands) s=s.replace(/\./g,''); }
       const n=Number(s); return Number.isFinite(n)? n : NaN;
     }
+const n=Number(s); return Number.isFinite(n)? n : NaN;
+}
+
+// --- tiny helpers ---
+const debounce = (fn, delay = 120) => { 
+  let t; 
+  return (...a) => { 
+    clearTimeout(t); 
+    t = setTimeout(() => fn(...a), delay); 
+  }; 
+};
+
+const debouncedSaveTotals = debounce(() => { 
+  updateTotals(); 
+  saveBuildings(); 
+}, 120);
+
+const addStr = (qs, k, v) => { 
+  if (v != null && String(v).trim() !== '') qs.set(k, String(v)); 
+};
+const addNum = (qs, k, v) => { 
+  const n = toNumber(v); 
+  if (Number.isFinite(n) && n !== 0) qs.set(k, String(n)); 
+};
+
+/* -------- categories -------- */
+const CATS_MONTH_ISK = [
 
     /* ---------- categories ---------- */
     const CATS_MONTH_ISK = [
