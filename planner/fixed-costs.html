@@ -179,6 +179,7 @@
     // debounce
     const debounce=(fn,ms=120)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}};
     const debouncedSave = debounce(()=>{ updateTotals(); saveBuildings(); }, 120);
+     }
 
     /* ---------- categories ---------- */
     const CATS_MONTH_ISK = [
