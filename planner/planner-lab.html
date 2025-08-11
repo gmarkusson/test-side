@@ -389,16 +389,19 @@ class FactoryPane{
   }
   bindRefs(){
     const q=sel=>this.root.querySelector(sel);
-    this.refs={
-      month:q('.month'), workingDays:q('.workingDays'),
-      iskPerEur:q('.iskPerEur'), pricePerKg:q('.pricePerKg'),
-      rawKg:q('.rawKg'), yieldPct:q('.yieldPct'), netKg:q('.netKg'),
-      laborOps:q('.laborOps'), laborSup:q('.laborSup'), materialsDay:q('.materialsDay'),
-      packDay:q('.packDay'), freightDay:q('.freightDay'), deprDay:q('.deprDay'),
-      yr:q('.yr'), fcIskDay:q('.fcIskDay'), fcEurDay:q('.fcEurDay'), fcTotalDay:q('.fcTotalDay'),
-      kn_revenue:q('.kn_revenue'), kn_totalCost:q('.kn_totalCost'), kn_profit:q('.kn_profit'), kn_margin:q('.kn_margin'), kn_profitPerKg:q('.kn_profitPerKg'),
-      badge:this.root.querySelector(`[data-badge="${this.id}"]`)
-    };
+    this.refs = {
+  month:q('.month'), workingDays:q('.workingDays'),
+  iskPerEur:q('.iskPerEur'), pricePerKg:q('.pricePerKg'),
+  rawKg:q('.rawKg'), yieldPct:q('.yieldPct'), netKg:q('.netKg'),
+  laborOps:q('.laborOps'), laborSup:q('.laborSup'), materialsDay:q('.materialsDay'),
+  packDay:q('.packDay'), freightDay:q('.freightDay'), deprDay:q('.deprDay'),
+  yr:q('.yr'), fcIskDay:q('.fcIskDay'), fcEurDay:q('.fcEurDay'), fcTotalDay:q('.fcTotalDay'),
+  kn_revenue:q('.kn_revenue'), kn_totalCost:q('.kn_totalCost'), kn_profit:q('.kn_profit'),
+  kn_margin:q('.kn_margin'), kn_profitPerKg:q('.kn_profitPerKg'),
+  badge:this.root.querySelector(`[data-badge="${this.id}"]`),
+  selectedMonth:q('.selected-month')   // <-- ADD THIS
+};
+
     if (!this.refs.yr){ const l=this.root.querySelector('.small'); if(l){ const s=document.createElement('span'); s.className='yr'; l.prepend(s); this.refs.yr=s; } }
     this.refs.yr.textContent=this.year;
   }
@@ -430,42 +433,42 @@ class FactoryPane{
       inp.addEventListener('input', debounce(()=>{ scheduleURLUpdate(); this.compute(); },250));
     });
   }
-  wireLogic(){
-  this.refs.month.addEventListener('change', ()=>{
-    const mv = toNumber(this.refs.month.value);
-    const monthName = this.refs.month.options[this.refs.month.selectedIndex]?.text || '';
-    
+ wireLogic(){
+  const updateSelectedMonth = () => {
+    const sel = this.refs.month;
+    const txt = sel.options[sel.selectedIndex]?.text || '';
     const display = this.root.querySelector('.selected-month');
-    if (display) {
-      display.textContent = monthName ? `Selected: ${monthName}` : '';
-    }
+    if (display) display.textContent = txt ? `Selected: ${txt}` : '';
+  };
 
-    if(mv>=1 && mv<=12){
+  // Month changed
+  this.refs.month.addEventListener('change', () => {
+    const mv = toNumber(this.refs.month.value);
+    updateSelectedMonth();
+
+    if (mv >= 1 && mv <= 12) {
       const auto = this.calcWorkingDays(mv);
-      if(!this.manualWD || !this.refs.workingDays.value.trim()){ 
-        this.refs.workingDays.value = fmt(auto,0); 
+      if (!this.manualWD || !this.refs.workingDays.value.trim()) {
+        this.refs.workingDays.value = fmt(auto, 0);
       }
-      scheduleURLUpdate(); 
+      scheduleURLUpdate();
       this.compute();
     }
   });
 
-  this.refs.workingDays.addEventListener('input', ()=>{ this.manualWD=true; });
-  this.root.querySelectorAll('input,select').forEach(el=>{
-    el.addEventListener('change', ()=>this.compute());
-    el.addEventListener('input', debounce(()=>this.compute(),200));
+  // Manual override of working days
+  this.refs.workingDays.addEventListener('input', () => { this.manualWD = true; });
+
+  // Recompute for any input/select changes
+  this.root.querySelectorAll('input,select').forEach(el => {
+    el.addEventListener('change', () => this.compute());
+    el.addEventListener('input', debounce(() => this.compute(), 200));
   });
+
+  // Render the selected-month text on first paint
+  updateSelectedMonth();
 }
-    this.refs.workingDays.addEventListener('input', ()=>{ this.manualWD=true; });
-    this.root.querySelectorAll('input,select').forEach(el=>{
-      el.addEventListener('change', ()=>this.compute());
-      el.addEventListener('input', debounce(()=>this.compute(),200));
-    });
-  }
-  loadFromURL(){
-    const sp=readParams();
-    for(const key of FIELD_KEYS){
-      const val=sp.get(`${this.id}_${key}`);
+
       if(val!=null){
         const el=this.refs[key];
         if(el){
