@@ -378,30 +378,51 @@
     }
 
     // load fp:* defaults only for visible inputs
-    const FIXED_DEFAULT_IDS = ['iskPerEur','workingDays','housingCost','equipCost','adminCost','deprCost'];
-    function loadDefaultsFromStorage() {
-      FIXED_DEFAULT_IDS.forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        if (el.value !== '' && el.value != null) return;
-        const v = localStorage.getItem(LS_PREFIX + id);
-        if (v != null && v !== '') el.value = v;
-      });
-    }
+    const LS_PREFIX = 'fp:';  // existing
 
-    function attachSync(){
-      qa('input, select').forEach(el=>{
-        el.addEventListener('input', ()=>{
-          syncUrlFromInputs();
-          calcKeyNumbers();
-          calcDay();
-        });
-      });
-      q('#producedKg')?.addEventListener('blur', ()=>formatIntInput(q('#producedKg')));
-      q('#rawUsedKg')?.addEventListener('blur', ()=>formatIntInput(q('#rawUsedKg')));
-      q('#producedKg_day')?.addEventListener('blur', ()=>formatIntInput(q('#producedKg_day')));
-      q('#rawUsedKg_day')?.addEventListener('blur', ()=>formatIntInput(q('#rawUsedKg_day')));
-    }
+function loadDefaultsFromStorage() {
+  // 1) Fill simple fields from storage if empty (as you already did)
+  const ids = [
+    'iskPerEur','workingDays',
+    'housingCost','equipCost','adminCost',
+    'maintenanceCost','deprCost','otherCost',
+    'elecKwh','elecCostPerKwh','waterM3','waterCostPerM3'
+  ];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (el.value !== '' && el.value != null) return;
+    const v = localStorage.getItem(LS_PREFIX + id);
+    if (v != null && v !== '') el.value = v;
+  });
+
+  // 2) If €/day fields are still empty, derive them from the monthly EUR buckets
+  const wdBox = document.getElementById('workingDays');
+  let wd = toNumber(wdBox?.value);
+  if (!Number.isFinite(wd)) {
+    // use selected month if present, else 22
+    const m = document.getElementById('month')?.value;
+    wd = Number.isFinite(workingDaysInMonth?.(m)) ? workingDaysInMonth(m) : 22;
+    if (wdBox && !wdBox.value) wdBox.value = String(wd);
+  }
+
+  const getM = (k) => toNumber(localStorage.getItem(LS_PREFIX + k));
+  const maintMonth = (getM('maintEurMonth') || 0) + (getM('sparesEurMonth') || 0);
+  const otherMonth = (getM('rentalsEurMonth') || 0)
+                   + (getM('electricityEurMonth') || 0)
+                   + (getM('waterEurMonth') || 0)
+                   + (getM('otherEurMonth') || 0);
+
+  const maintDay = Number.isFinite(wd) && wd > 0 ? maintMonth / wd : NaN;
+  const otherDay = Number.isFinite(wd) && wd > 0 ? otherMonth / wd : NaN;
+
+  const maintEl = document.getElementById('maintenanceCost');
+  const otherEl = document.getElementById('otherCost');
+
+  if (maintEl && !maintEl.value && Number.isFinite(maintDay)) maintEl.value = maintDay.toFixed(2);
+  if (otherEl && !otherEl.value && Number.isFinite(otherDay)) otherEl.value = otherDay.toFixed(2);
+}
+
 
     document.addEventListener('DOMContentLoaded', () => {
       populateMonthSelect();
