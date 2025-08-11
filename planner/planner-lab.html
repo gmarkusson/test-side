@@ -70,6 +70,8 @@
   justify-self: start;   /* stops grid from forcing full width */
   box-sizing: border-box;
 }
+    .help-row { margin-top: -6px; }        /* pulls help text closer to inputs */
+.help-row .small { font-size: 12px; color: var(--muted); }
   </style>
 </head>
 <body>
@@ -103,7 +105,11 @@
   <label>Price (EUR/kg)</label>
   <input type="text" class="num pricePerKg short" placeholder="e.g. 6,90">
 </div>
-<div id="fxA-help-isk" class="small">1 € = this many ISK (used to convert ISK monthly costs to EUR/day).</div>
+<div class="row help-row">
+  <div id="fxA-help-isk" class="small" style="grid-column: 1 / -1;">
+    1 € = this many ISK (used to convert ISK monthly costs to EUR/day).
+  </div>
+</div>
         </div>
       </div>
 
@@ -164,7 +170,12 @@
   <label>Price (EUR/kg)</label>
   <input type="text" class="num pricePerKg short" placeholder="e.g. 6,90">
 </div>
-<div id="fxB-help-isk" class="small">1 € = this many ISK (used to convert ISK monthly costs to EUR/day).</div>
+<div class="row help-row">
+  <div id="fxB-help-isk" class="small" style="grid-column: 1 / -1;">
+    1 € = this many ISK (used to convert ISK monthly costs to EUR/day).
+  </div>
+</div>
+
         </div>
       </div>
 
@@ -225,7 +236,12 @@
   <label>Price (EUR/kg)</label>
   <input type="text" class="num pricePerKg short" placeholder="e.g. 6,90">
 </div>
-<div id="fxC-help-isk" class="small">1 € = this many ISK (used to convert ISK monthly costs to EUR/day).</div>
+<div class="row help-row">
+  <div id="fxC-help-isk" class="small" style="grid-column: 1 / -1;">
+    1 € = this many ISK (used to convert ISK monthly costs to EUR/day).
+  </div>
+</div>
+
         </div>
       </div>
 
