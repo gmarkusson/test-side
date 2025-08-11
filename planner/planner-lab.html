@@ -2,30 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Factory Planner — Lab (3 Factories, Light)</title>
+  <title>Factory Planner — Lab (A/B/C)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    /* ===== Light theme ===== */
     :root{
-      --bg:#ffffff;
-      --card:#f9fafb;
-      --muted:#6b7280;
-      --text:#111827;
-      --accent:#0ea5e9;
-      --ok:#10b981;
-      --warn:#f59e0b;
-      --bad:#ef4444;
-      --border:#d1d5db;
-      --chip:#e5e7eb;
+      --bg:#ffffff; --card:#f9fafb; --muted:#6b7280; --text:#111827; --accent:#0ea5e9;
+      --ok:#10b981; --warn:#f59e0b; --bad:#ef4444; --border:#d1d5db; --chip:#e5e7eb;
     }
     html,body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;margin:0}
     .wrap{max-width:1400px;margin:40px auto;padding:0 20px}
     header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
     h1{font-size:clamp(20px,3vw,28px);margin:0}
-    a.button,button{
-      background:var(--accent);color:#fff;border:none;border-radius:10px;
-      padding:9px 12px;font-weight:600;cursor:pointer;transition:filter .15s;
-    }
+    a.button,button{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 12px;font-weight:600;cursor:pointer;transition:filter .15s}
     a.button:hover,button:hover{filter:brightness(1.05)}
     .grid3{display:grid;gap:16px}
     @media(min-width:1100px){ .grid3{grid-template-columns:1fr 1fr 1fr} }
@@ -33,49 +21,30 @@
     .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px}
     .factory{display:flex;flex-direction:column;gap:12px}
     .factory h2{margin:0 0 6px 0;font-size:18px;display:flex;align-items:center;justify-content:space-between}
-
-    /* Row: label | control */
     .row{display:grid;grid-template-columns:170px 1fr;gap:10px;align-items:center;margin:6px 0}
     label{color:var(--muted)}
-
-    input[type="text"],select{
-      width:100%;background:#fff;color:var(--text);border:1px solid var(--border);
-      border-radius:10px;padding:9px 10px;font-size:14px;outline:none;
-    }
+    input[type="text"],select{width:100%;background:#fff;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:9px 10px;font-size:14px;outline:none}
     input[type="text"]:focus,select:focus{border-color:var(--accent)}
     .small{font-size:12px;color:var(--muted)}
-
     .totals{display:grid;gap:6px}
     .line{display:flex;justify-content:space-between;border-bottom:1px dashed var(--border);padding:5px 0}
-    .grand{font-weight:700}
     .badge{padding:4px 8px;border-radius:8px;background:var(--chip);border:1px solid var(--border);font-size:12px}
-    .hl{color:var(--accent);font-weight:700}
-    .money-ok{color:var(--ok)} .money-warn{color:var(--warn)} .money-bad{color:var(--bad)}
     .stack{display:flex;gap:8px;flex-wrap:wrap}
-
-    /* Two-column area inside each factory */
     .split{display:grid;row-gap:10px;column-gap:28px}
     @media(min-width:520px){ .split{grid-template-columns:1fr 1fr} }
-
     hr{border:none;border-top:1px solid var(--border);margin:10px 0}
     .compare{margin-top:18px}
     .compare table{width:100%;border-collapse:separate;border-spacing:0 8px}
     .compare th,.compare td{padding:8px 10px;text-align:left}
     .compare th{color:var(--muted);font-weight:600;font-size:13px}
     .chip{display:inline-block;background:var(--chip);border:1px solid var(--border);padding:4px 8px;border-radius:999px;font-size:12px}
-
-    /* ===== Right-column compact inputs ===== */
     .factory .split .row { grid-template-columns: 150px auto; }
     input.short { width:160px; min-width:160px; }
-    .row input.short { justify-self:start; box-sizing:border-box; } /* prevent grid stretch */
-    @media (max-width:640px){
-      input.short { width:100%; min-width:0; }
-    }
-    .selected-month {
-      margin-top: 4px;
-      color: var(--muted);
-      font-style: italic;
-    }
+    .row input.short { justify-self:start; box-sizing:border-box; }
+    @media (max-width:640px){ input.short { width:100%; min-width:0; } }
+    .selected-month { margin-top:4px; color:var(--muted); font-style:italic; }
+    .readonly{background:#f3f4f6}
+    .money-ok{color:var(--ok)} .money-bad{color:var(--bad)}
   </style>
 </head>
 <body>
@@ -108,26 +77,16 @@
         <div>
           <div class="row">
             <label title="1 € costs this many ISK">ISK per EUR</label>
-            <input type="text" class="num iskPerEur short" placeholder="e.g. 153,50">
+            <input type="text" class="num iskPerEur short" placeholder="e.g. 153,50" aria-describedby="fxA-help-isk">
           </div>
-          <div class="row">
-            <label>Price (EUR/kg)</label>
-            <input type="text" class="num pricePerKg short" placeholder="e.g. 6,90">
-          </div>
+          <div id="fxA-help-isk" class="small">1 € = this many ISK (used to convert ISK monthly costs to EUR/day).</div>
+          <div class="row"><label>Price (EUR/kg)</label><input type="text" class="num pricePerKg short" placeholder="e.g. 6,90"></div>
 
-          <!-- Labor from hours (DV/YV) -->
-          <hr>
-          <div class="row"><label>DV hours (day)</label><input type="text" class="num dvHours" placeholder="e.g. 48"></div>
-          <div class="row"><label>YV hours (day)</label><input type="text" class="num yvHours" placeholder="e.g. 6"></div>
-          <div class="row"><label>Hourly rate DV</label><input type="text" class="num dvRateIsk" placeholder="ISK/hour"></div>
-          <div class="row"><label>Hourly rate YV</label><input type="text" class="num yvRateIsk" placeholder="ISK/hour"></div>
-          <div class="row" style="margin-top:4px">
-            <label>Labor from hours</label>
-            <div class="stack">
-              <span class="badge">ISK/day: <span class="labIskDay">–</span></span>
-              <span class="badge">EUR/day: <span class="labEurDay">–</span></span>
-            </div>
-          </div>
+          <!-- New: labor hours inputs -->
+          <div class="row"><label>DV hours (daytime)</label><input type="text" class="num dvHours short" placeholder="e.g. 120"></div>
+          <div class="row"><label>YV hours (overtime)</label><input type="text" class="num yvHours short" placeholder="e.g. 20"></div>
+          <div class="row"><label>Hourly rate (ISK/hour)</label><input type="text" class="num hourlyRateISK short" placeholder="e.g. 4.200"></div>
+          <div class="row"><label>Labor from hours (€/day)</label><input type="text" class="num laborFromHoursDay readonly short" readonly></div>
         </div>
       </div>
 
@@ -187,26 +146,15 @@
         <div>
           <div class="row">
             <label title="1 € costs this many ISK">ISK per EUR</label>
-            <input type="text" class="num iskPerEur short" placeholder="e.g. 153,50">
+            <input type="text" class="num iskPerEur short" placeholder="e.g. 153,50" aria-describedby="fxB-help-isk">
           </div>
-          <div class="row">
-            <label>Price (EUR/kg)</label>
-            <input type="text" class="num pricePerKg short" placeholder="e.g. 6,90">
-          </div>
+          <div id="fxB-help-isk" class="small">1 € = this many ISK (used to convert ISK monthly costs to EUR/day).</div>
+          <div class="row"><label>Price (EUR/kg)</label><input type="text" class="num pricePerKg short" placeholder="e.g. 6,90"></div>
 
-          <!-- Labor from hours (DV/YV) -->
-          <hr>
-          <div class="row"><label>DV hours (day)</label><input type="text" class="num dvHours" placeholder="e.g. 48"></div>
-          <div class="row"><label>YV hours (day)</label><input type="text" class="num yvHours" placeholder="e.g. 6"></div>
-          <div class="row"><label>Hourly rate DV</label><input type="text" class="num dvRateIsk" placeholder="ISK/hour"></div>
-          <div class="row"><label>Hourly rate YV</label><input type="text" class="num yvRateIsk" placeholder="ISK/hour"></div>
-          <div class="row" style="margin-top:4px">
-            <label>Labor from hours</label>
-            <div class="stack">
-              <span class="badge">ISK/day: <span class="labIskDay">–</span></span>
-              <span class="badge">EUR/day: <span class="labEurDay">–</span></span>
-            </div>
-          </div>
+          <div class="row"><label>DV hours (daytime)</label><input type="text" class="num dvHours short" placeholder="e.g. 120"></div>
+          <div class="row"><label>YV hours (overtime)</label><input type="text" class="num yvHours short" placeholder="e.g. 20"></div>
+          <div class="row"><label>Hourly rate (ISK/hour)</label><input type="text" class="num hourlyRateISK short" placeholder="e.g. 4.200"></div>
+          <div class="row"><label>Labor from hours (€/day)</label><input type="text" class="num laborFromHoursDay readonly short" readonly></div>
         </div>
       </div>
 
@@ -266,26 +214,15 @@
         <div>
           <div class="row">
             <label title="1 € costs this many ISK">ISK per EUR</label>
-            <input type="text" class="num iskPerEur short" placeholder="e.g. 153,50">
+            <input type="text" class="num iskPerEur short" placeholder="e.g. 153,50" aria-describedby="fxC-help-isk">
           </div>
-          <div class="row">
-            <label>Price (EUR/kg)</label>
-            <input type="text" class="num pricePerKg short" placeholder="e.g. 6,90">
-          </div>
+          <div id="fxC-help-isk" class="small">1 € = this many ISK (used to convert ISK monthly costs to EUR/day).</div>
+          <div class="row"><label>Price (EUR/kg)</label><input type="text" class="num pricePerKg short" placeholder="e.g. 6,90"></div>
 
-          <!-- Labor from hours (DV/YV) -->
-          <hr>
-          <div class="row"><label>DV hours (day)</label><input type="text" class="num dvHours" placeholder="e.g. 48"></div>
-          <div class="row"><label>YV hours (day)</label><input type="text" class="num yvHours" placeholder="e.g. 6"></div>
-          <div class="row"><label>Hourly rate DV</label><input type="text" class="num dvRateIsk" placeholder="ISK/hour"></div>
-          <div class="row"><label>Hourly rate YV</label><input type="text" class="num yvRateIsk" placeholder="ISK/hour"></div>
-          <div class="row" style="margin-top:4px">
-            <label>Labor from hours</label>
-            <div class="stack">
-              <span class="badge">ISK/day: <span class="labIskDay">–</span></span>
-              <span class="badge">EUR/day: <span class="labEurDay">–</span></span>
-            </div>
-          </div>
+          <div class="row"><label>DV hours (daytime)</label><input type="text" class="num dvHours short" placeholder="e.g. 120"></div>
+          <div class="row"><label>YV hours (overtime)</label><input type="text" class="num yvHours short" placeholder="e.g. 20"></div>
+          <div class="row"><label>Hourly rate (ISK/hour)</label><input type="text" class="num hourlyRateISK short" placeholder="e.g. 4.200"></div>
+          <div class="row"><label>Labor from hours (€/day)</label><input type="text" class="num laborFromHoursDay readonly short" readonly></div>
         </div>
       </div>
 
@@ -376,9 +313,9 @@ function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(
 const FACTORIES=['A','B','C'];
 const FIELD_KEYS=[
   'month','workingDays','iskPerEur','pricePerKg',
-  'rawKg','yieldPct','netKg','laborOps','laborSup','materialsDay','packDay','freightDay','deprDay',
-  // NEW:
-  'dvHours','yvHours','dvRateIsk','yvRateIsk'
+  'dvHours','yvHours','hourlyRateISK',           // NEW
+  'rawKg','yieldPct','netKg','laborOps','laborSup',
+  'materialsDay','packDay','freightDay','deprDay'
 ];
 let urlUpdateQueued=false;
 function readParams(){ return new URLSearchParams(location.search); }
@@ -433,7 +370,7 @@ class FactoryPane{
     this.wireLogic();
     this.loadFromURL();
     this.applyDefaultsFromFixed();
-    this.refs.month.dispatchEvent(new Event('change')); // render month text + auto WD
+    this.refs.month.dispatchEvent(new Event('change')); // set selected-month + auto WD
     this.compute();
   }
 
@@ -442,30 +379,21 @@ class FactoryPane{
     this.refs = {
       month:q('.month'), workingDays:q('.workingDays'),
       iskPerEur:q('.iskPerEur'), pricePerKg:q('.pricePerKg'),
+      dvHours:q('.dvHours'), yvHours:q('.yvHours'), hourlyRateISK:q('.hourlyRateISK'),
+      laborFromHoursDay:q('.laborFromHoursDay'),
       rawKg:q('.rawKg'), yieldPct:q('.yieldPct'), netKg:q('.netKg'),
-      laborOps:q('.laborOps'), laborSup:q('.laborSup'), materialsDay:q('.materialsDay'),
-      packDay:q('.packDay'), freightDay:q('.freightDay'), deprDay:q('.deprDay'),
-
-      // NEW (hours + rates + badges)
-      dvHours:q('.dvHours'), yvHours:q('.yvHours'),
-      dvRateIsk:q('.dvRateIsk'), yvRateIsk:q('.yvRateIsk'),
-      labIskDay:q('.labIskDay'), labEurDay:q('.labEurDay'),
-
+      laborOps:q('.laborOps'), laborSup:q('.laborSup'),
+      materialsDay:q('.materialsDay'), packDay:q('.packDay'),
+      freightDay:q('.freightDay'), deprDay:q('.deprDay'),
       yr:q('.yr'), fcIskDay:q('.fcIskDay'), fcEurDay:q('.fcEurDay'), fcTotalDay:q('.fcTotalDay'),
       kn_revenue:q('.kn_revenue'), kn_totalCost:q('.kn_totalCost'), kn_profit:q('.kn_profit'),
       kn_margin:q('.kn_margin'), kn_profitPerKg:q('.kn_profitPerKg'),
       badge:this.root.querySelector(`[data-badge="${this.id}"]`),
       selectedMonth:q('.selected-month')
     };
-
     if (!this.refs.yr){
       const l=this.root.querySelector('.small');
-      if(l){
-        const s=document.createElement('span');
-        s.className='yr';
-        l.prepend(s);
-        this.refs.yr=s;
-      }
+      if(l){ const s=document.createElement('span'); s.className='yr'; l.prepend(s); this.refs.yr=s; }
     }
     this.refs.yr.textContent = this.year;
   }
@@ -510,15 +438,12 @@ class FactoryPane{
     const updateSelectedMonth = () => {
       const sel = this.refs.month;
       const txt = sel.options[sel.selectedIndex]?.text || '';
-      if (this.refs.selectedMonth) {
-        this.refs.selectedMonth.textContent = txt ? `Selected: ${txt}` : '';
-      }
+      if (this.refs.selectedMonth) this.refs.selectedMonth.textContent = txt ? `Selected: ${txt}` : '';
     };
 
     this.refs.month.addEventListener('change', ()=>{
       const mv = toNumber(this.refs.month.value);
       updateSelectedMonth();
-
       if(mv>=1 && mv<=12){
         const auto = this.calcWorkingDays(mv);
         if(!this.manualWD || !this.refs.workingDays.value.trim()){
@@ -528,7 +453,6 @@ class FactoryPane{
         this.compute();
       }
     });
-
     this.refs.workingDays.addEventListener('input', ()=>{ this.manualWD=true; });
 
     this.root.querySelectorAll('input,select').forEach(el=>{
@@ -577,8 +501,19 @@ class FactoryPane{
     return { iskDay, eurDay, total };
   }
 
+  laborFromHoursEURDay(){
+    const dv=toNumber(this.refs.dvHours.value)||0;
+    const yv=toNumber(this.refs.yvHours.value)||0;
+    const rateISK=toNumber(this.refs.hourlyRateISK.value)||0;
+    const fx=toNumber(this.refs.iskPerEur.value)||0;
+    const totalHours = dv + yv; // no OT multiplier yet
+    const eur = (fx>0) ? (totalHours*rateISK)/fx : NaN;
+    this.refs.laborFromHoursDay.value = Number.isFinite(eur)? fmt(eur) : '';
+    return Number.isFinite(eur)? eur : 0;
+  }
+
   compute(){
-    // Yield triad
+    // auto-fill netKg / yield / raw if two of three known
     const raw=toNumber(this.refs.rawKg.value);
     const y=toNumber(this.refs.yieldPct.value);
     const net=toNumber(this.refs.netKg.value);
@@ -588,35 +523,22 @@ class FactoryPane{
     else if(!Number.isFinite(yy) && Number.isFinite(n) && Number.isFinite(r) && r!==0){ yy=(n/r)*100; this.refs.yieldPct.value=fmt(yy); }
 
     const price=toNumber(this.refs.pricePerKg.value);
-
-    // Fixed per day
     const { total: fixedDay }=this.fixedPerDay();
 
-    // NEW: Labor from hours (ISK/day -> EUR/day via fx)
-    const dvH = toNumber(this.refs.dvHours?.value) || 0;
-    const yvH = toNumber(this.refs.yvHours?.value) || 0;
-    const dvRate = toNumber(this.refs.dvRateIsk?.value) || 0;
-    const yvRate = toNumber(this.refs.yvRateIsk?.value) || 0;
-    const laborIskDay = (dvH * dvRate) + (yvH * yvRate);
-    const fx = toNumber(this.refs.iskPerEur.value) || 0;
-    const laborEurDay = (fx > 0) ? (laborIskDay / fx) : 0;
+    // NEW: labor from hours (EUR/day)
+    const laborHoursDay = this.laborFromHoursEURDay();
 
-    if (this.refs.labIskDay) this.refs.labIskDay.textContent = fmt(laborIskDay, 2);
-    if (this.refs.labEurDay) this.refs.labEurDay.textContent = fmt(laborEurDay, 2);
-
-    // Build day cost parts (include new laborEurDay first)
     const parts=[
-      laborEurDay || 0,
-      toNumber(this.refs.laborOps?.value) || 0,
-      toNumber(this.refs.laborSup?.value) || 0,
-      toNumber(this.refs.materialsDay?.value) || 0,
-      toNumber(this.refs.packDay?.value) || 0,
-      toNumber(this.refs.freightDay?.value) || 0,
-      toNumber(this.refs.deprDay?.value) || 0,
-      fixedDay || 0
+      toNumber(this.refs.laborOps.value)||0,
+      toNumber(this.refs.laborSup.value)||0,
+      toNumber(this.refs.materialsDay.value)||0,
+      toNumber(this.refs.packDay.value)||0,
+      toNumber(this.refs.freightDay.value)||0,
+      toNumber(this.refs.deprDay.value)||0,
+      laborHoursDay||0,         // include new labor component
+      fixedDay||0
     ];
     const dayCost=parts.reduce((a,b)=>a+b,0);
-
     const revenue=(Number.isFinite(n) && Number.isFinite(price)) ? (n*price) : NaN;
     const profit=(Number.isFinite(revenue) ? (revenue-dayCost) : NaN);
     const margin=(Number.isFinite(revenue) && revenue!==0) ? (profit/revenue*100) : NaN;
@@ -632,11 +554,7 @@ class FactoryPane{
     updateCompare(this.id,{ netKg:n, revenue, totalCost:dayCost, profit, margin, pPerKg });
   }
 
-  setText(el,text,extra){
-    el.textContent=text;
-    el.classList.remove('money-ok','money-bad','money-warn');
-    if(extra) el.classList.add(extra);
-  }
+  setText(el,text,extra){ el.textContent=text; el.classList.remove('money-ok','money-bad'); if(extra) el.classList.add(extra); }
 }
 
 /* ===== Compare table ===== */
@@ -648,7 +566,7 @@ function updateCompare(id,vals){
     const v=compareState[f]||{};
     const tr=document.createElement('tr');
     tr.innerHTML=`
-      <td><strong>${f==='A'?'Salmon':f}</strong></td>
+      <td><strong>${f}</strong></td>
       <td>${fmt(v.netKg)}</td>
       <td>${fmt(v.revenue)}</td>
       <td>${fmt(v.totalCost)}</td>
