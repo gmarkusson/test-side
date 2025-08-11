@@ -452,6 +452,42 @@ function loadDefaultsFromStorage() {
   if (otherEl && !otherEl.value && Number.isFinite(otherDay)) otherEl.value = otherDay.toFixed(2);
 }
 
+    // Add this somewhere before DOMContentLoaded (e.g., after workingDaysInMonth)
+function attachSync(){
+  // Recalc + keep URL in sync when anything changes
+  const onChange = () => {
+    syncUrlFromInputs();
+    calcKeyNumbers();
+    calcDay();
+  };
+
+  qa('input, select, textarea').forEach(el => {
+    el.addEventListener('input', onChange);
+    el.addEventListener('change', onChange);
+  });
+
+  // When month changes and Working days is empty ⇒ auto-fill from calendar
+  const monthSel = q('#month');
+  monthSel?.addEventListener('change', () => {
+    const wdBox = q('#workingDays');
+    if (wdBox && !wdBox.value) {
+      const wd = workingDaysInMonth(monthSel.value);
+      if (Number.isFinite(wd)) wdBox.value = String(wd);
+    }
+    onChange();
+  });
+
+  // Nice integer formatting on blur
+  const fmtInt = (sel) => {
+    const el = q(sel);
+    el?.addEventListener('blur', () => formatIntInput(el));
+  };
+  fmtInt('#producedKg');
+  fmtInt('#rawUsedKg');
+  fmtInt('#producedKg_day');
+  fmtInt('#rawUsedKg_day');
+}
+
 
     document.addEventListener('DOMContentLoaded', () => {
   // populate month dropdown if you have one
