@@ -218,6 +218,55 @@ function updateWorkingDaysFromMonth(){
   if (Number.isFinite(wd)) box.value = String(wd);
 }
 
+// ---------- Thousand/decimal formatting for ALL numeric inputs ----------
+function initNumberFormatting(){
+  // Decide decimals: default from inputmode (numeric=0, decimal=2), override with data-decimals
+  const decimalsFor = (el) => {
+    if (el.dataset.decimals != null) return Math.max(0, Number(el.dataset.decimals) || 0);
+    return el.getAttribute('inputmode') === 'numeric' ? 0 : 2;
+  };
+
+  const fmtCache = new Map(); // cache Intl instances per decimals
+  const getFmt = (d) => {
+    if (!fmtCache.has(d)) fmtCache.set(d, new Intl.NumberFormat('is-IS', {
+      minimumFractionDigits: d, maximumFractionDigits: d
+    }));
+    return fmtCache.get(d);
+  };
+
+  const formatPretty = (el) => {
+    const d = decimalsFor(el);
+    const n = toNumber(el.value);
+    if (!Number.isFinite(n)) return;
+    const v = d === 0 ? Math.round(n) : n;
+    el.value = getFmt(d).format(v);
+  };
+
+  const formatRaw = (el) => {
+    const d = decimalsFor(el);
+    const n = toNumber(el.value);
+    if (!Number.isFinite(n)) return;
+    el.value = d === 0 ? String(Math.round(n)) : String(n.toFixed(d));
+  };
+
+  // Delegate focus/blur so it also works for any inputs added later
+  document.addEventListener('focusin', (e) => {
+    const el = e.target;
+    if (el.matches('input[inputmode="decimal"], input[inputmode="numeric"]')) {
+      formatRaw(el);
+    }
+  });
+  document.addEventListener('focusout', (e) => {
+    const el = e.target;
+    if (el.matches('input[inputmode="decimal"], input[inputmode="numeric"]')) {
+      formatPretty(el);
+    }
+  });
+
+  // Initial pass: pretty format whatever is already filled (URL/LS)
+  qa('input[inputmode="decimal"], input[inputmode="numeric"]').forEach(formatPretty);
+}
+
   
 document.addEventListener('DOMContentLoaded', () => {
   // Month select + default working days
@@ -227,6 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateWorkingDaysFromMonth();
     calcDay();
     syncUrlFromInputs?.();
+    initNumberFormatting();
   });
 
   // Read query params (from "Copy to planner now")
