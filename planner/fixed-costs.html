@@ -248,7 +248,7 @@ function addCostRow(rowsEl, preset={}){
 }
 
 /* ---------- serialize / restore ---------- */
-const STORE_KEY = 'fp:fixed:v4';
+const STORE_KEY = 'fp:fixed:v5';
 function serializeBuilding(bEl){
   const pack = (sel)=> qa(`${sel} .row`, bEl).map(r=>({
     name: r.querySelector('.name')?.value?.trim() || '',
@@ -345,7 +345,10 @@ function updateTotals(){
 
   return {
     t_housing:agg.housing, t_equipment:agg.equipment, t_admin:agg.admin,
-    eur:{ maint:agg.maint, rentals:agg.rentals, spares:agg.spares, electricity:agg.elec, water:agg.water, other:agg.othereur }
+    eur:{
+      maint:agg.maint, rentals:agg.rentals, spares:agg.spares,
+      electricity:agg.elec, water:agg.water, other:agg.othereur
+    }
   };
 }
 
@@ -421,31 +424,7 @@ function wireButtons(){
   q('#copyBtn').addEventListener('click', copyToPlanner);
   q('#resetBtn').addEventListener('click', resetAll);
 }
-<script>
-// --- universal delegated handlers for add buttons ---
-document.addEventListener('click', (ev) => {
-  const iskBtn = ev.target.closest('.add-monthly-isk');
-  if (iskBtn) {
-    const building = iskBtn.closest('.building');
-    if (building) {
-      addCostRow(building.querySelector('.monthly-isk'));
-      debouncedSave();
-    }
-    return; // don't fall through
-  }
 
-  const eurBtn = ev.target.closest('.add-monthly-eur');
-  if (eurBtn) {
-    const building = eurBtn.closest('.building');
-    if (building) {
-      addCostRow(building.querySelector('.monthly-eur'));
-      debouncedSave();
-    }
-  }
-});
-</script>
-
-  
 document.addEventListener('DOMContentLoaded', ()=>{
   wireButtons();
   loadBuildings();
