@@ -201,8 +201,7 @@
       else if(hasD){ const parts=s.split('.'), thousands=parts.length>1&&parts.every((p,i)=>(i===0?p.length<=3:p.length===3)); if(thousands) s=s.replace(/\./g,''); }
       const n=Number(s); return Number.isFinite(n)? n : NaN;
     }
-const n=Number(s); return Number.isFinite(n)? n : NaN;
-}
+
 // --- tiny helpers ---
 const debounce = (fn, delay = 120) => {
   let t;
