@@ -21,6 +21,21 @@
   padding:9px 12px; font-weight:600; cursor:pointer; transition:filter .15s;
 }
 .btn:hover{ filter:brightness(1.05) }
+/* Quiet remove-row button (the little × in each row) */
+table .danger{
+  background:var(--chip);
+  color:var(--muted);
+  border:1px solid var(--border);
+  width:32px; height:32px; padding:0;
+  border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:700; line-height:1;
+}
+table .danger:hover{
+  background:#fff;
+  color:var(--bad);
+  border-color:var(--bad);
+}
 
   /* cards/tables */
   .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px}
