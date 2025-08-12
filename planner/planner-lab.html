@@ -636,7 +636,7 @@ class FactoryPane{
     const margin=(Number.isFinite(revenue) && revenue!==0) ? (profit/revenue*100) : NaN;
     const pPerKg=(Number.isFinite(profit) && Number.isFinite(n) && n!==0) ? (profit/n) : NaN;
     // Salaries (EUR/day) and per kg
-this.setText(this.refs.kn_salariesDay, fmt(laborHoursEUR));
+this.setText(this.refs.kn_salaries, fmt(laborHoursEUR));
 const salariesPerKg = (Number.isFinite(laborHoursEUR) && Number.isFinite(n) && n !== 0)
   ? (laborHoursEUR / n)
   : NaN;
