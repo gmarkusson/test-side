@@ -633,9 +633,12 @@ if (Number.isFinite(yy) && document.activeElement !== this.refs.yieldPct) {
     this.setText(this.refs.kn_margin, Number.isFinite(margin)?fmt(margin)+' %':'–');
     this.setText(this.refs.kn_profitPerKg, fmt(pPerKg));
 
-    this.refs.badge.textContent=(Number.isFinite(revenue) && Number.isFinite(dayCost))?'Calculated':'Ready';
-    updateCompare(this.id,{ netKg:n, revenue, totalCost:dayCost, profit, margin, pPerKg });
-  }
+    this.refs.badge.textContent = (Number.isFinite(revenue) && Number.isFinite(dayCost)) ? 'Calculated' : 'Ready';
+updateCompare(this.id, { netKg: n, revenue, totalCost: dayCost, profit, margin, pPerKg });
+
+// Make sure URL reflects any auto-filled values (net/raw/yield)
+scheduleURLUpdate();
+}
 
   setText(el,text,extra){ el.textContent=text; el.classList.remove('money-ok','money-bad'); if(extra) el.classList.add(extra); }
 }
