@@ -217,25 +217,43 @@ const LOCALE='is-IS';
 function toNumber(value){
   if (value == null) return NaN;
   if (typeof value === 'number') return value;
-  let s = (''+value).replace(/\s|\u00A0/g,'').trim();
+
+  // Remove ALL common Unicode space separators (incl. NBSP, narrow NBSP, thin, figure, ideographic)
+  let s = (''+value)
+    .replace(/[\s\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000]/g, '')
+    .trim();
   if (s === '') return NaN;
 
   const hasComma = s.includes(','), hasDot = s.includes('.');
   if (hasComma && hasDot){
     const lastComma = s.lastIndexOf(','), lastDot = s.lastIndexOf('.');
+    // Assume the last separator is decimal; remove the others as thousands
     s = (lastComma > lastDot) ? s.replace(/\./g,'').replace(',', '.') : s.replace(/,/g,'');
   } else if (hasComma){
     const commas = (s.match(/,/g)||[]).length;
-    if (commas > 1){ const last = s.lastIndexOf(','); s = s.slice(0,last).replace(/,/g,'') + '.' + s.slice(last+1); }
-    else { const idx=s.indexOf(','), fracLen=s.length-idx-1; s = (fracLen===3)? s.replace(/,/g,'') : s.replace(',', '.'); }
+    if (commas > 1){
+      const last = s.lastIndexOf(',');
+      s = s.slice(0,last).replace(/,/g,'') + '.' + s.slice(last+1);
+    } else {
+      // Single comma: infer decimal unless exactly 3 digits follow (then it's thousands)
+      const idx = s.indexOf(','), fracLen = s.length - idx - 1;
+      s = (fracLen === 3) ? s.replace(/,/g,'') : s.replace(',', '.');
+    }
   } else if (hasDot){
     const dots = (s.match(/\./g)||[]).length;
-    if (dots > 1){ const last = s.lastIndexOf('.'); s = s.slice(0,last).replace(/\./g,'') + '.' + s.slice(last+1); }
-    else { const idx=s.indexOf('.'), fracLen=s.length-idx-1; if (fracLen===3) s = s.replace(/\./g,''); }
+    if (dots > 1){
+      const last = s.lastIndexOf('.');
+      s = s.slice(0,last).replace(/\./g,'') + '.' + s.slice(last+1);
+    } else {
+      // Single dot: if exactly 3 digits follow, treat as thousands (remove)
+      const idx = s.indexOf('.'), fracLen = s.length - idx - 1;
+      if (fracLen === 3) s = s.replace(/\./g,'');
+    }
   }
   const n = Number(s);
   return Number.isFinite(n) ? n : NaN;
 }
+
 function fmt(n, dec){
   if (!Number.isFinite(n)) return '–';
   return new Intl.NumberFormat(LOCALE,
