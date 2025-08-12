@@ -252,7 +252,14 @@ function toNumber(value){
   const n = Number(s);
   return Number.isFinite(n) ? n : NaN;
 }
-
+function fmt(n, dec){
+  if (!Number.isFinite(n)) return '–';
+  return new Intl.NumberFormat(LOCALE,
+    typeof dec === 'number'
+      ? { minimumFractionDigits: dec, maximumFractionDigits: dec }
+      : (Number.isInteger(n) ? { maximumFractionDigits: 0 } : { maximumFractionDigits: 2 })
+  ).format(n);
+}
 
 /* ========================= Row model & UI ========================= */
 const CAT_ISK = ['housing','equipment','admin'];
