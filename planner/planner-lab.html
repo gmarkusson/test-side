@@ -555,25 +555,29 @@ class FactoryPane{
   }
 
   compute(){
-   // --- Net, Yield, Raw relationship (net+yield drives raw) ---
+// --- Net, Yield, Raw relationship (net+yield drives raw) ---
 let n  = toNumber(this.refs.netKg.value);
 let yy = toNumber(this.refs.yieldPct.value);
 let r  = toNumber(this.refs.rawKg.value);
 
-// If net & yield are given, ALWAYS derive raw
+const fmtInt = x => Number.isFinite(x)
+  ? new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 0 }).format(x)
+  : '';
+
 if (Number.isFinite(n) && Number.isFinite(yy) && yy !== 0) {
+  // net + yield -> raw
   r = n / (yy / 100);
-  this.refs.rawKg.value = fmt(r);
+  this.refs.rawKg.value = fmtInt(r);        // <-- whole kg with thousands
 }
-// Otherwise, if raw & yield are given, derive net
 else if (Number.isFinite(r) && Number.isFinite(yy)) {
+  // raw + yield -> net
   n = r * (yy / 100);
-  this.refs.netKg.value = fmt(n);
+  this.refs.netKg.value = fmtInt(n);        // (use fmt(n) if you want decimals)
 }
-// Otherwise, if net & raw are given, derive yield
 else if (Number.isFinite(n) && Number.isFinite(r) && r !== 0) {
+  // net + raw -> yield
   yy = (n / r) * 100;
-  this.refs.yieldPct.value = fmt(yy);
+  this.refs.yieldPct.value = fmt(yy, 2);    // keep 2-decimals for %
 }
 
     const price=toNumber(this.refs.pricePerKg.value);
