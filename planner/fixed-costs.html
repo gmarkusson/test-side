@@ -460,6 +460,32 @@ function copyToPlannerURL(){
   location.href = url;
 }
 
+  function copyToPlannerLabURL(){
+  const sp = new URLSearchParams();
+  const pairs = [
+    ['fp_housingCost',        localStorage.getItem('fp:housingCost')],
+    ['fp_equipCost',          localStorage.getItem('fp:equipCost')],
+    ['fp_adminCost',          localStorage.getItem('fp:adminCost')],
+    ['fp_maintEurMonth',      localStorage.getItem('fp:maintEurMonth')],
+    ['fp_rentalsEurMonth',    localStorage.getItem('fp:rentalsEurMonth')],
+    ['fp_sparesEurMonth',     localStorage.getItem('fp:sparesEurMonth')],
+    ['fp_electricityEurMonth',localStorage.getItem('fp:electricityEurMonth')],
+    ['fp_waterEurMonth',      localStorage.getItem('fp:waterEurMonth')],
+    ['fp_otherEurMonth',      localStorage.getItem('fp:otherEurMonth')],
+    ['fp_iskPerEur',          localStorage.getItem('fp:iskPerEur')],
+    ['fp_workingDays',        localStorage.getItem('fp:workingDays')],
+    ['fp_dvRateISK',          localStorage.getItem('fp:dvRateISK')],
+    ['fp_yvRateISK',          localStorage.getItem('fp:yvRateISK')]
+  ];
+  for (const [k,v] of pairs){
+    const n = toNumber(v);
+    if (v!=null && Number.isFinite(n) && Math.abs(n)>0) sp.set(k, String(n));
+  }
+  const url = 'planner-lab.html' + (sp.toString() ? ('?'+sp.toString()) : '');
+  try { navigator.clipboard.writeText(new URL(url, location.href).href); } catch(e){}
+  location.href = url;
+}
+
 /* ========================= Events & bootstrap ========================= */
 function wireButtons(){
   document.querySelectorAll('button[data-add]').forEach(btn=>{
