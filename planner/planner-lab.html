@@ -354,7 +354,8 @@ function readFixedFromURL(){
     'fp_housingCost':'fp:housingCost','fp_equipCost':'fp:equipCost','fp_adminCost':'fp:adminCost',
     'fp_maintEurMonth':'fp:maintEurMonth','fp_rentalsEurMonth':'fp:rentalsEurMonth','fp_sparesEurMonth':'fp:sparesEurMonth',
     'fp_electricityEurMonth':'fp:electricityEurMonth','fp_waterEurMonth':'fp:waterEurMonth','fp_otherEurMonth':'fp:otherEurMonth',
-    'fp_iskPerEur':'fp:iskPerEur','fp_workingDays':'fp:workingDays'
+    'fp_iskPerEur':'fp:iskPerEur','fp_workingDays':'fp:workingDays',
+    'fp_dvRateISK':'fp:dvRateISK','fp_yvRateISK':'fp:yvRateISK'
   };
   const o={}; for(const [k,v] of Object.entries(map)){ if(p.get(k)!=null) o[v]=p.get(k); } return o;
 }
@@ -363,7 +364,7 @@ function fixedMonthlyTotals(){
   const get=(key)=> (fromURL[key]!=null ? toNumber(fromURL[key]) : (fromLS[key]!=null ? toNumber(fromLS[key]) : NaN));
   const iskMonth=(get('fp:housingCost')||0)+(get('fp:equipCost')||0)+(get('fp:adminCost')||0);
   const eurMonth=(get('fp:maintEurMonth')||0)+(get('fp:rentalsEurMonth')||0)+(get('fp:sparesEurMonth')||0)+(get('fp:electricityEurMonth')||0)+(get('fp:waterEurMonth')||0)+(get('fp:otherEurMonth')||0);
-  return { iskMonth, eurMonth, fxDefault:get('fp:iskPerEur'), wdDefault:get('fp:workingDays') };
+  return { iskMonth, eurMonth, fxDefault:get('fp:iskPerEur'), wdDefault:get('fp:workingDays'), dvRateISK:get('fp:dvRateISK'), yvRateISK:get('fp:yvRateISK')};
 }
 
 /* ===== Factory controller ===== */
