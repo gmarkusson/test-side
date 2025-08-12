@@ -555,15 +555,26 @@ class FactoryPane{
   }
 
   compute(){
-    // Two-of-three: net, yield, raw
-    const net=toNumber(this.refs.netKg.value);
-    const y=toNumber(this.refs.yieldPct.value);
-    const raw=toNumber(this.refs.rawKg.value);
-    let n=net, yy=y, r=raw;
+   // --- Net, Yield, Raw relationship (net+yield drives raw) ---
+let n  = toNumber(this.refs.netKg.value);
+let yy = toNumber(this.refs.yieldPct.value);
+let r  = toNumber(this.refs.rawKg.value);
 
-    if(!Number.isFinite(r) && Number.isFinite(n) && Number.isFinite(yy) && yy!==0){ r=n/(yy/100); this.refs.rawKg.value=fmt(r); }
-    else if(!Number.isFinite(n) && Number.isFinite(r) && Number.isFinite(yy)){ n=r*(yy/100); this.refs.netKg.value=fmt(n); }
-    else if(!Number.isFinite(yy) && Number.isFinite(n) && Number.isFinite(r) && r!==0){ yy=(n/r)*100; this.refs.yieldPct.value=fmt(yy); }
+// If net & yield are given, ALWAYS derive raw
+if (Number.isFinite(n) && Number.isFinite(yy) && yy !== 0) {
+  r = n / (yy / 100);
+  this.refs.rawKg.value = fmt(r);
+}
+// Otherwise, if raw & yield are given, derive net
+else if (Number.isFinite(r) && Number.isFinite(yy)) {
+  n = r * (yy / 100);
+  this.refs.netKg.value = fmt(n);
+}
+// Otherwise, if net & raw are given, derive yield
+else if (Number.isFinite(n) && Number.isFinite(r) && r !== 0) {
+  yy = (n / r) * 100;
+  this.refs.yieldPct.value = fmt(yy);
+}
 
     const price=toNumber(this.refs.pricePerKg.value);
     const rawCostPerKg=toNumber(this.refs.rawCostPerKg.value);
