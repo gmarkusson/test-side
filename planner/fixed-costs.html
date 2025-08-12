@@ -339,7 +339,6 @@ function loadAll(){
       }
     }
   }
-  }
   
   // Load globals
   const fx = localStorage.getItem('fp:iskPerEur');   if (fx) document.getElementById('iskPerEur').value = fmt(toNumber(fx),2);
@@ -356,6 +355,7 @@ if (yv !== null) {
     new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 0, useGrouping: false })
       .format(toNumber(yv));
 }
+}  
 
 /* ========================= Totals & Saved keys ========================= */
 function recalcAll(){
