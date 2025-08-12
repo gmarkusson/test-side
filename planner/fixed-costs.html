@@ -309,7 +309,11 @@ function saveAll(){
     'fp:yvRateISK' : document.getElementById('yvRateISK').value.trim()
   };
   for (const [k,v] of Object.entries(g)){
-    if (v) localStorage.setItem(k, String(toNumber(v))); else localStorage.removeItem(k);
+    if (v !== '') {
+  localStorage.setItem(k, String(toNumber(v)));
+} else {
+  localStorage.removeItem(k);
+}
   }
 }
 function loadAll(){
