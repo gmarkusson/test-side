@@ -321,9 +321,9 @@ function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(
 
 /* ===== URL sync (A_, B_, C_) ===== */
 const FACTORIES=['A','B','C'];
-const FIELD_KEYS=[
+const FIELD_KEYS = [
   'month','workingDays','iskPerEur','pricePerKg',
-  'dvHours','dvRateISK','yvHours','yvRateISK',   // NEW fields
+  'dvHours','yvHours',           // removed dvRateISK, yvRateISK
   'rawKg','yieldPct','netKg','laborOps','laborSup',
   'materialsDay','packDay','freightDay','deprDay'
 ];
