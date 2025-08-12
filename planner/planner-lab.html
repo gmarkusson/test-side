@@ -81,7 +81,6 @@
           </div>
           <div id="fxA-help-isk" class="small">1 € = this many ISK (used to convert ISK monthly costs to EUR/day).</div>
 
-          <!-- Labor hours & rates (still driven by Fixed Costs) -->
           <div class="row"><label>DV hours (daytime)</label><input type="text" class="num dvHours short" placeholder="e.g. 120"></div>
           <div class="row"><label>YV hours (overtime)</label><input type="text" class="num yvHours short" placeholder="e.g. 20"></div>
           <div class="row"><label>Labor from hours (ISK/day)</label><input type="text" class="num laborFromHoursDay readonly short" readonly></div>
@@ -91,20 +90,21 @@
       <hr>
 
       <div class="split">
-        <div class="row">
-  <label>Net saleable kg</label>
-  <input type="text" class="num num-int netKg" placeholder="e.g. 1.000">
-</div>
-<div class="row">
-  <label>Yield %</label>
-  <input type="text" class="num yieldPct" placeholder="e.g. 63,5">
-</div>
-<div class="row">
-  <label>Raw used kg</label>
-  <input type="text" class="num num-int rawKg" placeholder="auto from net & yield (or enter)">
-</div>
         <div>
-          <!-- Price moved here; add raw material cost -->
+          <div class="row">
+            <label>Net saleable kg</label>
+            <input type="text" class="num num-int netKg" placeholder="e.g. 1.000">
+          </div>
+          <div class="row">
+            <label>Yield %</label>
+            <input type="text" class="num yieldPct" placeholder="e.g. 63,5">
+          </div>
+          <div class="row">
+            <label>Raw used kg</label>
+            <input type="text" class="num num-int rawKg" placeholder="auto from net & yield (or enter)">
+          </div>
+        </div>
+        <div>
           <div class="row"><label>Price (EUR/kg)</label><input type="text" class="num pricePerKg short" placeholder="e.g. 6,90"></div>
           <div class="row"><label>Raw material cost (EUR/kg raw)</label><input type="text" class="num rawCostPerKg short" placeholder="e.g. 3,20"></div>
 
@@ -167,9 +167,18 @@
 
       <div class="split">
         <div>
-          <label>Net saleable kg</label><input type="text" class="num num-int netKg" placeholder="e.g. 1.000">
-          <div class="row"><label>Yield %</label><input type="text" class="num yieldPct" placeholder="e.g. 63,5"></div>
-          <label>Raw used kg</label><input type="text" class="num num-int rawKg" placeholder="auto from net & yield (or enter)>
+          <div class="row">
+            <label>Net saleable kg</label>
+            <input type="text" class="num num-int netKg" placeholder="e.g. 1.000">
+          </div>
+          <div class="row">
+            <label>Yield %</label>
+            <input type="text" class="num yieldPct" placeholder="e.g. 63,5">
+          </div>
+          <div class="row">
+            <label>Raw used kg</label>
+            <input type="text" class="num num-int rawKg" placeholder="auto from net & yield (or enter)">
+          </div>
         </div>
         <div>
           <div class="row"><label>Price (EUR/kg)</label><input type="text" class="num pricePerKg short" placeholder="e.g. 6,90"></div>
@@ -234,9 +243,18 @@
 
       <div class="split">
         <div>
-          <label>Net saleable kg</label><input type="text" class="num num-int netKg" placeholder="e.g. 1.000">
-          <div class="row"><label>Yield %</label><input type="text" class="num yieldPct" placeholder="e.g. 63,5"></div>
-          <label>Raw used kg</label><input type="text" class="num num-int rawKg" placeholder="auto from net & yield (or enter)>
+          <div class="row">
+            <label>Net saleable kg</label>
+            <input type="text" class="num num-int netKg" placeholder="e.g. 1.000">
+          </div>
+          <div class="row">
+            <label>Yield %</label>
+            <input type="text" class="num yieldPct" placeholder="e.g. 63,5">
+          </div>
+          <div class="row">
+            <label>Raw used kg</label>
+            <input type="text" class="num num-int rawKg" placeholder="auto from net & yield (or enter)">
+          </div>
         </div>
         <div>
           <div class="row"><label>Price (EUR/kg)</label><input type="text" class="num pricePerKg short" placeholder="e.g. 6,90"></div>
@@ -288,19 +306,17 @@
 <script>
 /* ===== Shared helpers (is-IS locale) ===== */
 const LOCALE='is-IS';
+
 function toNumber(value){
   if (value == null) return NaN;
   if (typeof value === 'number') return value;
   let s = (''+value).replace(/\s|\u00A0/g,'').trim();
   if (s === '') return NaN;
 
-  const hasComma = s.includes(',');
-  const hasDot   = s.includes('.');
+  const hasComma = s.includes(','), hasDot = s.includes('.');
 
   if (hasComma && hasDot){
-    // decimal is whichever appears last
-    const lastComma = s.lastIndexOf(',');
-    const lastDot   = s.lastIndexOf('.');
+    const lastComma = s.lastIndexOf(','), lastDot = s.lastIndexOf('.');
     if (lastComma > lastDot){
       // "3.000,75" -> "3000.75"
       s = s.replace(/\./g,'').replace(',', '.');
@@ -309,27 +325,25 @@ function toNumber(value){
       s = s.replace(/,/g,'');
     }
   } else if (hasComma){
-    // If multiple commas, last is decimal; others are thousands
     const commas = (s.match(/,/g)||[]).length;
     if (commas > 1){
+      // "1,234,567,89" -> "1234567.89" (last comma decimal)
       const last = s.lastIndexOf(',');
       s = s.slice(0,last).replace(/,/g,'') + '.' + s.slice(last+1);
     } else {
       // Single comma: thousands if exactly 3 digits after; otherwise decimal
-      const idx = s.indexOf(',');
-      const fracLen = s.length - idx - 1;
-      if (fracLen === 3) s = s.replace(/,/g,''); else s = s.replace(',', '.');
+      const idx = s.indexOf(','), fracLen = s.length - idx - 1;
+      s = (fracLen === 3) ? s.replace(/,/g,'') : s.replace(',', '.');
     }
   } else if (hasDot){
-    // If multiple dots, last is decimal; others are thousands
     const dots = (s.match(/\./g)||[]).length;
     if (dots > 1){
+      // "1.234.567.89" -> "1234567.89" (last dot decimal)
       const last = s.lastIndexOf('.');
       s = s.slice(0,last).replace(/\./g,'') + '.' + s.slice(last+1);
     } else {
       // Single dot: thousands if exactly 3 digits after
-      const idx = s.indexOf('.');
-      const fracLen = s.length - idx - 1;
+      const idx = s.indexOf('.'), fracLen = s.length - idx - 1;
       if (fracLen === 3) s = s.replace(/\./g,'');
     }
   }
@@ -344,6 +358,12 @@ function fmt(n,dec){
     : (Number.isInteger(n) ? { maximumFractionDigits: 0 } : { maximumFractionDigits: 2 })
   ).format(n);
 }
+
+function fmtInt(n){
+  if (!Number.isFinite(n)) return '';
+  return new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 0 }).format(n);
+}
+
 function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; }
 
 /* ===== URL sync (A_, B_, C_) ===== */
@@ -544,7 +564,7 @@ class FactoryPane{
     return { iskDay, eurDay, total };
   }
 
-  // Labor from hours – convert ISK to EUR/day
+  // Labor from hours – convert ISK to EUR/day for cost, show ISK/day in the readonly field
   laborFromHoursCosts(){
     const dvH = toNumber(this.refs.dvHours.value) || 0;
     const yvH = toNumber(this.refs.yvHours.value) || 0;
@@ -561,30 +581,26 @@ class FactoryPane{
   }
 
   compute(){
-// --- Net, Yield, Raw relationship (net+yield drives raw) ---
-let n  = toNumber(this.refs.netKg.value);
-let yy = toNumber(this.refs.yieldPct.value);
-let r  = toNumber(this.refs.rawKg.value);
+    // --- Net, Yield, Raw relationship (net+yield drives raw) ---
+    let n  = toNumber(this.refs.netKg.value);
+    let yy = toNumber(this.refs.yieldPct.value);
+    let r  = toNumber(this.refs.rawKg.value);
 
-const fmtInt = x => Number.isFinite(x)
-  ? new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 0 }).format(x)
-  : '';
-
-if (Number.isFinite(n) && Number.isFinite(yy) && yy !== 0) {
-  // net + yield -> raw
-  r = n / (yy / 100);
-  this.refs.rawKg.value = fmtInt(r);        // <-- whole kg with thousands
-}
-else if (Number.isFinite(r) && Number.isFinite(yy)) {
-  // raw + yield -> net
-  n = r * (yy / 100);
-  this.refs.netKg.value = fmtInt(n);        // (use fmt(n) if you want decimals)
-}
-else if (Number.isFinite(n) && Number.isFinite(r) && r !== 0) {
-  // net + raw -> yield
-  yy = (n / r) * 100;
-  this.refs.yieldPct.value = fmt(yy, 2);    // keep 2-decimals for %
-}
+    if (Number.isFinite(n) && Number.isFinite(yy) && yy !== 0) {
+      // net + yield -> raw
+      r = n / (yy / 100);
+      this.refs.rawKg.value = fmtInt(r);        // whole kg
+    }
+    else if (Number.isFinite(r) && Number.isFinite(yy)) {
+      // raw + yield -> net
+      n = r * (yy / 100);
+      this.refs.netKg.value = fmtInt(n);        // whole kg
+    }
+    else if (Number.isFinite(n) && Number.isFinite(r) && r !== 0) {
+      // net + raw -> yield
+      yy = (n / r) * 100;
+      this.refs.yieldPct.value = fmt(yy, 2);    // percent with 2 decimals
+    }
 
     const price=toNumber(this.refs.pricePerKg.value);
     const rawCostPerKg=toNumber(this.refs.rawCostPerKg.value);
@@ -594,7 +610,7 @@ else if (Number.isFinite(n) && Number.isFinite(r) && r !== 0) {
     const { eurDay: laborHoursEUR } = this.laborFromHoursCosts();
 
     const parts=[
-      rawCostDay || 0,                        // NEW: raw material day cost
+      rawCostDay || 0,
       toNumber(this.refs.materialsDay.value)||0,
       toNumber(this.refs.packDay.value)||0,
       toNumber(this.refs.freightDay.value)||0,
