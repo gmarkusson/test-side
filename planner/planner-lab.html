@@ -595,8 +595,8 @@ else if (Number.isFinite(n) && Number.isFinite(r) && r !== 0) {
   yy = (n / r) * 100;
 }
 
-// Always reformat yield with two decimals
-if (Number.isFinite(yy)) {
+// Show Yield with two decimals, but don't fight the user while typing
+if (Number.isFinite(yy) && document.activeElement !== this.refs.yieldPct) {
   this.refs.yieldPct.value = fmt(yy, 2);
 }
 
