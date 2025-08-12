@@ -339,6 +339,8 @@ function loadAll(){
       }
     }
   }
+  }
+  
   // Load globals
   const fx = localStorage.getItem('fp:iskPerEur');   if (fx) document.getElementById('iskPerEur').value = fmt(toNumber(fx),2);
   const wd = localStorage.getItem('fp:workingDays'); if (wd) document.getElementById('workingDays').value = fmt(toNumber(wd),0);
