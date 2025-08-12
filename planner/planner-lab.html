@@ -347,7 +347,7 @@ function setParamsFromDOM(){
 function scheduleURLUpdate(){ if(urlUpdateQueued) return; urlUpdateQueued=true; requestAnimationFrame(()=>{ setParamsFromDOM(); urlUpdateQueued=false; }); }
 
 /* ===== Fixed-costs interop ===== */
-const LS_KEYS=['fp:housingCost','fp:equipCost','fp:adminCost','fp:maintEurMonth','fp:rentalsEurMonth','fp:sparesEurMonth','fp:electricityEurMonth','fp:waterEurMonth','fp:otherEurMonth','fp:iskPerEur','fp:workingDays'];
+const LS_KEYS=['fp:housingCost','fp:equipCost','fp:adminCost','fp:maintEurMonth','fp:rentalsEurMonth','fp:sparesEurMonth','fp:electricityEurMonth','fp:waterEurMonth','fp:otherEurMonth','fp:iskPerEur','fp:workingDays','fp:dvRateISK','fp:yvRateISK'];
 function readFixedFromLS(){ const o={}; for(const k of LS_KEYS){ const v=localStorage.getItem(k); if(v!=null) o[k]=v; } return o; }
 function readFixedFromURL(){
   const p=readParams(); const map={
