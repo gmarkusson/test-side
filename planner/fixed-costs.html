@@ -335,8 +335,17 @@ function loadAll(){
   // Load globals
   const fx = localStorage.getItem('fp:iskPerEur');   if (fx) document.getElementById('iskPerEur').value = fmt(toNumber(fx),2);
   const wd = localStorage.getItem('fp:workingDays'); if (wd) document.getElementById('workingDays').value = fmt(toNumber(wd),0);
-  const dv = localStorage.getItem('fp:dvRateISK');   if (dv) document.getElementById('dvRateISK').value = fmt(toNumber(dv));
-  const yv = localStorage.getItem('fp:yvRateISK');   if (yv) document.getElementById('yvRateISK').value = fmt(toNumber(yv));
+  const dv = localStorage.getItem('fp:dvRateISK');
+if (dv !== null) {
+  document.getElementById('dvRateISK').value =
+    new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 0, useGrouping: false })
+      .format(toNumber(dv));
+}
+const yv = localStorage.getItem('fp:yvRateISK');
+if (yv !== null) {
+  document.getElementById('yvRateISK').value =
+    new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 0, useGrouping: false })
+      .format(toNumber(yv));
 }
 
 /* ========================= Totals & Saved keys ========================= */
