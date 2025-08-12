@@ -518,8 +518,7 @@ class FactoryPane{
   laborFromHoursCosts(){
     const dvH = toNumber(this.refs.dvHours.value) || 0;
     const yvH = toNumber(this.refs.yvHours.value) || 0;
-    const dvR = toNumber(this.refs.dvRateISK.value) || 0; // ISK/hour
-    const yvR = toNumber(this.refs.yvRateISK.value) || 0; // ISK/hour
+    const { dvRateISK: dvR, yvRateISK: yvR } = fixedMonthlyTotals(); // pulled from fixed-costs.html
     const fx  = toNumber(this.refs.iskPerEur.value) || 0;  // ISK per EUR
 
     const iskDay = (dvH * dvR) + (yvH * yvR);
