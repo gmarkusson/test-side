@@ -4,86 +4,87 @@
   <meta charset="utf-8" />
   <title>Factory Planner — Fixed Costs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
- <style>
-  :root{
-    --bg:#ffffff; --card:#f9fafb; --muted:#6b7280; --text:#111827; --accent:#0ea5e9;
-    --ok:#10b981; --warn:#f59e0b; --bad:#ef4444; --border:#d1d5db; --chip:#e5e7eb;
-  }
+  <style>
+    :root{
+      --bg:#ffffff; --card:#f9fafb; --muted:#6b7280; --text:#111827; --accent:#0ea5e9;
+      --ok:#10b981; --warn:#f59e0b; --bad:#ef4444; --border:#d1d5db; --chip:#e5e7eb;
+    }
 
-  html,body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;margin:0}
-  .wrap{max-width:1100px;margin:40px auto;padding:0 20px}
-  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-  h1{font-size:clamp(20px,3vw,28px);margin:0}
+    html,body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;margin:0}
+    .wrap{max-width:1100px;margin:40px auto;padding:0 20px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    h1{font-size:clamp(20px,3vw,28px);margin:0}
 
- /* Primary buttons only */
-.btn{
-  background:var(--accent); color:#fff; border:none; border-radius:10px;
-  padding:9px 12px; font-weight:600; cursor:pointer; transition:filter .15s;
-}
-.btn:hover{ filter:brightness(1.05) }
-/* Quiet remove-row button (the little × in each row) */
-table .danger{
-  background:var(--chip);
-  color:var(--muted);
-  border:1px solid var(--border);
-  width:32px; height:32px; padding:0;
-  border-radius:8px;
-  display:flex; align-items:center; justify-content:center;
-  font-weight:700; line-height:1;
-}
-table .danger:hover{
-  background:#fff;
-  color:var(--bad);
-  border-color:var(--bad);
-}
+    /* Primary buttons only */
+    .btn{
+      background:var(--accent); color:#fff; border:none; border-radius:10px;
+      padding:9px 12px; font-weight:600; cursor:pointer; transition:filter .15s;
+    }
+    .btn:hover{ filter:brightness(1.05) }
 
-  /* cards/tables */
-  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px}
-  .grid{display:grid;gap:16px}
-  @media(min-width:980px){ .grid{grid-template-columns:1fr 1fr} }
-  table{width:100%;border-collapse:separate;border-spacing:0 8px}
-  th,td{padding:8px 10px;text-align:left}
-  th{color:var(--muted);font-weight:600;font-size:13px}
-  td .row{display:flex;gap:8px;align-items:center}
-  label{color:var(--muted)}
+    /* Quiet remove-row button (the little × in each row) */
+    table .danger{
+      background:var(--chip);
+      color:var(--muted);
+      border:1px solid var(--border);
+      width:32px; height:32px; padding:0;
+      border-radius:8px;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:700; line-height:1;
+    }
+    table .danger:hover{
+      background:#fff;
+      color:var(--bad);
+      border-color:var(--bad);
+    }
 
-  /* inputs to match Lab (light fields) */
-  input[type="text"]{
-    width:100%;background:#fff;color:var(--text);border:1px solid var(--border);
-    border-radius:10px;padding:9px 10px;font-size:14px;outline:none;
-  }
-.toast{
-  position:fixed; left:50%; bottom:16px; transform:translateX(-50%);
-  background:var(--accent); color:#fff; padding:8px 12px; border-radius:10px;
-  box-shadow:0 8px 24px rgba(0,0,0,.15);
-  opacity:0; pointer-events:none; transition:opacity .2s, transform .2s;
-  font-weight:600; font-size:13px; z-index:9999;
-}
-.toast.show{ opacity:1; transform:translateX(-50%) translateY(-4px); }
-   
-  input[type="text"]:focus{border-color:var(--accent)}
+    /* cards/tables */
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px}
+    .grid{display:grid;gap:16px}
+    @media(min-width:980px){ .grid{grid-template-columns:1fr 1fr} }
+    table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    th,td{padding:8px 10px;text-align:left}
+    th{color:var(--muted);font-weight:600;font-size:13px}
+    td .row{display:flex;gap:8px;align-items:center}
+    label{color:var(--muted)}
 
-  .muted{color:var(--muted);font-size:12px}
-  .subtotal{font-weight:700}
+    /* inputs to match Lab (light fields) */
+    input[type="text"]{
+      width:100%;background:#fff;color:var(--text);border:1px solid var(--border);
+      border-radius:10px;padding:9px 10px;font-size:14px;outline:none;
+    }
+    input[type="text"]:focus{border-color:var(--accent)}
 
-  /* chips/pills same look as Lab’s badges */
-  .pill{display:inline-block;background:var(--chip);border:1px solid var(--border);
-        padding:5px 8px;border-radius:999px;font-size:12px;margin-left:8px}
-  .inline{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-  .ok{color:var(--ok);font-weight:700}
-</style>
+    .muted{color:var(--muted);font-size:12px}
+    .subtotal{font-weight:700}
 
+    /* chips/pills same look as Lab’s badges */
+    .pill{display:inline-block;background:var(--chip);border:1px solid var(--border);
+          padding:5px 8px;border-radius:999px;font-size:12px;margin-left:8px}
+    .inline{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .ok{color:var(--ok);font-weight:700}
+
+    /* Toast */
+    .toast{
+      position:fixed; left:50%; bottom:16px; transform:translateX(-50%);
+      background:var(--accent); color:#fff; padding:8px 12px; border-radius:10px;
+      box-shadow:0 8px 24px rgba(0,0,0,.15);
+      opacity:0; pointer-events:none; transition:opacity .2s, transform .2s;
+      font-weight:600; font-size:13px; z-index:9999;
+    }
+    .toast.show{ opacity:1; transform:translateX(-50%) translateY(-4px); }
+  </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <h1>Fixed Costs — Monthly</h1>
     <div class="inline">
-  <button id="copyToPlannerLab" class="btn">Copy to Planner-Lab URL</button>
-  <button id="copyToPlanner" class="btn">Copy to Planner URL</button>
-  <a class="btn" href="index.html">Open Planner</a>
-  <a class="btn" href="planner-lab.html">Open Planner — Lab</a>
-</div>
+      <button id="copyToPlannerLab" class="btn">Copy to Planner-Lab URL</button>
+      <button id="copyToPlanner" class="btn">Copy to Planner URL</button>
+      <a class="btn" href="index.html">Open Planner</a>
+      <a class="btn" href="planner-lab.html">Open Planner — Lab</a>
+    </div>
   </header>
 
   <!-- ===== Globals ===== -->
@@ -208,7 +209,6 @@ table .danger:hover{
       <code>fp:iskPerEur</code>, <code>fp:workingDays</code>, <code>fp:dvRateISK</code>, <code>fp:yvRateISK</code>.
     </div>
   </section>
-
 </div>
 
 <script>
@@ -220,44 +220,18 @@ function toNumber(value){
   let s = (''+value).replace(/\s|\u00A0/g,'').trim();
   if (s === '') return NaN;
 
-  const hasComma = s.includes(',');
-  const hasDot   = s.includes('.');
-
+  const hasComma = s.includes(','), hasDot = s.includes('.');
   if (hasComma && hasDot){
-    // decimal is whichever appears last
-    const lastComma = s.lastIndexOf(',');
-    const lastDot   = s.lastIndexOf('.');
-    if (lastComma > lastDot){
-      // "3.000,75" -> "3000.75"
-      s = s.replace(/\./g,'').replace(',', '.');
-    } else {
-      // "3,000.75" -> "3000.75"
-      s = s.replace(/,/g,'');
-    }
+    const lastComma = s.lastIndexOf(','), lastDot = s.lastIndexOf('.');
+    s = (lastComma > lastDot) ? s.replace(/\./g,'').replace(',', '.') : s.replace(/,/g,'');
   } else if (hasComma){
-    // If multiple commas, last is decimal; others are thousands
     const commas = (s.match(/,/g)||[]).length;
-    if (commas > 1){
-      const last = s.lastIndexOf(',');
-      s = s.slice(0,last).replace(/,/g,'') + '.' + s.slice(last+1);
-    } else {
-      // Single comma: treat as thousands if exactly 3 digits after it; otherwise decimal
-      const idx = s.indexOf(',');
-      const fracLen = s.length - idx - 1;
-      if (fracLen === 3) s = s.replace(/,/g,''); else s = s.replace(',', '.');
-    }
+    if (commas > 1){ const last = s.lastIndexOf(','); s = s.slice(0,last).replace(/,/g,'') + '.' + s.slice(last+1); }
+    else { const idx=s.indexOf(','), fracLen=s.length-idx-1; s = (fracLen===3)? s.replace(/,/g,'') : s.replace(',', '.'); }
   } else if (hasDot){
-    // If multiple dots, last is decimal; others are thousands
     const dots = (s.match(/\./g)||[]).length;
-    if (dots > 1){
-      const last = s.lastIndexOf('.');
-      s = s.slice(0,last).replace(/\./g,'') + '.' + s.slice(last+1);
-    } else {
-      // Single dot: treat as thousands if exactly 3 digits after it; otherwise decimal
-      const idx = s.indexOf('.');
-      const fracLen = s.length - idx - 1;
-      if (fracLen === 3) s = s.replace(/\./g,'');
-    }
+    if (dots > 1){ const last = s.lastIndexOf('.'); s = s.slice(0,last).replace(/\./g,'') + '.' + s.slice(last+1); }
+    else { const idx=s.indexOf('.'), fracLen=s.length-idx-1; if (fracLen===3) s = s.replace(/\./g,''); }
   }
   const n = Number(s);
   return Number.isFinite(n) ? n : NaN;
@@ -270,6 +244,7 @@ function fmt(n, dec){
       : (Number.isInteger(n) ? { maximumFractionDigits: 0 } : { maximumFractionDigits: 2 })
   ).format(n);
 }
+function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; }
 
 /* ========================= Row model & UI ========================= */
 const CAT_ISK = ['housing','equipment','admin'];
@@ -306,9 +281,8 @@ function addRow(building, currency, cat='', amount=''){
 }
 
 /* ========================= Persistence ========================= */
-function storageKey(building,currency){
-  return `fp:rows:${building}:${currency}`;
-}
+function storageKey(building,currency){ return `fp:rows:${building}:${currency}`; }
+
 function saveAll(){
   // Save tables
   for (const building of ['A','B']){
@@ -320,19 +294,17 @@ function saveAll(){
   }
   // Save globals
   const g = {
-    'fp:iskPerEur' : document.getElementById('iskPerEur').value.trim(),
+    'fp:iskPerEur'   : document.getElementById('iskPerEur').value.trim(),
     'fp:workingDays' : document.getElementById('workingDays').value.trim(),
-    'fp:dvRateISK' : document.getElementById('dvRateISK').value.trim(),
-    'fp:yvRateISK' : document.getElementById('yvRateISK').value.trim()
+    'fp:dvRateISK'   : document.getElementById('dvRateISK').value.trim(),
+    'fp:yvRateISK'   : document.getElementById('yvRateISK').value.trim()
   };
   for (const [k,v] of Object.entries(g)){
-    if (v !== '') {
-  localStorage.setItem(k, String(toNumber(v)));
-} else {
-  localStorage.removeItem(k);
-}
+    if (v !== '') localStorage.setItem(k, String(toNumber(v)));
+    else localStorage.removeItem(k);
   }
 }
+
 function loadAll(){
   for (const building of ['A','B']){
     for (const currency of ['ISK','EUR']){
@@ -349,23 +321,22 @@ function loadAll(){
       }
     }
   }
-  
+
   // Load globals
   const fx = localStorage.getItem('fp:iskPerEur');   if (fx) document.getElementById('iskPerEur').value = fmt(toNumber(fx),2);
   const wd = localStorage.getItem('fp:workingDays'); if (wd) document.getElementById('workingDays').value = fmt(toNumber(wd),0);
+
   const dv = localStorage.getItem('fp:dvRateISK');
-if (dv !== null) {
-  document.getElementById('dvRateISK').value =
-    new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 0, useGrouping: false })
-      .format(toNumber(dv));
+  if (dv !== null) {
+    document.getElementById('dvRateISK').value =
+      new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 0, useGrouping: false }).format(toNumber(dv));
+  }
+  const yv = localStorage.getItem('fp:yvRateISK');
+  if (yv !== null) {
+    document.getElementById('yvRateISK').value =
+      new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 0, useGrouping: false }).format(toNumber(yv));
+  }
 }
-const yv = localStorage.getItem('fp:yvRateISK');
-if (yv !== null) {
-  document.getElementById('yvRateISK').value =
-    new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 0, useGrouping: false })
-      .format(toNumber(yv));
-}
-}  
 
 /* ========================= Totals & Saved keys ========================= */
 function recalcAll(){
@@ -434,13 +405,11 @@ function recalcAll(){
   document.getElementById('t_yvRate').textContent = Number.isFinite(yv) ? fmt(yv) : '–';
 }
 function saveKeyNum(key, num){
-  if (num && Number.isFinite(num) && Math.abs(num) > 0){
-    localStorage.setItem(key, String(num));
-  } else {
-    localStorage.removeItem(key);
-  }
+  if (num && Number.isFinite(num) && Math.abs(num) > 0) localStorage.setItem(key, String(num));
+  else localStorage.removeItem(key);
 }
-// --- Toast helper (place above the copy functions) ---
+
+/* ========================= Toast helper ========================= */
 function showToast(msg){
   const t = document.getElementById('toast');
   if (!t) return;
@@ -450,63 +419,53 @@ function showToast(msg){
   showToast._t = setTimeout(()=> t.classList.remove('show'), 1600);
 }
 
-/* ========================= Copy to Planner URL ========================= */
-function copyToPlannerURL(btn){ /* ... */ }
-function copyToPlannerLabURL(btn){ /* ... */ }
-
-  
-/* ========================= Copy to Planner URL ========================= */
-function copyToPlannerURL(){
+/* ========================= Copy helpers ========================= */
+function buildPlannerParams(){
   const sp = new URLSearchParams();
   const pairs = [
-    ['fp_housingCost',        localStorage.getItem('fp:housingCost')],
-    ['fp_equipCost',          localStorage.getItem('fp:equipCost')],
-    ['fp_adminCost',          localStorage.getItem('fp:adminCost')],
-    ['fp_maintEurMonth',      localStorage.getItem('fp:maintEurMonth')],
-    ['fp_rentalsEurMonth',    localStorage.getItem('fp:rentalsEurMonth')],
-    ['fp_sparesEurMonth',     localStorage.getItem('fp:sparesEurMonth')],
-    ['fp_electricityEurMonth',localStorage.getItem('fp:electricityEurMonth')],
-    ['fp_waterEurMonth',      localStorage.getItem('fp:waterEurMonth')],
-    ['fp_otherEurMonth',      localStorage.getItem('fp:otherEurMonth')],
-    ['fp_iskPerEur',          localStorage.getItem('fp:iskPerEur')],
-    ['fp_workingDays',        localStorage.getItem('fp:workingDays')],
-    // NEW: rates
-    ['fp_dvRateISK',          localStorage.getItem('fp:dvRateISK')],
-    ['fp_yvRateISK',          localStorage.getItem('fp:yvRateISK')]
+    ['fp_housingCost',         localStorage.getItem('fp:housingCost')],
+    ['fp_equipCost',           localStorage.getItem('fp:equipCost')],
+    ['fp_adminCost',           localStorage.getItem('fp:adminCost')],
+    ['fp_maintEurMonth',       localStorage.getItem('fp:maintEurMonth')],
+    ['fp_rentalsEurMonth',     localStorage.getItem('fp:rentalsEurMonth')],
+    ['fp_sparesEurMonth',      localStorage.getItem('fp:sparesEurMonth')],
+    ['fp_electricityEurMonth', localStorage.getItem('fp:electricityEurMonth')],
+    ['fp_waterEurMonth',       localStorage.getItem('fp:waterEurMonth')],
+    ['fp_otherEurMonth',       localStorage.getItem('fp:otherEurMonth')],
+    ['fp_iskPerEur',           localStorage.getItem('fp:iskPerEur')],
+    ['fp_workingDays',         localStorage.getItem('fp:workingDays')],
+    ['fp_dvRateISK',           localStorage.getItem('fp:dvRateISK')],
+    ['fp_yvRateISK',           localStorage.getItem('fp:yvRateISK')]
   ];
   for (const [k,v] of pairs){
     const n = toNumber(v);
     if (v!=null && Number.isFinite(n) && Math.abs(n)>0) sp.set(k, String(n));
   }
-  const url = 'index.html' + (sp.toString() ? ('?'+sp.toString()) : '');
-  try { navigator.clipboard.writeText(new URL(url, location.href).href); } catch(e){}
-  location.href = url;
+  return sp;
 }
 
-  function copyToPlannerLabURL(){
-  const sp = new URLSearchParams();
-  const pairs = [
-    ['fp_housingCost',        localStorage.getItem('fp:housingCost')],
-    ['fp_equipCost',          localStorage.getItem('fp:equipCost')],
-    ['fp_adminCost',          localStorage.getItem('fp:adminCost')],
-    ['fp_maintEurMonth',      localStorage.getItem('fp:maintEurMonth')],
-    ['fp_rentalsEurMonth',    localStorage.getItem('fp:rentalsEurMonth')],
-    ['fp_sparesEurMonth',     localStorage.getItem('fp:sparesEurMonth')],
-    ['fp_electricityEurMonth',localStorage.getItem('fp:electricityEurMonth')],
-    ['fp_waterEurMonth',      localStorage.getItem('fp:waterEurMonth')],
-    ['fp_otherEurMonth',      localStorage.getItem('fp:otherEurMonth')],
-    ['fp_iskPerEur',          localStorage.getItem('fp:iskPerEur')],
-    ['fp_workingDays',        localStorage.getItem('fp:workingDays')],
-    ['fp_dvRateISK',          localStorage.getItem('fp:dvRateISK')],
-    ['fp_yvRateISK',          localStorage.getItem('fp:yvRateISK')]
-  ];
-  for (const [k,v] of pairs){
-    const n = toNumber(v);
-    if (v!=null && Number.isFinite(n) && Math.abs(n)>0) sp.set(k, String(n));
-  }
-  const url = 'planner-lab.html' + (sp.toString() ? ('?'+sp.toString()) : '');
+function copyAndGo(url, btn){
   try { navigator.clipboard.writeText(new URL(url, location.href).href); } catch(e){}
-  location.href = url;
+  showToast('Copied settings to URL — opening…');
+  if (btn){
+    const prev = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Copied — opening…';
+    setTimeout(()=>{ location.href = url; }, 350);
+    // restore after navigation if user cancels/back
+    setTimeout(()=>{ btn.disabled=false; btn.textContent=prev; }, 3000);
+  } else {
+    setTimeout(()=>{ location.href = url; }, 200);
+  }
+}
+
+function copyToPlannerURL(ev){
+  const url = 'index.html' + ( (p=>p.toString()?('?'+p.toString()):'')(buildPlannerParams()) );
+  copyAndGo(url, ev?.currentTarget || null);
+}
+function copyToPlannerLabURL(ev){
+  const url = 'planner-lab.html' + ( (p=>p.toString()?('?'+p.toString()):'')(buildPlannerParams()) );
+  copyAndGo(url, ev?.currentTarget || null);
 }
 
 /* ========================= Events & bootstrap ========================= */
@@ -518,42 +477,39 @@ function wireButtons(){
       saveAll(); recalcAll();
     });
   });
-  document.getElementById('copyToPlanner').addEventListener('click', copyToPlannerURL);
-  document.getElementById('copyToPlannerLab').addEventListener('click', copyToPlannerLabURL); 
+
+  document.getElementById('copyToPlanner').addEventListener('click', (e)=>copyToPlannerURL(e));
+  document.getElementById('copyToPlannerLab').addEventListener('click', (e)=>copyToPlannerLabURL(e));
 
   // Globals formatting & save
   ['iskPerEur','workingDays','dvRateISK','yvRateISK'].forEach(id=>{
-  const el = document.getElementById(id);
-  el.addEventListener('focus', ()=>{ const n = toNumber(el.value); if (Number.isFinite(n)) el.value = String(n); });
-  el.addEventListener('blur', ()=>{
-    const n = toNumber(el.value);
-    if (!Number.isFinite(n)) { el.value=''; saveAll(); return; }
-
-    if (id==='workingDays') {
-      el.value = new Intl.NumberFormat(LOCALE, { maximumFractionDigits:0, useGrouping:false }).format(n);
-    } else if (id==='iskPerEur') {
-      el.value = new Intl.NumberFormat(LOCALE, { minimumFractionDigits:2, maximumFractionDigits:2 }).format(n);
-    } else if (id==='dvRateISK' || id==='yvRateISK') {
-      // rates: integers, no grouping so “6200” stays “6200”
-      el.value = new Intl.NumberFormat(LOCALE, { maximumFractionDigits:0, useGrouping:false }).format(n);
-    }
-    saveAll();
-    recalcAll();
+    const el = document.getElementById(id);
+    el.addEventListener('focus', ()=>{ const n = toNumber(el.value); if (Number.isFinite(n)) el.value = String(n); });
+    el.addEventListener('blur', ()=>{
+      const n = toNumber(el.value);
+      if (!Number.isFinite(n)) { el.value=''; saveAll(); return; }
+      if (id==='workingDays') {
+        el.value = new Intl.NumberFormat(LOCALE, { maximumFractionDigits:0, useGrouping:false }).format(n);
+      } else if (id==='iskPerEur') {
+        el.value = new Intl.NumberFormat(LOCALE, { minimumFractionDigits:2, maximumFractionDigits:2 }).format(n);
+      } else if (id==='dvRateISK' || id==='yvRateISK') {
+        el.value = new Intl.NumberFormat(LOCALE, { maximumFractionDigits:0, useGrouping:false }).format(n);
+      }
+      saveAll(); recalcAll();
+    });
+    el.addEventListener('input', debounce(()=>{ saveAll(); recalcAll(); },300));
   });
-  el.addEventListener('input', debounce(()=>{ saveAll(); recalcAll(); },300));
-});
 }
 
-function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; }
-
 window.addEventListener('beforeunload', saveAll);
-  
+
 document.addEventListener('DOMContentLoaded', ()=>{
   loadAll();
   recalcAll();
   wireButtons();
 });
 </script>
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
