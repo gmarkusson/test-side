@@ -6,15 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root{
-  --bg:#ffffff;       /* white page background */
-  --card:#f9fafb;     /* light grey cards */
-  --muted:#6b7280;    /* medium grey text for labels */
-  --text:#111827;     /* dark text */
-  --accent:#0ea5e9;   /* blue buttons/accents */
-  --border:#d1d5db;   /* light border */
-  --chip:#e5e7eb;     /* chip background */
-  --ok:#10b981;       /* green for positive numbers */
-}
+      --bg:#ffffff;
+      --card:#f9fafb;
+      --muted:#6b7280;
+      --text:#111827;
+      --accent:#0ea5e9;
+      --border:#d1d5db;
+      --chip:#e5e7eb;
+      --ok:#10b981;
+    }
     html,body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;margin:0}
     .wrap{max-width:1100px;margin:40px auto;padding:0 20px}
     header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
@@ -27,7 +27,7 @@
     th{color:var(--muted);font-weight:600;font-size:13px}
     td .row{display:flex;gap:8px;align-items:center}
     input[type="text"]{
-      width:100%;background:#0b1020;color:var(--text);border:1px solid var(--border);
+      width:100%;background:#0b1020;color:#fff;border:1px solid var(--border);
       border-radius:10px;padding:9px 10px;font-size:14px;outline:none;
     }
     input[type="text"]:focus{border-color:#2b3b52}
@@ -42,6 +42,7 @@
     .inline{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
     .danger{background:#ef4444;color:#fff}
     .ok{color:var(--ok);font-weight:700}
+    .spacer{width:10px}
   </style>
 </head>
 <body>
@@ -54,23 +55,37 @@
     </div>
   </header>
 
+  <!-- ===== Globals ===== -->
   <section class="card">
-    <div class="inline">
-      <div>
+    <div class="inline" style="justify-content:space-between;align-items:flex-start">
+      <div style="flex:1 1 auto">
         <div class="muted">Globals</div>
         <div class="inline" style="margin-top:6px">
           <label class="muted" for="iskPerEur">ISK per EUR</label>
           <input type="text" id="iskPerEur" class="num" inputmode="decimal" placeholder="e.g. 153,50" style="width:140px">
+
+          <span class="spacer"></span>
+
           <label class="muted" for="workingDays">Working days (optional)</label>
           <input type="text" id="workingDays" class="num num-int" inputmode="decimal" placeholder="e.g. 21" style="width:120px">
+        </div>
+
+        <div class="inline" style="margin-top:10px">
+          <label class="muted" for="dvRateISK">Daytime hourly rate (ISK/hour)</label>
+          <input type="text" id="dvRateISK" class="num" inputmode="decimal" placeholder="e.g. 3.800" style="width:150px">
+
+          <span class="spacer"></span>
+
+          <label class="muted" for="yvRateISK">Overtime hourly rate (ISK/hour)</label>
+          <input type="text" id="yvRateISK" class="num" inputmode="decimal" placeholder="e.g. 5.400" style="width:150px">
         </div>
       </div>
       <span class="pill">Locale: is-IS</span>
     </div>
   </section>
 
+  <!-- ===== ISK/month per building ===== -->
   <section class="grid">
-    <!-- ISK categories per building -->
     <div class="card" id="iskA">
       <h2 style="margin:0 0 8px 0">Building A — ISK/month</h2>
       <table data-building="A" data-currency="ISK">
@@ -102,8 +117,8 @@
     </div>
   </section>
 
+  <!-- ===== EUR/month per building ===== -->
   <section class="grid">
-    <!-- EUR operational categories per building -->
     <div class="card" id="eurA">
       <h2 style="margin:0 0 8px 0">Building A — EUR/month</h2>
       <table data-building="A" data-currency="EUR">
@@ -130,6 +145,7 @@
     </div>
   </section>
 
+  <!-- ===== Aggregated totals (and saved globals preview) ===== -->
   <section class="card">
     <h2 style="margin:0 0 8px 0">Aggregated totals (saved)</h2>
     <div class="inline" style="gap:18px">
@@ -149,9 +165,16 @@
         <span class="pill">other: <strong id="t_other">–</strong></span>
       </div>
     </div>
+    <div class="inline" style="gap:12px;margin-top:10px">
+      <div>Labor rates (ISK/hour) →
+        <span class="pill">Daytime: <strong id="t_dvRate">–</strong></span>
+        <span class="pill">Overtime: <strong id="t_yvRate">–</strong></span>
+      </div>
+    </div>
     <div class="muted" style="margin-top:8px">Saved keys:
       <code>fp:housingCost</code>, <code>fp:equipCost</code>, <code>fp:adminCost</code>,
-      <code>fp:maintEurMonth</code>, <code>fp:rentalsEurMonth</code>, <code>fp:sparesEurMonth</code>, <code>fp:electricityEurMonth</code>, <code>fp:waterEurMonth</code>, <code>fp:otherEurMonth</code>, plus <code>fp:iskPerEur</code> and (optional) <code>fp:workingDays</code>.
+      <code>fp:maintEurMonth</code>, <code>fp:rentalsEurMonth</code>, <code>fp:sparesEurMonth</code>, <code>fp:electricityEurMonth</code>, <code>fp:waterEurMonth</code>, <code>fp:otherEurMonth</code>,
+      <code>fp:iskPerEur</code>, <code>fp:workingDays</code>, <code>fp:dvRateISK</code>, <code>fp:yvRateISK</code>.
     </div>
   </section>
 
@@ -160,49 +183,28 @@
 <script>
 /* ========================= Locale helpers (shared) ========================= */
 const LOCALE='is-IS';
-const nf0 = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 0 });
-const nf2 = new Intl.NumberFormat(LOCALE, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
 function toNumber(value){
   if (value == null) return NaN;
   if (typeof value === 'number') return value;
   let s = (''+value).replace(/\s|\u00A0/g,'').trim();
   if (s === '') return NaN;
 
-  const hasComma = s.includes(',');
-  const hasDot   = s.includes('.');
-  if (hasComma && hasDot){
-    const lastComma = s.lastIndexOf(',');
-    const lastDot   = s.lastIndexOf('.');
-    const decIsComma = lastComma > lastDot;
-    if (decIsComma){
-      s = s.replace(/\./g,'').replace(',', '.');
-    } else {
-      s = s.replace(/,/g,''); // dot decimal
-    }
-  } else if (hasComma){
-    if ((s.match(/,/g)||[]).length > 1){
-      const last = s.lastIndexOf(',');
-      s = s.slice(0,last).replace(/,/g,'') + '.' + s.slice(last+1);
-    } else {
-      s = s.replace(',', '.');
-    }
-  } else if (hasDot){
-    if ((s.match(/\./g)||[]).length > 1){
-      const last = s.lastIndexOf('.');
-      s = s.slice(0,last).replace(/\./g,'') + '.' + s.slice(last+1);
-    }
+  // is-IS: comma is decimal, dot is thousand
+  if (s.includes(',')){
+    s = s.replace(/\./g,'').replace(',', '.');
+  } else {
+    s = s.replace(/\./g,'');
   }
   const n = Number(s);
   return Number.isFinite(n) ? n : NaN;
 }
 function fmt(n,dec){
   if (!Number.isFinite(n)) return '–';
-  if (typeof dec==='number'){
-    return new Intl.NumberFormat(LOCALE, { minimumFractionDigits: dec, maximumFractionDigits: dec }).format(n);
-  }
-  const opts = Number.isInteger(n) ? { maximumFractionDigits: 0 } : { maximumFractionDigits: 2 };
-  return new Intl.NumberFormat(LOCALE, opts).format(n);
+  return new Intl.NumberFormat(LOCALE,
+    typeof dec==='number'
+      ? { minimumFractionDigits: dec, maximumFractionDigits: dec }
+      : (Number.isInteger(n) ? { maximumFractionDigits: 0 } : { maximumFractionDigits: 2 })
+  ).format(n);
 }
 
 /* ========================= Row model & UI ========================= */
@@ -222,7 +224,6 @@ function makeRow(building, currency, cat='', amount=''){
   tr.querySelector('input.cat').addEventListener('input', debounce(()=>{ saveAll(); recalcAll(); },250));
   return tr;
 }
-
 function wireNum(inp){
   inp.addEventListener('focus', ()=>{
     const n = toNumber(inp.value);
@@ -235,7 +236,6 @@ function wireNum(inp){
   });
   inp.addEventListener('input', debounce(()=>{ saveAll(); recalcAll(); },250));
 }
-
 function addRow(building, currency, cat='', amount=''){
   const table = document.querySelector(`table[data-building="${building}"][data-currency="${currency}"] tbody`);
   table.appendChild(makeRow(building, currency, cat, amount));
@@ -243,31 +243,28 @@ function addRow(building, currency, cat='', amount=''){
 
 /* ========================= Persistence ========================= */
 function storageKey(building,currency){
-  return `fp:rows:${building}:${currency}`; // stores JSON of rows [{cat,amount},...]
+  return `fp:rows:${building}:${currency}`;
 }
 function saveAll(){
   // Save tables
   for (const building of ['A','B']){
     for (const currency of ['ISK','EUR']){
       const rows = [...document.querySelectorAll(`table[data-building="${building}"][data-currency="${currency}"] tbody tr`)]
-        .map(tr=>{
-          return {
-            cat: tr.querySelector('input.cat').value.trim(),
-            amount: tr.querySelector('input.amt').value.trim()
-          };
-        });
+        .map(tr=>({ cat: tr.querySelector('input.cat').value.trim(), amount: tr.querySelector('input.amt').value.trim() }));
       localStorage.setItem(storageKey(building,currency), JSON.stringify(rows));
     }
   }
   // Save globals
-  const iskPerEur = document.getElementById('iskPerEur').value.trim();
-  const workingDays = document.getElementById('workingDays').value.trim();
-  if (iskPerEur) localStorage.setItem('fp:iskPerEur', String(toNumber(iskPerEur)));
-  else           localStorage.removeItem('fp:iskPerEur');
-  if (workingDays) localStorage.setItem('fp:workingDays', String(toNumber(workingDays)));
-  else             localStorage.removeItem('fp:workingDays');
+  const g = {
+    'fp:iskPerEur' : document.getElementById('iskPerEur').value.trim(),
+    'fp:workingDays' : document.getElementById('workingDays').value.trim(),
+    'fp:dvRateISK' : document.getElementById('dvRateISK').value.trim(),
+    'fp:yvRateISK' : document.getElementById('yvRateISK').value.trim()
+  };
+  for (const [k,v] of Object.entries(g)){
+    if (v) localStorage.setItem(k, String(toNumber(v))); else localStorage.removeItem(k);
+  }
 }
-
 function loadAll(){
   for (const building of ['A','B']){
     for (const currency of ['ISK','EUR']){
@@ -277,7 +274,6 @@ function loadAll(){
       let rows = [];
       try { rows = JSON.parse(localStorage.getItem(key)||'[]') } catch(e){}
       if (!rows || !rows.length){
-        // Seed default rows per spec categories
         const cats = currency==='ISK' ? CAT_ISK : CAT_EUR;
         for (const c of cats) addRow(building, currency, c, '');
       } else {
@@ -286,13 +282,15 @@ function loadAll(){
     }
   }
   // Load globals
-  const fx = localStorage.getItem('fp:iskPerEur'); if (fx) document.getElementById('iskPerEur').value = fmt(toNumber(fx),2);
+  const fx = localStorage.getItem('fp:iskPerEur');   if (fx) document.getElementById('iskPerEur').value = fmt(toNumber(fx),2);
   const wd = localStorage.getItem('fp:workingDays'); if (wd) document.getElementById('workingDays').value = fmt(toNumber(wd),0);
+  const dv = localStorage.getItem('fp:dvRateISK');   if (dv) document.getElementById('dvRateISK').value = fmt(toNumber(dv));
+  const yv = localStorage.getItem('fp:yvRateISK');   if (yv) document.getElementById('yvRateISK').value = fmt(toNumber(yv));
 }
 
-/* ========================= Totals & Saving required keys ========================= */
+/* ========================= Totals & Saved keys ========================= */
 function recalcAll(){
-  // Subtotals per table
+  // Subtotals
   for (const building of ['A','B']){
     for (const currency of ['ISK','EUR']){
       const rows = [...document.querySelectorAll(`table[data-building="${building}"][data-currency="${currency}"] tbody tr`)];
@@ -306,7 +304,7 @@ function recalcAll(){
     }
   }
 
-  // Aggregate to the exact saved keys
+  // Aggregate to saved keys
   const aggISK = { housing:0, equipment:0, admin:0 };
   const aggEUR = { maintenance:0, rentals:0, spares:0, electricity:0, water:0, other:0 };
 
@@ -322,11 +320,11 @@ function recalcAll(){
       const cat = (tr.querySelector('input.cat').value||'').trim().toLowerCase();
       const val = toNumber(tr.querySelector('input.amt').value)||0;
       if (cat in aggEUR) aggEUR[cat] += val;
-      else if (cat && !CAT_EUR.includes(cat)) aggEUR.other += val; // non-listed EUR cats count as "other"
+      else if (cat && !CAT_EUR.includes(cat)) aggEUR.other += val;
     }
   }
 
-  // Save required keys (remove if zero)
+  // Save required numeric keys (remove if zero)
   saveKeyNum('fp:housingCost', aggISK.housing);
   saveKeyNum('fp:equipCost',   aggISK.equipment);
   saveKeyNum('fp:adminCost',   aggISK.admin);
@@ -349,8 +347,13 @@ function recalcAll(){
   document.getElementById('t_elec').textContent    = fmt(aggEUR.electricity,2);
   document.getElementById('t_water').textContent   = fmt(aggEUR.water,2);
   document.getElementById('t_other').textContent   = fmt(aggEUR.other,2);
-}
 
+  // Rates preview
+  const dv = toNumber(localStorage.getItem('fp:dvRateISK'));
+  const yv = toNumber(localStorage.getItem('fp:yvRateISK'));
+  document.getElementById('t_dvRate').textContent = Number.isFinite(dv) ? fmt(dv) : '–';
+  document.getElementById('t_yvRate').textContent = Number.isFinite(yv) ? fmt(yv) : '–';
+}
 function saveKeyNum(key, num){
   if (num && Number.isFinite(num) && Math.abs(num) > 0){
     localStorage.setItem(key, String(num));
@@ -361,30 +364,28 @@ function saveKeyNum(key, num){
 
 /* ========================= Copy to Planner URL ========================= */
 function copyToPlannerURL(){
-  // Start with base index.html
   const sp = new URLSearchParams();
-
-  // Include non-zero totals & globals
   const pairs = [
-    ['fp_housingCost',       localStorage.getItem('fp:housingCost')],
-    ['fp_equipCost',         localStorage.getItem('fp:equipCost')],
-    ['fp_adminCost',         localStorage.getItem('fp:adminCost')],
-    ['fp_maintEurMonth',     localStorage.getItem('fp:maintEurMonth')],
-    ['fp_rentalsEurMonth',   localStorage.getItem('fp:rentalsEurMonth')],
-    ['fp_sparesEurMonth',    localStorage.getItem('fp:sparesEurMonth')],
+    ['fp_housingCost',        localStorage.getItem('fp:housingCost')],
+    ['fp_equipCost',          localStorage.getItem('fp:equipCost')],
+    ['fp_adminCost',          localStorage.getItem('fp:adminCost')],
+    ['fp_maintEurMonth',      localStorage.getItem('fp:maintEurMonth')],
+    ['fp_rentalsEurMonth',    localStorage.getItem('fp:rentalsEurMonth')],
+    ['fp_sparesEurMonth',     localStorage.getItem('fp:sparesEurMonth')],
     ['fp_electricityEurMonth',localStorage.getItem('fp:electricityEurMonth')],
-    ['fp_waterEurMonth',     localStorage.getItem('fp:waterEurMonth')],
-    ['fp_otherEurMonth',     localStorage.getItem('fp:otherEurMonth')],
-    ['fp_iskPerEur',         localStorage.getItem('fp:iskPerEur')],
-    ['fp_workingDays',       localStorage.getItem('fp:workingDays')]
+    ['fp_waterEurMonth',      localStorage.getItem('fp:waterEurMonth')],
+    ['fp_otherEurMonth',      localStorage.getItem('fp:otherEurMonth')],
+    ['fp_iskPerEur',          localStorage.getItem('fp:iskPerEur')],
+    ['fp_workingDays',        localStorage.getItem('fp:workingDays')],
+    // NEW: rates
+    ['fp_dvRateISK',          localStorage.getItem('fp:dvRateISK')],
+    ['fp_yvRateISK',          localStorage.getItem('fp:yvRateISK')]
   ];
   for (const [k,v] of pairs){
     const n = toNumber(v);
     if (v!=null && Number.isFinite(n) && Math.abs(n)>0) sp.set(k, String(n));
   }
-
   const url = 'index.html' + (sp.toString() ? ('?'+sp.toString()) : '');
-  // Copy to clipboard & also navigate (pleasant flow)
   try { navigator.clipboard.writeText(new URL(url, location.href).href); } catch(e){}
   location.href = url;
 }
@@ -400,19 +401,20 @@ function wireButtons(){
   });
   document.getElementById('copyToPlanner').addEventListener('click', copyToPlannerURL);
 
-  // Globals behavior
-  ['iskPerEur','workingDays'].forEach(id=>{
+  // Globals formatting & save
+  ['iskPerEur','workingDays','dvRateISK','yvRateISK'].forEach(id=>{
     const el = document.getElementById(id);
-    // formatters
-    el.addEventListener('focus', ()=>{
-      const n = toNumber(el.value); if (Number.isFinite(n)) el.value = String(n);
-    });
+    el.addEventListener('focus', ()=>{ const n = toNumber(el.value); if (Number.isFinite(n)) el.value = String(n); });
     el.addEventListener('blur', ()=>{
       const n = toNumber(el.value);
-      el.value = Number.isFinite(n) ? (id==='workingDays' ? fmt(n,0) : fmt(n,2)) : '';
+      if (!Number.isFinite(n)) { el.value=''; saveAll(); return; }
+      if (id==='workingDays') el.value = fmt(n,0);
+      else if (id==='iskPerEur') el.value = fmt(n,2);
+      else el.value = fmt(n); // rates
       saveAll();
+      recalcAll();
     });
-    el.addEventListener('input', debounce(saveAll,300));
+    el.addEventListener('input', debounce(()=>{ saveAll(); recalcAll(); },300));
   });
 }
 
