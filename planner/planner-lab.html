@@ -645,7 +645,7 @@ function updateCompare(id,vals){
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td><strong>${f}</strong></td>
-      <td>${fmt(v.netKg)}</td>
+      <td>${fmtInt(v.netKg)}</td>
       <td>${fmt(v.revenue)}</td>
       <td>${fmt(v.totalCost)}</td>
       <td class="${(v.profit>0)?'money-ok':(v.profit<0?'money-bad':'')}">${fmt(v.profit)}</td>
@@ -659,6 +659,7 @@ function updateCompare(id,vals){
   if(iskMonth) chips.appendChild(chip(`ISK/month (H+E+A): ${fmt(iskMonth,0)} ISK`));
   if(eurMonth) chips.appendChild(chip(`EUR/month (ops): ${fmt(eurMonth,2)} €`));
 }
+
 function chip(text){ const s=document.createElement('span'); s.className='chip'; s.textContent=text; return s; }
 
 /* ===== Bootstrap ===== */
