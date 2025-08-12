@@ -80,9 +80,8 @@
             <input type="text" class="num iskPerEur short" placeholder="e.g. 153,50" aria-describedby="fxA-help-isk">
           </div>
           <div id="fxA-help-isk" class="small">1 € = this many ISK (used to convert ISK monthly costs to EUR/day).</div>
-          <div class="row"><label>Price (EUR/kg)</label><input type="text" class="num pricePerKg short" placeholder="e.g. 6,90"></div>
 
-          <!-- Labor hours & rates (ISK) -->
+          <!-- Labor hours & rates (still driven by Fixed Costs) -->
           <div class="row"><label>DV hours (daytime)</label><input type="text" class="num dvHours short" placeholder="e.g. 120"></div>
           <div class="row"><label>YV hours (overtime)</label><input type="text" class="num yvHours short" placeholder="e.g. 20"></div>
           <div class="row"><label>Labor from hours (ISK/day)</label><input type="text" class="num laborFromHoursDay readonly short" readonly></div>
@@ -93,13 +92,16 @@
 
       <div class="split">
         <div>
-          <div class="row"><label>Raw used kg</label><input type="text" class="num rawKg" placeholder="e.g. 1.500"></div>
+          <!-- Start from production: Net -> Yield -> Raw (computed) -->
+          <div class="row"><label>Net saleable kg</label><input type="text" class="num netKg" placeholder="e.g. 1.000"></div>
           <div class="row"><label>Yield %</label><input type="text" class="num yieldPct" placeholder="e.g. 63,5"></div>
-          <div class="row"><label>Net saleable kg</label><input type="text" class="num netKg" placeholder="auto if set"></div>
+          <div class="row"><label>Raw used kg</label><input type="text" class="num rawKg" placeholder="auto from net & yield (or enter)"></div>
         </div>
         <div>
-          <div class="row"><label>Labor — operators</label><input type="text" class="num laborOps" placeholder="EUR/day"></div>
-          <div class="row"><label>Labor — supervisors</label><input type="text" class="num laborSup" placeholder="EUR/day"></div>
+          <!-- Price moved here; add raw material cost -->
+          <div class="row"><label>Price (EUR/kg)</label><input type="text" class="num pricePerKg short" placeholder="e.g. 6,90"></div>
+          <div class="row"><label>Raw material cost (EUR/kg raw)</label><input type="text" class="num rawCostPerKg short" placeholder="e.g. 3,20"></div>
+
           <div class="row"><label>Materials</label><input type="text" class="num materialsDay" placeholder="EUR/day"></div>
           <div class="row"><label>Pack</label><input type="text" class="num packDay" placeholder="EUR/day"></div>
           <div class="row"><label>Freight</label><input type="text" class="num freightDay" placeholder="EUR/day"></div>
@@ -148,7 +150,6 @@
             <input type="text" class="num iskPerEur short" placeholder="e.g. 153,50" aria-describedby="fxB-help-isk">
           </div>
           <div id="fxB-help-isk" class="small">1 € = this many ISK (used to convert ISK monthly costs to EUR/day).</div>
-          <div class="row"><label>Price (EUR/kg)</label><input type="text" class="num pricePerKg short" placeholder="e.g. 6,90"></div>
 
           <div class="row"><label>DV hours (daytime)</label><input type="text" class="num dvHours short" placeholder="e.g. 120"></div>
           <div class="row"><label>YV hours (overtime)</label><input type="text" class="num yvHours short" placeholder="e.g. 20"></div>
@@ -160,13 +161,14 @@
 
       <div class="split">
         <div>
-          <div class="row"><label>Raw used kg</label><input type="text" class="num rawKg" placeholder="e.g. 1.500"></div>
+          <div class="row"><label>Net saleable kg</label><input type="text" class="num netKg" placeholder="e.g. 1.000"></div>
           <div class="row"><label>Yield %</label><input type="text" class="num yieldPct" placeholder="e.g. 63,5"></div>
-          <div class="row"><label>Net saleable kg</label><input type="text" class="num netKg" placeholder="auto if set"></div>
+          <div class="row"><label>Raw used kg</label><input type="text" class="num rawKg" placeholder="auto from net & yield (or enter)"></div>
         </div>
         <div>
-          <div class="row"><label>Labor — operators</label><input type="text" class="num laborOps" placeholder="EUR/day"></div>
-          <div class="row"><label>Labor — supervisors</label><input type="text" class="num laborSup" placeholder="EUR/day"></div>
+          <div class="row"><label>Price (EUR/kg)</label><input type="text" class="num pricePerKg short" placeholder="e.g. 6,90"></div>
+          <div class="row"><label>Raw material cost (EUR/kg raw)</label><input type="text" class="num rawCostPerKg short" placeholder="e.g. 3,20"></div>
+
           <div class="row"><label>Materials</label><input type="text" class="num materialsDay" placeholder="EUR/day"></div>
           <div class="row"><label>Pack</label><input type="text" class="num packDay" placeholder="EUR/day"></div>
           <div class="row"><label>Freight</label><input type="text" class="num freightDay" placeholder="EUR/day"></div>
@@ -215,7 +217,6 @@
             <input type="text" class="num iskPerEur short" placeholder="e.g. 153,50" aria-describedby="fxC-help-isk">
           </div>
           <div id="fxC-help-isk" class="small">1 € = this many ISK (used to convert ISK monthly costs to EUR/day).</div>
-          <div class="row"><label>Price (EUR/kg)</label><input type="text" class="num pricePerKg short" placeholder="e.g. 6,90"></div>
 
           <div class="row"><label>DV hours (daytime)</label><input type="text" class="num dvHours short" placeholder="e.g. 120"></div>
           <div class="row"><label>YV hours (overtime)</label><input type="text" class="num yvHours short" placeholder="e.g. 20"></div>
@@ -227,13 +228,14 @@
 
       <div class="split">
         <div>
-          <div class="row"><label>Raw used kg</label><input type="text" class="num rawKg" placeholder="e.g. 1.500"></div>
+          <div class="row"><label>Net saleable kg</label><input type="text" class="num netKg" placeholder="e.g. 1.000"></div>
           <div class="row"><label>Yield %</label><input type="text" class="num yieldPct" placeholder="e.g. 63,5"></div>
-          <div class="row"><label>Net saleable kg</label><input type="text" class="num netKg" placeholder="auto if set"></div>
+          <div class="row"><label>Raw used kg</label><input type="text" class="num rawKg" placeholder="auto from net & yield (or enter)"></div>
         </div>
         <div>
-          <div class="row"><label>Labor — operators</label><input type="text" class="num laborOps" placeholder="EUR/day"></div>
-          <div class="row"><label>Labor — supervisors</label><input type="text" class="num laborSup" placeholder="EUR/day"></div>
+          <div class="row"><label>Price (EUR/kg)</label><input type="text" class="num pricePerKg short" placeholder="e.g. 6,90"></div>
+          <div class="row"><label>Raw material cost (EUR/kg raw)</label><input type="text" class="num rawCostPerKg short" placeholder="e.g. 3,20"></div>
+
           <div class="row"><label>Materials</label><input type="text" class="num materialsDay" placeholder="EUR/day"></div>
           <div class="row"><label>Pack</label><input type="text" class="num packDay" placeholder="EUR/day"></div>
           <div class="row"><label>Freight</label><input type="text" class="num freightDay" placeholder="EUR/day"></div>
@@ -322,9 +324,10 @@ function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(
 /* ===== URL sync (A_, B_, C_) ===== */
 const FACTORIES=['A','B','C'];
 const FIELD_KEYS = [
-  'month','workingDays','iskPerEur','pricePerKg',
-  'dvHours','yvHours',           // removed dvRateISK, yvRateISK
-  'rawKg','yieldPct','netKg','laborOps','laborSup',
+  'month','workingDays','iskPerEur',
+  'dvHours','yvHours',
+  'netKg','yieldPct','rawKg',
+  'pricePerKg','rawCostPerKg',
   'materialsDay','packDay','freightDay','deprDay'
 ];
 let urlUpdateQueued=false;
@@ -389,14 +392,16 @@ class FactoryPane{
     const q = sel => this.root.querySelector(sel);
     this.refs = {
       month:q('.month'), workingDays:q('.workingDays'),
-      iskPerEur:q('.iskPerEur'), pricePerKg:q('.pricePerKg'),
-      dvHours:q('.dvHours'),
-      yvHours:q('.yvHours'), 
+      iskPerEur:q('.iskPerEur'),
+      dvHours:q('.dvHours'), yvHours:q('.yvHours'),
       laborFromHoursDay:q('.laborFromHoursDay'),
-      rawKg:q('.rawKg'), yieldPct:q('.yieldPct'), netKg:q('.netKg'),
-      laborOps:q('.laborOps'), laborSup:q('.laborSup'),
+      // production block
+      netKg:q('.netKg'), yieldPct:q('.yieldPct'), rawKg:q('.rawKg'),
+      pricePerKg:q('.pricePerKg'), rawCostPerKg:q('.rawCostPerKg'),
+      // other day costs
       materialsDay:q('.materialsDay'), packDay:q('.packDay'),
       freightDay:q('.freightDay'), deprDay:q('.deprDay'),
+      // fixed + totals
       yr:q('.yr'), fcIskDay:q('.fcIskDay'), fcEurDay:q('.fcEurDay'), fcTotalDay:q('.fcTotalDay'),
       kn_revenue:q('.kn_revenue'), kn_totalCost:q('.kn_totalCost'), kn_profit:q('.kn_profit'),
       kn_margin:q('.kn_margin'), kn_profitPerKg:q('.kn_profitPerKg'),
@@ -514,51 +519,51 @@ class FactoryPane{
     return { iskDay, eurDay, total };
   }
 
-  // NEW: calculate labor from hours in ISK/day, return both ISK and EUR/day
+  // Labor from hours – convert ISK to EUR/day
   laborFromHoursCosts(){
     const dvH = toNumber(this.refs.dvHours.value) || 0;
-const yvH = toNumber(this.refs.yvHours.value) || 0;
+    const yvH = toNumber(this.refs.yvHours.value) || 0;
+    const { dvRateISK, yvRateISK } = fixedMonthlyTotals();
+    const dvR = Number.isFinite(dvRateISK) ? dvRateISK : 0;
+    const yvR = Number.isFinite(yvRateISK) ? yvRateISK : 0;
+    const fx  = toNumber(this.refs.iskPerEur.value) || 0;
 
-const { dvRateISK, yvRateISK } = fixedMonthlyTotals();
-const dvR = Number.isFinite(dvRateISK) ? dvRateISK : 0;  // fallback
-const yvR = Number.isFinite(yvRateISK) ? yvRateISK : 0;  // fallback
+    const iskDay = (dvH * dvR) + (yvH * yvR);
+    const eurDay = fx > 0 ? (iskDay / fx) : 0;
 
-const fx  = toNumber(this.refs.iskPerEur.value) || 0;
-
-const iskDay = (dvH * dvR) + (yvH * yvR);
-const eurDay = fx > 0 ? (iskDay / fx) : 0;
-
-this.refs.laborFromHoursDay.value = Number.isFinite(iskDay) ? fmt(iskDay) : '';
-return { iskDay, eurDay };
+    this.refs.laborFromHoursDay.value = Number.isFinite(iskDay) ? fmt(iskDay) : '';
+    return { iskDay, eurDay };
   }
 
   compute(){
-    // auto-fill netKg / yield / raw if two of three known
-    const raw=toNumber(this.refs.rawKg.value);
-    const y=toNumber(this.refs.yieldPct.value);
+    // Two-of-three: net, yield, raw
     const net=toNumber(this.refs.netKg.value);
-    let r=raw, yy=y, n=net;
-    if(!Number.isFinite(n) && Number.isFinite(r) && Number.isFinite(yy)){ n=r*(yy/100); this.refs.netKg.value=fmt(n); }
-    else if(!Number.isFinite(r) && Number.isFinite(n) && Number.isFinite(yy) && yy!==0){ r=n/(yy/100); this.refs.rawKg.value=fmt(r); }
+    const y=toNumber(this.refs.yieldPct.value);
+    const raw=toNumber(this.refs.rawKg.value);
+    let n=net, yy=y, r=raw;
+
+    if(!Number.isFinite(r) && Number.isFinite(n) && Number.isFinite(yy) && yy!==0){ r=n/(yy/100); this.refs.rawKg.value=fmt(r); }
+    else if(!Number.isFinite(n) && Number.isFinite(r) && Number.isFinite(yy)){ n=r*(yy/100); this.refs.netKg.value=fmt(n); }
     else if(!Number.isFinite(yy) && Number.isFinite(n) && Number.isFinite(r) && r!==0){ yy=(n/r)*100; this.refs.yieldPct.value=fmt(yy); }
 
     const price=toNumber(this.refs.pricePerKg.value);
-    const { total: fixedDay }=this.fixedPerDay();
+    const rawCostPerKg=toNumber(this.refs.rawCostPerKg.value);
+    const rawCostDay = (Number.isFinite(r) && Number.isFinite(rawCostPerKg)) ? (r * rawCostPerKg) : 0;
 
-    // NEW: labor from hours (show ISK/day, use EUR/day in totals)
+    const { total: fixedDay }=this.fixedPerDay();
     const { eurDay: laborHoursEUR } = this.laborFromHoursCosts();
 
     const parts=[
-      toNumber(this.refs.laborOps.value)||0,
-      toNumber(this.refs.laborSup.value)||0,
+      rawCostDay || 0,                        // NEW: raw material day cost
       toNumber(this.refs.materialsDay.value)||0,
       toNumber(this.refs.packDay.value)||0,
       toNumber(this.refs.freightDay.value)||0,
       toNumber(this.refs.deprDay.value)||0,
-      laborHoursEUR||0,         // include labor from hours (EUR/day)
+      laborHoursEUR||0,
       fixedDay||0
     ];
     const dayCost=parts.reduce((a,b)=>a+b,0);
+
     const revenue=(Number.isFinite(n) && Number.isFinite(price)) ? (n*price) : NaN;
     const profit=(Number.isFinite(revenue) ? (revenue-dayCost) : NaN);
     const margin=(Number.isFinite(revenue) && revenue!==0) ? (profit/revenue*100) : NaN;
