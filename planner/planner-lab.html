@@ -357,7 +357,7 @@ function fmt(n,dec){
 }
 
 function fmtInt(n){
-  if (!Number.isFinite(n)) return '';
+  if (!Number.isFinite(n)) return '–';
   return new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 0 }).format(n);
 }
 
