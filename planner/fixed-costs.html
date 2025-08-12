@@ -486,6 +486,8 @@ function wireButtons(){
 
 function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; }
 
+window.addEventListener('beforeunload', saveAll);
+  
 document.addEventListener('DOMContentLoaded', ()=>{
   loadAll();
   recalcAll();
