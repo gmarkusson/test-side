@@ -449,19 +449,25 @@ function wireButtons(){
 
   // Globals formatting & save
   ['iskPerEur','workingDays','dvRateISK','yvRateISK'].forEach(id=>{
-    const el = document.getElementById(id);
-    el.addEventListener('focus', ()=>{ const n = toNumber(el.value); if (Number.isFinite(n)) el.value = String(n); });
-    el.addEventListener('blur', ()=>{
-      const n = toNumber(el.value);
-      if (!Number.isFinite(n)) { el.value=''; saveAll(); return; }
-      if (id==='workingDays') el.value = fmt(n,0);
-      else if (id==='iskPerEur') el.value = fmt(n,2);
-      else el.value = fmt(n); // rates
-      saveAll();
-      recalcAll();
-    });
-    el.addEventListener('input', debounce(()=>{ saveAll(); recalcAll(); },300));
+  const el = document.getElementById(id);
+  el.addEventListener('focus', ()=>{ const n = toNumber(el.value); if (Number.isFinite(n)) el.value = String(n); });
+  el.addEventListener('blur', ()=>{
+    const n = toNumber(el.value);
+    if (!Number.isFinite(n)) { el.value=''; saveAll(); return; }
+
+    if (id==='workingDays') {
+      el.value = new Intl.NumberFormat(LOCALE, { maximumFractionDigits:0, useGrouping:false }).format(n);
+    } else if (id==='iskPerEur') {
+      el.value = new Intl.NumberFormat(LOCALE, { minimumFractionDigits:2, maximumFractionDigits:2 }).format(n);
+    } else if (id==='dvRateISK' || id==='yvRateISK') {
+      // rates: integers, no grouping so “6200” stays “6200”
+      el.value = new Intl.NumberFormat(LOCALE, { maximumFractionDigits:0, useGrouping:false }).format(n);
+    }
+    saveAll();
+    recalcAll();
   });
+  el.addEventListener('input', debounce(()=>{ saveAll(); recalcAll(); },300));
+});
 }
 
 function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; }
