@@ -517,15 +517,19 @@ class FactoryPane{
   // NEW: calculate labor from hours in ISK/day, return both ISK and EUR/day
   laborFromHoursCosts(){
     const dvH = toNumber(this.refs.dvHours.value) || 0;
-    const yvH = toNumber(this.refs.yvHours.value) || 0;
-    const { dvRateISK: dvR, yvRateISK: yvR } = fixedMonthlyTotals(); // pulled from fixed-costs.html
-    const fx  = toNumber(this.refs.iskPerEur.value) || 0;  // ISK per EUR
+const yvH = toNumber(this.refs.yvHours.value) || 0;
 
-    const iskDay = (dvH * dvR) + (yvH * yvR);
-    const eurDay = fx > 0 ? (iskDay / fx) : 0;
+const { dvRateISK, yvRateISK } = fixedMonthlyTotals();
+const dvR = Number.isFinite(dvRateISK) ? dvRateISK : 0;  // fallback
+const yvR = Number.isFinite(yvRateISK) ? yvRateISK : 0;  // fallback
 
-    this.refs.laborFromHoursDay.value = Number.isFinite(iskDay) ? fmt(iskDay) : '';
-    return { iskDay, eurDay };
+const fx  = toNumber(this.refs.iskPerEur.value) || 0;
+
+const iskDay = (dvH * dvR) + (yvH * yvR);
+const eurDay = fx > 0 ? (iskDay / fx) : 0;
+
+this.refs.laborFromHoursDay.value = Number.isFinite(iskDay) ? fmt(iskDay) : '';
+return { iskDay, eurDay };
   }
 
   compute(){
