@@ -474,25 +474,29 @@ class FactoryPane{
     return days;
   }
 
-  wireFormatting(){
-    // don't attach formatting to readonly computed fields
-    this.root.querySelectorAll('input.num:not(.readonly)').forEach(inp=>{
-      inp.addEventListener('focus', ()=>{
-        const n=toNumber(inp.value);
-        if(Number.isFinite(n)){
-          if(inp.classList.contains('num-int')) inp.value=String(Math.trunc(n));
-          else inp.value=String(n).replace(/(?<=\d)\.0+$/,'');
-        }
-      });
-      inp.addEventListener('blur', ()=>{
-        const n=toNumber(inp.value);
-        const isInt=inp.classList.contains('num-int');
-        inp.value=Number.isFinite(n)?fmt(n,isInt?0:undefined):'';
-        scheduleURLUpdate(); this.compute();
-      });
-      inp.addEventListener('input', debounce(()=>{ scheduleURLUpdate(); this.compute(); },250));
+ wireFormatting(){
+  // don't attach formatting to readonly computed fields
+  this.root.querySelectorAll('input.num:not(.readonly)').forEach(inp=>{
+    inp.addEventListener('focus', ()=>{
+      const n=toNumber(inp.value);
+      if(Number.isFinite(n)){
+        if(inp.classList.contains('num-int')) inp.value=String(Math.trunc(n));
+        else inp.value=String(n).replace(/(?<=\d)\.0+$/,'');
+      }
     });
-  }
+    inp.addEventListener('blur', ()=>{
+      const n=toNumber(inp.value);
+      const isYield = inp.classList.contains('yieldPct');
+      const isInt=inp.classList.contains('num-int');
+      // Yield always 2 decimals on blur; others: int->0, else adaptive
+      inp.value=Number.isFinite(n)?fmt(n, isYield ? 2 : (isInt?0:undefined)):'';
+      scheduleURLUpdate();
+      this.compute();
+    });
+    inp.addEventListener('input', debounce(()=>{ scheduleURLUpdate(); this.compute(); },250));
+  });
+}
+
 
   wireLogic(){
     const updateSelectedMonth = () => {
