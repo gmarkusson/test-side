@@ -331,7 +331,7 @@ let urlUpdateQueued=false;
 function readParams(){ return new URLSearchParams(location.search); }
 function setParamsFromDOM(){
   const sp=new URLSearchParams(), current=readParams();
-  const carry=['fp_housingCost','fp_equipCost','fp_adminCost','fp_maintEurMonth','fp_rentalsEurMonth','fp_sparesEurMonth','fp_electricityEurMonth','fp_waterEurMonth','fp_otherEurMonth','fp_iskPerEur','fp_workingDays'];
+  const carry=['fp_housingCost','fp_equipCost','fp_adminCost','fp_maintEurMonth','fp_rentalsEurMonth','fp_sparesEurMonth','fp_electricityEurMonth','fp_waterEurMonth','fp_otherEurMonth','fp_iskPerEur','fp_workingDays','fp_dvRateISK','fp_yvRateISK'];
   carry.forEach(k=>{ if(current.get(k)!=null) sp.set(k, current.get(k)); });
   for (const f of FACTORIES){
     const root=document.getElementById('fx'+f);
